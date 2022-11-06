@@ -20,4 +20,8 @@ public class Post extends BasicTime {
     private String description;
 
     private int liked;
+
+    public void setPostType(PostType postType) {
+        this.postType = postType;
+    }
 }
