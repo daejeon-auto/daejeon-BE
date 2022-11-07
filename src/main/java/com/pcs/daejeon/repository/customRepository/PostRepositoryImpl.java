@@ -10,10 +10,11 @@ import org.springframework.data.domain.Pageable;
 import static com.pcs.daejeon.entity.QPost.*;
 
 @RequiredArgsConstructor
-public class PostRepositoryImpl {
+public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory query;
 
+    @Override
     public QueryResults<Post> pagingPost(Pageable page) {
 
         return query
