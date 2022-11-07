@@ -1,11 +1,12 @@
 package com.pcs.daejeon.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Setter
+@Getter
 public class PostDto {
 
     private Long postId;
