@@ -2,6 +2,7 @@ package com.pcs.daejeon.repository.customRepository;
 
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.repository.PostRepository;
+import com.pcs.daejeon.service.PostService;
 import com.querydsl.core.QueryResults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,9 @@ class PostRepositoryImplTest {
     @Autowired
     PostRepository postRepository;
 
+    @Autowired
+    PostService postService;
+
     @BeforeEach
     public void testDataInsert() {
         for (int i = 1; i <= 30; i++) {
@@ -44,5 +48,14 @@ class PostRepositoryImplTest {
 
         assertThat(postPage.getTotal()).isEqualTo(30);
         assertThat(postPage.getLimit()).isEqualTo(20);
+    }
+
+    @Test
+    public void write() {
+        Long postId = postService.writePost("this is test value");
+
+        Post postById = postService.findPostById(postId);
+
+        assertThat(postById.getDescription()).isEqualTo("this is test value");
     }
 }
