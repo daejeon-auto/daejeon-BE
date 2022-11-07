@@ -28,7 +28,7 @@ class PostRepositoryImplTest {
 
     @BeforeEach
     public void testDataInsert() {
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= 30; i++) {
             em.persist(new Post("Test.dev" + i));
         }
     }
@@ -38,7 +38,10 @@ class PostRepositoryImplTest {
         Pageable page = PageRequest.of(1, 20);
         QueryResults<Post> postPage = postRepository.pagingPost(page);
 
-        assertThat(postPage.getResults().get(19).getDescription()).isEqualTo("Test.dev80");
+        for (Post result : postPage.getResults()) {
+            System.out.println("result = " + result.getDescription());
+        }
+
         assertThat(postPage.getTotal()).isEqualTo(100);
         assertThat(postPage.getLimit()).isEqualTo(20);
     }
