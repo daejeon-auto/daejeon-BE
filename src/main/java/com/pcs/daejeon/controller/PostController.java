@@ -25,7 +25,7 @@ public class PostController {
 
     @GetMapping("/posts")
     public Result getPostPage(@PageableDefault(size = 20) Pageable pageable) {
-        QueryResults<Post> post = postService.getPost(pageable);
+        QueryResults<Post> post = postService.findPagedPost(pageable);
         Stream<PostDto> postDto = post.getResults()
                 .stream()
                 .map(o -> new PostDto(

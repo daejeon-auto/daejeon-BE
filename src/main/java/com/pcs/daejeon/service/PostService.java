@@ -16,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,7 +26,7 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    public Long writePost(String description) throws MalformedURLException {
+    public Long writePost(String description) {
 //        boolean isOk = isBadDesc(description);
 //        if (!isOk) {
 //            throw new IllegalStateException("bad words");
@@ -45,10 +44,7 @@ public class PostService {
         ResponseEntity<Map> resultMap = callValidDescApi(description);
 
         if (!resultMap.getStatusCode().is2xxSuccessful()) {
-            if (Objects.requireNonNull(resultMap.getBody()).toString() == "욕") {
-                return true;
-            }
-            return false;
+            return Objects.requireNonNull(resultMap.getBody()).toString() == "욕";
         } else {
             throw new IllegalStateException("no response for valid description");
         }
@@ -82,27 +78,26 @@ public class PostService {
 
 
     public void rejectPost(Long postId) {
-        Post post = getPost(postId);
+        Post post = findPostById(postId);
 
         post.setPostType(PostType.REJECTED);
     }
 
     public void acceptPost(Long postId) {
-        Post post = getPost(postId);
+        Post post = findPostById(postId);
 
         post.setPostType(PostType.ACCEPTED);
     }
 
-    public QueryResults<Post> getPost(Pageable page) {
+    public QueryResults<Post> findPagedPost(Pageable page) {
         return postRepository.pagingPost(page);
     }
 
-    private Post getPost(Long postId) {
+    public Post findPostById(Long postId) {
         Optional<Post> findPost = postRepository.findById(postId);
         if (findPost.isEmpty()) {
             throw new IllegalStateException("not found post");
         }
-        Post post = findPost.get();
-        return post;
+        return findPost.get();
     }
 }
