@@ -5,28 +5,18 @@ import com.pcs.daejeon.entity.PostType;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.HttpRetryException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,25 +27,57 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    public String writePost(String description) throws MalformedURLException {
+    public Long writePost(String description) throws MalformedURLException {
+//        boolean isOk = isBadDesc(description);
+//        if (!isOk) {
+//            throw new IllegalStateException("bad words");
+//        }
+        Post save = postRepository.save(new Post(description));
+        return save.getId();
+    }
+
+    /**
+     *  check is it bad words in description
+     * @return 욕 == true || 욕 아님 == false
+     */
+    private boolean isBadDesc(String description) {
+
+        ResponseEntity<Map> resultMap = callValidDescApi(description);
+
+        if (!resultMap.getStatusCode().is2xxSuccessful()) {
+            if (Objects.requireNonNull(resultMap.getBody()).toString() == "욕") {
+                return true;
+            }
+            return false;
+        } else {
+            throw new IllegalStateException("no response for valid description");
+        }
+    }
+
+    /**
+     * api 관련 부분
+     * @param description
+     * @return
+     */
+    private static ResponseEntity<Map> callValidDescApi(String description) {
+
         try {
             RestTemplate restTemplate = new RestTemplate();
+
             HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("text", description);
+
             HttpEntity<?> entity = new HttpEntity<>(headers);
             UriComponents uri = UriComponentsBuilder.fromHttpUrl("localhost:5000/chk").build();
 
             ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.POST, entity, Map.class);
-
-            Map body = null;
-
-            if (!resultMap.getStatusCode().is2xxSuccessful()) {
-                return Objects.requireNonNull(resultMap.getBody()).toString();
-            }
-        } catch (HttpClientErrorException |HttpServerErrorException e) {
-            return "api server error";
+            return resultMap;
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new IllegalStateException("description valid api server error");
         }
-
-        return null;
     }
 
 
