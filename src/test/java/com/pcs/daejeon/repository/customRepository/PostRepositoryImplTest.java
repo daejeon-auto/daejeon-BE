@@ -42,7 +42,7 @@ class PostRepositoryImplTest {
             System.out.println("result = " + result.getDescription());
         }
 
-        assertThat(postPage.getTotal()).isEqualTo(100);
+        assertThat(postPage.getTotal()).isEqualTo(30);
         assertThat(postPage.getLimit()).isEqualTo(20);
     }
 }
