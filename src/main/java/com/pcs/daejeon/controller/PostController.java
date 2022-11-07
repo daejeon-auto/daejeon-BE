@@ -8,7 +8,11 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.MalformedURLException;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +26,15 @@ public class PostController {
         Result<Post> postResult = new Result(post);
 
         return postResult;
+    }
+
+    @PostMapping("/post/write")
+    public Result writePost(@RequestBody Post post) throws MalformedURLException {
+        // TODO: is login
+
+        String s = postService.writePost(post.getDescription());
+
+        return new Result("success");
     }
 
     @Data
