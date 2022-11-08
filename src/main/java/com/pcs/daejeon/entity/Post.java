@@ -34,4 +34,9 @@ public class Post extends BasicTime {
     public Post(String description) {
         this.description = description;
     }
+
+    @PrePersist
+    public void prePersist() {
+        this.postType = PostType.ACCEPTED;
+    }
 }
