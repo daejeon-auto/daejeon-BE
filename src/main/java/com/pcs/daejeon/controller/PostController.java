@@ -9,10 +9,9 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
 import java.util.stream.Stream;
@@ -24,7 +23,7 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/posts")
-    public Result getPostPage(@PageableDefault(size = 20) Pageable pageable) {
+    public Result<Post> getPostPage(@PageableDefault(size = 20) Pageable pageable) {
         QueryResults<Post> post = postService.findPagedPost(pageable);
         Stream<PostDto> postDto = post.getResults()
                 .stream()
@@ -39,12 +38,33 @@ public class PostController {
     }
 
     @PostMapping("/post/write")
-    public Result writePost(@RequestBody Post post) throws MalformedURLException {
+    public Result<String> writePost(@RequestBody Post post) throws MalformedURLException {
         // TODO: is login
 
         Long postId = postService.writePost(post.getDescription());
 
-        return new Result("success");
+        return new Result<>("success");
+    }
+
+    @PostMapping("/post/accept/{id}")
+    public ResponseEntity<Result<String>> acceptPost(@PathVariable("id") Long id) {
+        try {
+            postService.acceptPost(id);
+
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.ACCEPTED);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<Result<String>>(new Result<>("error on api server"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/post/reject/{id}")
+    public ResponseEntity<Result<String>> rejectedPost(@PathVariable("id") Long id) {
+        try {
+            postService.rejectPost(id);
+
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.ACCEPTED);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<Result<String>>(new Result<>("error on api server"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Data
