@@ -1,6 +1,7 @@
 package com.pcs.daejeon.repository.customRepository;
 
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.PostType;
 import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         return query
                 .selectFrom(post)
+                .where(post.postType.eq(PostType.ACCEPTED))
                 .orderBy(post.createdDate.desc())
                 .offset(page.getOffset())
                 .limit(20)
