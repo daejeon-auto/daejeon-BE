@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
 @Getter
 public class Post extends BasicTime {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
     private Long id;
 
