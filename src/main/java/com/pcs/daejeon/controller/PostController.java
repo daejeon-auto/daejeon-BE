@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.stream.Stream;
 
 @RestController
@@ -29,12 +31,16 @@ public class PostController {
         QueryResults<Post> post = postService.findPagedPost(pageable);
         Stream<PostDto> postDto = post.getResults()
                 .stream()
-                .map(o -> new PostDto(
-                        o.getId(),
-                        o.getDescription(),
-                        o.getCreatedDate(),
-                        o.getLiked()
-                ));
+                .map(o -> {
+                    ZoneId seoulId = ZoneId.of("Asia/Seoul");
+                    ZonedDateTime seoulTime = o.getCreatedDate().atZone(seoulId);
+                    return new PostDto(
+                            o.getId(),
+                            o.getDescription(),
+                            seoulTime,
+                            o.getLiked()
+                    );
+                });
         Result<Post> postResult = new Result(postDto);
 
         return postResult;
