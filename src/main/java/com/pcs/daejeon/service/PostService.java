@@ -102,4 +102,34 @@ public class PostService {
         }
         return findPost.get();
     }
+
+    public void addLike(Long postId) {
+        Optional<Post> post = postRepository.findById(postId);
+        if (post.isEmpty()) {
+            throw new IllegalArgumentException("post not found");
+        }
+
+        int likedCount = post.get().addLiked();
+
+        if (likedCount == 3) {
+            uploadInstagram(post.get().getDescription());
+        }
+    }
+
+    public void uploadInstagram(String description) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<?> entity = new HttpEntity<>(headers);
+            UriComponents uri = UriComponentsBuilder.fromHttpUrl("https://api.imgbun.com/png?key=619da368dc3f53a8d00e8a39667cc860&text="+ description +"&color=FFFFFF&size=20").build();
+
+            ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new IllegalStateException("convert api error");
+        }
+    }
 }

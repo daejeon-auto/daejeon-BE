@@ -27,8 +27,9 @@ public class Post extends BasicTime {
         this.postType = postType;
     }
 
-    public void addLiked() {
+    public int addLiked() {
         this.liked++;
+        return this.liked;
     }
 
     public Post(String description) {

@@ -51,7 +51,7 @@ public class PostController {
         try {
             postService.acceptPost(id);
 
-            return new ResponseEntity<>(new Result<>("success"), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
             return new ResponseEntity<Result<String>>(new Result<>("error on api server"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -61,9 +61,21 @@ public class PostController {
         try {
             postService.rejectPost(id);
 
-            return new ResponseEntity<>(new Result<>("success"), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
             return new ResponseEntity<Result<String>>(new Result<>("error on api server"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/post/like/add/{id}")
+    public ResponseEntity<Result> addLiked(@PathVariable("id") Long id) {
+
+        try {
+            postService.addLike(id);
+
+            return new ResponseEntity<>(new Result("success"), HttpStatus.OK);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return new ResponseEntity<>(new Result("server error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
