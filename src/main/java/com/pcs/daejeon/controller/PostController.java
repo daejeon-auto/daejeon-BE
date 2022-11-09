@@ -41,12 +41,16 @@ public class PostController {
     }
 
     @PostMapping("/post/write")
-    public Result<String> writePost(@RequestBody Post post) throws MalformedURLException {
+    public ResponseEntity<Result<String>> writePost(@RequestBody Post post) throws MalformedURLException {
         // TODO: is login
 
-        Long postId = postService.writePost(post.getDescription());
+        try {
+            Long postId = postService.writePost(post.getDescription());
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
+        }
 
-        return new Result<>("success");
+        return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
     }
 
     @PostMapping("/post/accept/{id}")
@@ -56,7 +60,7 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            return new ResponseEntity<Result<String>>(new Result<>("error on api server"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<Result<String>>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PostMapping("/post/reject/{id}")
@@ -66,7 +70,7 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            return new ResponseEntity<Result<String>>(new Result<>("error on api server"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<Result<String>>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -79,7 +83,7 @@ public class PostController {
             return new ResponseEntity<>(new Result("success"), HttpStatus.OK);
         } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println("e = " + e);
-            return new ResponseEntity<>(new Result("server error"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Result("server error", true), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -89,5 +93,11 @@ public class PostController {
     @AllArgsConstructor
     static class Result<T> {
         private T data;
+        private boolean hasError;
+
+        public Result(T data) {
+            this.data = data;
+            this.hasError = false;
+        }
     }
 }

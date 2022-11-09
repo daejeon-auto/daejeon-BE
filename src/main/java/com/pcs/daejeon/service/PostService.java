@@ -45,35 +45,21 @@ public class PostService {
 //    private final IGClient client;
 
     public Long writePost(String description) {
-//        boolean isOk = isBadDesc(description);
-//        if (!isOk) {
-//            throw new IllegalStateException("bad words");
-//        }
+        boolean isOk = isBadDesc(description);
+        if (!isOk) {
+            throw new IllegalArgumentException("bad words");
+        }
+
         Post save = postRepository.save(new Post(description));
         return save.getId();
     }
 
     /**
-     *  check is it bad words in description
-     * @return 욕 == true || 욕 아님 == false
-     */
-    private boolean isBadDesc(String description) {
-
-        ResponseEntity<Map> resultMap = callValidDescApi(description);
-
-        if (!resultMap.getStatusCode().is2xxSuccessful()) {
-            return Objects.requireNonNull(resultMap.getBody()).toString() == "욕";
-        } else {
-            throw new IllegalStateException("no response for valid description");
-        }
-    }
-
-    /**
-     * api 관련 부분
+     * check is description has bad words
      * @param description
      * @return
      */
-    private static ResponseEntity<Map> callValidDescApi(String description) {
+    private static boolean isBadDesc(String description) {
 
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -81,14 +67,27 @@ public class PostService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-            body.add("text", description);
-
             HttpEntity<?> entity = new HttpEntity<>(headers);
-            UriComponents uri = UriComponentsBuilder.fromHttpUrl("localhost:5000/chk").build();
+            UriComponents uri = UriComponentsBuilder.fromHttpUrl("https://spocjaxkrk.execute-api.ap-northeast-2.amazonaws.com/v1/detect?comment=" + description).build();
 
-            ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.POST, entity, Map.class);
-            return resultMap;
+            ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
+            if (
+                resultMap.hasBody() ||
+                resultMap.getBody().get("abuse") == "1" ||
+                resultMap.getBody().get("age") == "1" ||
+                resultMap.getBody().get("binan") == "1" ||
+                resultMap.getBody().get("gender") == "1" ||
+                resultMap.getBody().get("hansome") == "1" ||
+                resultMap.getBody().get("harassment") == "1" ||
+                resultMap.getBody().get("native") == "1" ||
+                resultMap.getBody().get("poli") == "1" ||
+                resultMap.getBody().get("race") == "1" ||
+                resultMap.getBody().get("religion") == "1"
+            ) {
+                return false;
+            }
+
+            return true;
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new IllegalStateException("description valid api server error");
         }
