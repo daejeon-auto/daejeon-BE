@@ -76,6 +76,7 @@ public class PostController {
 
             return new ResponseEntity<>(new Result("success"), HttpStatus.OK);
         } catch (IllegalStateException | IllegalArgumentException e) {
+            System.out.println("e = " + e);
             return new ResponseEntity<>(new Result("server error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

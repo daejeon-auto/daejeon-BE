@@ -1,5 +1,5 @@
 spring:
-#  datasource:
+  #  datasource:
 #    driver-class-name: org.postgresql.Driver
 #    url: jdbc:postgresql:tcp://localhost/querydsl
 #    username: sa
@@ -17,3 +17,16 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
 # org.hibernate.type: trace
+server:
+  port: 8888
+  servlet:
+    session:
+      timeout: 30
+  ssl:
+    enabled: true
+    key-alias: ayokeystore
+    key-store: ayokeystore.pkcs12
+    key-store-password: '123456'
+    key-password: '123456'
+    trust-store: ayotrust.pkcs12
+    trust-store-password: '123456'
