@@ -136,20 +136,16 @@ public class PostService {
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             HttpEntity<?> entity = new HttpEntity<>(headers);
-            UriComponents uri = UriComponentsBuilder.fromHttpUrl("https://api.imgbun.com/png?key=619da368dc3f53a8d00e8a39667cc860&text="+ description +"&color=FFFFFF&size=20").build();
+            UriComponents uri = UriComponentsBuilder.fromHttpUrl("https://api.imgbun.com/png?key=619da368dc3f53a8d00e8a39667cc860&text="+ description +"&color=000000&size=20").build();
 
             ResponseEntity<Map> response = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
+            Object link = Objects.requireNonNull(response.getBody()).get("direct_link");
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-            ApiResponseDto dto = objectMapper.readValue((JsonParser) response.getBody(), ApiResponseDto.class);
-
-            uploadImage(dto.getUrl());
-
+            uploadImage(link.toString());
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new IllegalStateException("convert api error");
         } catch (IOException | URISyntaxException e) {
-            throw new IllegalArgumentException("upload error");
+            throw new RuntimeException(e);
         }
     }
 
