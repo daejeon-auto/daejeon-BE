@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.stream.Stream;
 
 @RestController
@@ -78,6 +80,8 @@ public class PostController {
         } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println("e = " + e);
             return new ResponseEntity<>(new Result("server error"), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -24,12 +24,14 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,7 +42,7 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final IGClient client;
+//    private final IGClient client;
 
     public Long writePost(String description) {
 //        boolean isOk = isBadDesc(description);
@@ -117,7 +119,7 @@ public class PostService {
         return findPost.get();
     }
 
-    public void addLike(Long postId) {
+    public void addLike(Long postId) throws IOException, URISyntaxException {
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
             throw new IllegalArgumentException("post not found");
@@ -125,40 +127,47 @@ public class PostService {
 
         int likedCount = post.get().addLiked();
 
-        if (likedCount == 3) {
-            uploadInstagram(post.get().getDescription());
+        if (likedCount == 1) {
+            drawImage(post.get().getDescription());
         }
     }
 
-    public void textToImage(String description) {
+    private void drawImage(String description) throws IOException, URISyntaxException {
         try {
-            RestTemplate restTemplate = new RestTemplate();
+            StringBuffer text = new StringBuffer(description);
+            for (int i = 0; i < description.length(); i++) {
+                if ((i % 11) == 0) {
+                    text.insert(i, "\n");
+                }
+            }
+            System.out.println(text);
+            String [] lines = String.valueOf(text).split("\n");
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = img.createGraphics();
+            Font font = new Font("Nanum", Font.PLAIN, 40);
+            g2d.setFont(font);
+            FontMetrics fm = g2d.getFontMetrics();
+            int width = fm.stringWidth(String.valueOf(text.toString()));
 
-            HttpEntity<?> entity = new HttpEntity<>(headers);
-            UriComponents uri = UriComponentsBuilder.fromHttpUrl("https://api.imgbun.com/jpg?key=619da368dc3f53a8d00e8a39667cc860&size=40&text="+ description +"&color=000000").build();
+            img = new BufferedImage(width, fm.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            g2d = img.createGraphics();
+            int lineHeight = g2d.getFontMetrics().getHeight();
+            for(int lineCount = 0; lineCount < lines.length; lineCount++){ //lines from above
+                int xPos = 100;
+                int yPos = 100 + lineCount * lineHeight;
+                String line = lines[lineCount];
+                g2d.drawString(line, xPos, yPos);
+            }
+            g2d.setFont(font);
+            fm = g2d.getFontMetrics();
+            g2d.setColor(Color.BLACK);
+            g2d.setBackground(Color.white);
+            g2d.dispose();
 
-            ResponseEntity<Map> response = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
-            Object link = Objects.requireNonNull(response.getBody()).get("direct_link");
+            boolean jpg = ImageIO.write(img, "png", new File(System.getProperty("user.dir")+"/src/graphic.png"));
 
-            saveImage(link.toString());
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            throw new IllegalStateException("convert api error");
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void saveImage(String imageUrl) throws IOException, URISyntaxException {
-        try {
-            URL url = new URL(imageUrl);
-            BufferedImage img = ImageIO.read(url);
-            File file = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
-            boolean write = ImageIO.write(img, "jpg", file);
-            System.out.println("write = " + write);
-            uploadToInstagram(file);
+            convertPngToJpg();
         } catch (IllegalArgumentException e) {
             System.out.println("e = " + e);
             throw e;
@@ -167,12 +176,40 @@ public class PostService {
         }
     }
 
-    private void uploadToInstagram(File file) throws IOException {
-        byte[] imgData = Files.readAllBytes(file.toPath());
-        IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
-        String id = client.sendRequest(uploadReq).join().getUpload_id();
-        IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
-                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption("👍👍"));
-        MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
+//    private void uploadToInstagram() throws IOException {
+//        File file = new File(System.getProperty("user.dir")+"/src/graphic.png");
+//        byte[] imgData = Files.readAllBytes(file.toPath());
+//        IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
+//        String id = client.sendRequest(uploadReq).join().getUpload_id();
+//        IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
+//                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption("👍👍"));
+//        MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
+//    }
+
+    private void convertPngToJpg() throws IOException {
+        Path source = Paths.get(System.getProperty("user.dir")+"/src/graphic.png");
+        Path target = Paths.get(System.getProperty("user.dir")+"/src/textImage.jpg");
+
+        BufferedImage originalImage = ImageIO.read(source.toFile());
+
+        // jpg needs BufferedImage.TYPE_INT_RGB
+        // png needs BufferedImage.TYPE_INT_ARGB
+
+        // create a blank, RGB, same width and height
+        BufferedImage newBufferedImage = new BufferedImage(
+                originalImage.getWidth(),
+                originalImage.getHeight(),
+                BufferedImage.TYPE_INT_RGB);
+
+        // draw a white background and puts the originalImage on it.
+        newBufferedImage.createGraphics()
+                .drawImage(originalImage,
+                        0,
+                        0,
+                        Color.WHITE,
+                        null);
+
+        // save an image
+        ImageIO.write(newBufferedImage, "jpg", target.toFile());
     }
 }
