@@ -72,7 +72,7 @@ public class PostService {
 
             ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
             if (
-                resultMap.hasBody() ||
+                !resultMap.hasBody() ||
                 resultMap.getBody().get("abuse") == "1" ||
                 resultMap.getBody().get("age") == "1" ||
                 resultMap.getBody().get("binan") == "1" ||
@@ -126,7 +126,7 @@ public class PostService {
 
         int likedCount = post.get().addLiked();
 
-        if (likedCount == 1) {
+        if (likedCount == 5) {
             drawImage(post.get().getDescription());
         }
     }
