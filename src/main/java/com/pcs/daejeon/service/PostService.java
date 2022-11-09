@@ -139,7 +139,6 @@ public class PostService {
                     text.insert(i, "\n");
                 }
             }
-            System.out.println(text);
             String [] lines = String.valueOf(text).split("\n");
 
             BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
