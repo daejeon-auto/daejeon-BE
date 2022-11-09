@@ -30,7 +30,8 @@ public class PostController {
                 .map(o -> new PostDto(
                         o.getId(),
                         o.getDescription(),
-                        o.getCreatedDate()
+                        o.getCreatedDate(),
+                        o.getLiked()
                 ));
         Result<Post> postResult = new Result(postDto);
 
