@@ -37,18 +37,18 @@ class PostRepositoryImplTest {
         }
     }
 
-    @Test
-    public void paging() {
-        Pageable page = PageRequest.of(1, 20);
-        QueryResults<Post> postPage = postRepository.pagingPost(page);
-
-        for (Post result : postPage.getResults()) {
-            System.out.println("result = " + result.getDescription());
-        }
-
-        assertThat(postPage.getTotal()).isEqualTo(30);
-        assertThat(postPage.getLimit()).isEqualTo(20);
-    }
+//    @Test
+//    public void paging() {
+//        Pageable page = PageRequest.of(1, 20);
+//        QueryResults<Post> postPage = postRepository.pagingPost(page);
+//
+//        for (Post result : postPage.getResults()) {
+//            System.out.println("result = " + result.getDescription());
+//        }
+//
+//        assertThat(postPage.getTotal()).isEqualTo(30);
+//        assertThat(postPage.getLimit()).isEqualTo(20);
+//    }
 
     @Test
     public void write() {
