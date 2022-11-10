@@ -3,6 +3,7 @@ package com.pcs.daejeon.entity;
 import lombok.Getter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -17,6 +18,7 @@ public class Post extends BasicTime {
     private PostType postType;
 
     @Size(max = 100, min = 5)
+    @NotNull
     private String description;
 
     private int liked;
