@@ -5,6 +5,7 @@ import lombok.Getter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -38,7 +39,7 @@ public class Post extends BasicTime {
         this.description = description;
     }
     public boolean validDescription() {
-        return description.isEmpty();
+        return description == null | Objects.requireNonNull(description).length() < 5;
     }
 
     @PrePersist
