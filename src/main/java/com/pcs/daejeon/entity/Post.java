@@ -37,6 +37,9 @@ public class Post extends BasicTime {
     public Post(String description) {
         this.description = description;
     }
+    public boolean validDescription() {
+        return description.isEmpty();
+    }
 
     @PrePersist
     public void prePersist() {

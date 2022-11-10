@@ -51,13 +51,14 @@ public class PostController {
     public ResponseEntity<Result<String>> writePost(@RequestBody Post post) throws MalformedURLException {
         // TODO: is login
 
+        if (post.validDescription()) {
+            return new ResponseEntity<>(new Result<>("description's length is less then 5", true), HttpStatus.BAD_REQUEST);
+        }
+
         try {
-            if (post.getDescription().isBlank()) {
-                return new ResponseEntity<>(new Result<>("no description", true), HttpStatus.BAD_REQUEST);
-            }
             Long postId = postService.writePost(post.getDescription());
-        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
         }
 
         return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
