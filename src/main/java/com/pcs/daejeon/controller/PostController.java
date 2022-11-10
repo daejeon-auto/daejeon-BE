@@ -52,6 +52,9 @@ public class PostController {
         // TODO: is login
 
         try {
+            if (post.getDescription().isEmpty()) {
+                return new ResponseEntity<>(new Result<>("no description", true), HttpStatus.BAD_REQUEST);
+            }
             Long postId = postService.writePost(post.getDescription());
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
