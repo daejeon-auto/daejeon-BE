@@ -52,7 +52,7 @@ public class PostController {
         // TODO: is login
 
         try {
-            if (post.getDescription().length() < 6) {
+            if (post.getDescription().isBlank()) {
                 return new ResponseEntity<>(new Result<>("no description", true), HttpStatus.BAD_REQUEST);
             }
             Long postId = postService.writePost(post.getDescription());
