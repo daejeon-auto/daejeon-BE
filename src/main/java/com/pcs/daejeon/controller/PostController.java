@@ -57,8 +57,8 @@ public class PostController {
 
         try {
             Long postId = postService.writePost(post.getDescription());
-            return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
         } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
