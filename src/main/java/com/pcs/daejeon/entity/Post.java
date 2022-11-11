@@ -39,7 +39,7 @@ public class Post extends BasicTime {
         this.description = description;
     }
     public boolean validDescription() {
-        return description == null | Objects.requireNonNull(description).length() < 5;
+        return description == null || Objects.requireNonNull(description).length() < 5;
     }
 
     @PrePersist
