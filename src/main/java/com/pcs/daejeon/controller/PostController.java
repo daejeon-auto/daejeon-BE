@@ -1,6 +1,7 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.dto.PostDto;
+import com.pcs.daejeon.dto.PostListDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.service.PostService;
 import com.querydsl.core.QueryResults;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.time.ZoneId;
@@ -41,7 +43,11 @@ public class PostController {
                             o.getLiked()
                     );
                 });
-        Result<Post> postResult = new Result(postDto);
+        Result<Post> postResult = new Result(new PostListDto(
+                postDto,
+                post.getTotal(),
+                (post.getTotal() / 20)
+        ));
 
         return postResult;
     }

@@ -16,12 +16,16 @@
   Path: /posts
   Method: GET
   
-  data: List [
-      postId     : long / number
-      description: string
-      created    : LocalDateTime
-      liked      : int
-  ]
+  data: {
+    postList: List [
+        postId     : long / number
+        description: string
+        created    : LocalDateTime
+        liked      : int
+    ],
+    totalPost: long,
+    totalPage: long
+  }
 
 + Write Post
     ```
