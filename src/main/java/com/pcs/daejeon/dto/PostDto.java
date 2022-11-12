@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @AllArgsConstructor
@@ -12,6 +13,6 @@ public class PostDto {
 
     private Long postId;
     private String description;
-    private ZonedDateTime created;
+    private LocalDateTime created;
     private int liked;
 }
