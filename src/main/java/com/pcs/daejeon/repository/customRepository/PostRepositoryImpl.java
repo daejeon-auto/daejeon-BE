@@ -21,7 +21,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return query
                 .selectFrom(post)
                 .where(post.postType.eq(PostType.ACCEPTED))
-                .orderBy(post.createdDate.desc())
+                .orderBy(post.id.desc())
                 .offset(page.getOffset())
                 .limit(20)
                 .fetchResults();
