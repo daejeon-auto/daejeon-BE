@@ -8,11 +8,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
@@ -38,19 +36,15 @@ public class Member {
     @Column(nullable = false)
     private String studentNumber;
 
-    @Value("0")
     @Column(nullable = false)
-    @Size(max = 3)
     private int referCodeCount;
 
-    @Value("TIER0")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoleTier role;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Value("PENDING")
     private MemberType memberType;
 
     @JsonIgnore
@@ -65,20 +59,16 @@ public class Member {
     @NotEmpty(message = "비밀번호는 필수 입력 값입니다.")
     private String password;
 
-    public Member(String name, String birthDay, String phoneNumber, String studentNumber, MemberType memberType) {
+    public Member(String name, String birthDay, String phoneNumber, String studentNumber, String password, String loginId, AuthType authType) {
         this.name = name;
         this.birthDay = birthDay;
         this.phoneNumber = phoneNumber;
         this.studentNumber = studentNumber;
-        this.memberType = memberType;
-    }
-    public Member(String name, String birthDay, String phoneNumber, String studentNumber, MemberType memberType, String password, String loginId) {
-        this.name = name;
-        this.birthDay = birthDay;
-        this.phoneNumber = phoneNumber;
-        this.studentNumber = studentNumber;
-        this.memberType = memberType;
         this.password = password;
         this.loginId = loginId;
+        this.authType = authType;
+        this.referCodeCount = 0;
+        this.role = RoleTier.TIER0;
+        this .memberType = MemberType.PENDING;
     }
 }

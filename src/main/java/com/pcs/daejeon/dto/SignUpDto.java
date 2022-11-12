@@ -1,11 +1,7 @@
 package com.pcs.daejeon.dto;
 
 import com.pcs.daejeon.entity.type.AuthType;
-import com.pcs.daejeon.entity.type.MemberType;
-import com.pcs.daejeon.entity.type.RoleTier;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -25,8 +21,6 @@ public class SignUpDto {
 
     @NotNull
     private String studentNumber;
-
-    private MemberType memberType;
 
     @NotNull
     private String pwd;

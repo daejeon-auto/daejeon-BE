@@ -26,7 +26,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 )
                 .fetchOne();
 
-        return result != 0;
+        return result == null;
     }
 
     public Member createMember(SignUpDto signUpDto, PasswordEncoder pwdEncoder) {
@@ -35,9 +35,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 signUpDto.getBirthDay(),
                 signUpDto.getPhoneNumber(),
                 signUpDto.getStudentNumber(),
-                signUpDto.getMemberType(),
                 pwdEncoder.encode(signUpDto.getPwd()),
-                signUpDto.getLoginId()
+                signUpDto.getLoginId(),
+                signUpDto.getAuthType()
         );
     }
 }
