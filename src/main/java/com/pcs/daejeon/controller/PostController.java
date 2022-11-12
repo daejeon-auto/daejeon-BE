@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.stream.Stream;
 
@@ -30,15 +31,14 @@ public class PostController {
     @GetMapping("/posts")
     public Result<Post> getPostPage(@PageableDefault(size = 20) Pageable pageable) {
         QueryResults<Post> post = postService.findPagedPost(pageable);
+        ZoneId seoulId = ZoneOffset.of("Asia/Seoul");
         Stream<PostDto> postDto = post.getResults()
                 .stream()
                 .map(o -> {
-                    ZoneId seoulId = ZoneId.of("Asia/Seoul");
-                    ZonedDateTime seoulTime = o.getCreatedDate().atZone(seoulId);
                     return new PostDto(
                             o.getId(),
                             o.getDescription(),
-                            seoulTime,
+                            o.getCreatedDate().atZone(seoulId),
                             o.getLiked()
                     );
                 });
