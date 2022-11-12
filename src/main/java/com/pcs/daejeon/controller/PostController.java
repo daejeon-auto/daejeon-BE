@@ -92,9 +92,11 @@ public class PostController {
             postService.addLike(id);
 
             return new ResponseEntity<>(new Result("success"), HttpStatus.OK);
-        } catch (IllegalStateException | IllegalArgumentException e) {
+        } catch (IllegalStateException e) {
             System.out.println("e = " + e);
             return new ResponseEntity<>(new Result("server error", true), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new Result("post not found", true), HttpStatus.NOT_FOUND);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
