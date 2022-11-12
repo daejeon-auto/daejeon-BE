@@ -10,7 +10,6 @@ import org.hibernate.annotations.ColumnDefault;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-@AllArgsConstructor
 @Getter
 public class SignUpDto {
     @NotNull
@@ -34,4 +33,14 @@ public class SignUpDto {
 
     @NotNull
     private String loginId;
+
+    public SignUpDto(String name, String birthDay, String phoneNumber, AuthType authType, String studentNumber, String pwd, String loginId) {
+        this.name = name;
+        this.birthDay = birthDay;
+        this.phoneNumber = phoneNumber;
+        this.authType = authType;
+        this.studentNumber = studentNumber;
+        this.pwd = pwd;
+        this.loginId = loginId;
+    }
 }
