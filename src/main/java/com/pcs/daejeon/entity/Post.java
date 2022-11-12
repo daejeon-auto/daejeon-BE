@@ -1,5 +1,6 @@
 package com.pcs.daejeon.entity;
 
+import com.pcs.daejeon.entity.type.PostType;
 import lombok.Getter;
 
 import javax.persistence.*;

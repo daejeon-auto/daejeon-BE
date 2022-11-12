@@ -1,7 +1,7 @@
 package com.pcs.daejeon.repository.customRepository;
 
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.PostType;
+import com.pcs.daejeon.entity.type.PostType;
 import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

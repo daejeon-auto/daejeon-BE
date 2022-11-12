@@ -1,13 +1,7 @@
 package com.pcs.daejeon.service;
 
-import com.github.instagram4j.instagram4j.IGClient;
-import com.github.instagram4j.instagram4j.requests.IGRequest;
-import com.github.instagram4j.instagram4j.requests.media.MediaConfigureTimelineRequest;
-import com.github.instagram4j.instagram4j.requests.upload.RuploadPhotoRequest;
-import com.github.instagram4j.instagram4j.responses.media.MediaResponse;
-import com.github.instagram4j.instagram4j.responses.media.RuploadPhotoResponse;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.PostType;
+import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.QueryResults;
 import gui.ava.html.image.generator.HtmlImageGenerator;
@@ -25,13 +19,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 

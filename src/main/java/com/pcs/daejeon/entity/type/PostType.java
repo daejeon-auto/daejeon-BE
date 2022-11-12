@@ -1,4 +1,4 @@
-package com.pcs.daejeon.entity;
+package com.pcs.daejeon.entity.type;
 
 public enum PostType {
     REJECTED, ACCEPTED
