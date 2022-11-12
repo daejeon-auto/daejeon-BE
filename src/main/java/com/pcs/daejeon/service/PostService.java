@@ -125,7 +125,7 @@ public class PostService {
 
         int likedCount = post.get().addLiked();
 
-        if (likedCount == 1) {
+        if (likedCount == 15) {
             drawImage(post.get().getDescription());
         }
     }
@@ -134,13 +134,13 @@ public class PostService {
         StringBuilder text = new StringBuilder(description);
         int iterCount = 0;
         for (int i = 1; i <= description.length(); i++) {
-            if ((i % 10) == 0) {
+            if ((i % 20) == 0) {
                 text.insert(i + 6 * iterCount, "<br />");
                 iterCount++;
             }
         }
 
-        String code = "<div style=\"font-size: 100px;\">"+text.toString()+"</div>";
+        String code = "<div style=\"font-family: Malgun Gothic; font-size: 70px;\">"+text.toString()+"</div>";
 
         try {
             HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
