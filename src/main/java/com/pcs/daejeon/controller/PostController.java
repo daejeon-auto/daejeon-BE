@@ -1,12 +1,11 @@
 package com.pcs.daejeon.controller;
 
+import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.dto.PostDto;
 import com.pcs.daejeon.dto.PostListDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.service.PostService;
 import com.querydsl.core.QueryResults;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,12 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.stream.Stream;
 
 @RestController
@@ -54,8 +49,6 @@ public class PostController {
 
     @PostMapping("/post/write")
     public ResponseEntity<Result<String>> writePost(@RequestBody Post post) throws MalformedURLException {
-        // TODO: is login
-
         if (post.validDescription()) {
             return new ResponseEntity<>(new Result<>("description's length is less then 5", true), HttpStatus.BAD_REQUEST);
         }
@@ -96,7 +89,7 @@ public class PostController {
         try {
             postService.addLike(id);
 
-            return new ResponseEntity<>(new Result("success"), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
             System.out.println("e = " + e);
             return new ResponseEntity<>(new Result("server error", true), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -104,18 +97,6 @@ public class PostController {
             return new ResponseEntity<>(new Result("post not found", true), HttpStatus.NOT_FOUND);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    @Data
-    @AllArgsConstructor
-    static class Result<T> {
-        private T data;
-        private boolean hasError;
-
-        public Result(T data) {
-            this.data = data;
-            this.hasError = false;
         }
     }
 }
