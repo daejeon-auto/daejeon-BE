@@ -41,7 +41,7 @@ public class PostController {
         Result<Post> postResult = new Result(new PostListDto(
                 postDto,
                 post.getTotal(),
-                (post.getTotal() / 20)
+                (post.getTotal() / 20) + 1
         ));
 
         return postResult;
