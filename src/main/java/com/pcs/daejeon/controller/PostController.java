@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class PostController {
 
     private final PostService postService;
@@ -49,6 +50,10 @@ public class PostController {
     @PostMapping("/post/write")
     public ResponseEntity<Result<String>> writePost(@RequestBody Post post) throws MalformedURLException {
         // TODO: is login
+
+        if (post.validDescription()) {
+            return new ResponseEntity<>(new Result<>("description's length is less then 5", true), HttpStatus.BAD_REQUEST);
+        }
 
         try {
             Long postId = postService.writePost(post.getDescription());

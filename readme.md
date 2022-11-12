@@ -1,6 +1,6 @@
 
 # Api
-    default-path: 
+    default-path: https://pcs-daejeon.herokuapp.com/
     
     default structure: {
         "data": String | Array,
