@@ -1,9 +1,7 @@
 package com.pcs.daejeon.repository;
 
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.repository.customRepository.PostRepositoryCustom;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import com.pcs.daejeon.repository.customPostRepository.PostRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

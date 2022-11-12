@@ -1,4 +1,4 @@
-package com.pcs.daejeon.repository.customRepository;
+package com.pcs.daejeon.repository.customPostRepository;
 
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.type.PostType;
