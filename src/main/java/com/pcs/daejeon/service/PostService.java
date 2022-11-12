@@ -10,13 +10,12 @@ import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.PostType;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.QueryResults;
+import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -32,8 +31,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -126,46 +125,29 @@ public class PostService {
 
         int likedCount = post.get().addLiked();
 
-        if (likedCount == 5) {
+        if (likedCount == 1) {
             drawImage(post.get().getDescription());
         }
     }
 
     private void drawImage(String description) throws IOException, URISyntaxException {
+        StringBuilder text = new StringBuilder(description);
+        int iterCount = 0;
+        for (int i = 1; i <= description.length(); i++) {
+            if ((i % 10) == 0) {
+                text.insert(i + 6 * iterCount, "<br />");
+                iterCount++;
+            }
+        }
+
+        String code = "<div style=\"font-size: 100px;\">"+text.toString()+"</div>";
+
         try {
-            StringBuffer text = new StringBuffer(description);
-            for (int i = 0; i < description.length(); i++) {
-                if ((i % 11) == 0) {
-                    text.insert(i, "\n");
-                }
-            }
-            String [] lines = String.valueOf(text).split("\n");
-
-            BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2d = img.createGraphics();
-            Font font = new Font("Nanum", Font.PLAIN, 40);
-            g2d.setFont(font);
-            FontMetrics fm = g2d.getFontMetrics();
-            int width = fm.stringWidth(String.valueOf(text.toString()));
-
-            img = new BufferedImage(width, fm.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            g2d = img.createGraphics();
-            int lineHeight = g2d.getFontMetrics().getHeight();
-            for(int lineCount = 0; lineCount < lines.length; lineCount++){ //lines from above
-                int xPos = 100;
-                int yPos = 100 + lineCount * lineHeight;
-                String line = lines[lineCount];
-                g2d.drawString(line, xPos, yPos);
-            }
-            g2d.setFont(font);
-            fm = g2d.getFontMetrics();
-            g2d.setColor(Color.BLACK);
-            g2d.setBackground(Color.white);
-            g2d.dispose();
-
-            boolean jpg = ImageIO.write(img, "png", new File(System.getProperty("user.dir")+"/src/graphic.png"));
-
+            HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
+            imageGenerator.loadHtml(code);
+            imageGenerator.saveAsImage(System.getProperty("user.dir")+"/src/textImage.png");
             convertPngToJpg();
+//            uploadToInstagram();
         } catch (IllegalArgumentException e) {
             System.out.println("e = " + e);
             throw e;
@@ -175,7 +157,7 @@ public class PostService {
     }
 
 //    private void uploadToInstagram() throws IOException {
-//        File file = new File(System.getProperty("user.dir")+"/src/graphic.png");
+//        File file = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
 //        byte[] imgData = Files.readAllBytes(file.toPath());
 //        IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
 //        String id = client.sendRequest(uploadReq).join().getUpload_id();
@@ -185,13 +167,10 @@ public class PostService {
 //    }
 
     private void convertPngToJpg() throws IOException {
-        Path source = Paths.get(System.getProperty("user.dir")+"/src/graphic.png");
+        Path source = Paths.get(System.getProperty("user.dir")+"/src/textImage.png");
         Path target = Paths.get(System.getProperty("user.dir")+"/src/textImage.jpg");
 
         BufferedImage originalImage = ImageIO.read(source.toFile());
-
-        // jpg needs BufferedImage.TYPE_INT_RGB
-        // png needs BufferedImage.TYPE_INT_ARGB
 
         // create a blank, RGB, same width and height
         BufferedImage newBufferedImage = new BufferedImage(
