@@ -1,6 +1,5 @@
 package com.pcs.daejeon.config;
 
-import com.pcs.daejeon.config.filter.AjaxLoginProcessFilter;
 import com.pcs.daejeon.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -14,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -26,13 +26,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }
-
-    @Bean
-    public AjaxLoginProcessFilter ajaxLoginProcessingFilter() throws Exception {
-        AjaxLoginProcessFilter filter = new AjaxLoginProcessFilter();
-        filter.setAuthenticationManager(authenticationManagerBean());
-        return filter;
     }
 
 
@@ -48,13 +41,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .usernameParameter("loginId")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/")
-            .and()
-                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
+                .successHandler(authenticationSuccessHandler());
     }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     };
+
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler(){
+        return new CustomUrlAuthenticationSuccessHandler();
+    }
 }
