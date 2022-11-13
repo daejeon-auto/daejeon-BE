@@ -1,5 +1,6 @@
 package com.pcs.daejeon.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pcs.daejeon.entity.type.PostType;
 import lombok.Getter;
 
@@ -27,6 +28,7 @@ public class Post extends BasicEntity {
 
     @ManyToOne
     @JoinColumn(name = "member_id")
+    @JsonIgnore
     private Member createByMember;
 
     public Post() {}
@@ -43,12 +45,10 @@ public class Post extends BasicEntity {
     public Post(String description) {
         this.description = description;
     }
-    public boolean validDescription() {
-        return description == null || Objects.requireNonNull(description).length() < 5;
-    }
 
     @PrePersist
     public void prePersist() {
         this.postType = PostType.ACCEPTED;
+        this.liked = 0;
     }
 }

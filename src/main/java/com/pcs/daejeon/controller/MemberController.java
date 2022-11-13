@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
+
 @Controller
 @CrossOrigin("*")
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Result> signUp(@RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<Result> signUp(@RequestBody @Valid SignUpDto signUpDto) {
 
         try {
             Member save = memberService.saveMember(signUpDto);

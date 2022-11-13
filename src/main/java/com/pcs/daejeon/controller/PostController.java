@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -48,11 +49,7 @@ public class PostController {
     }
 
     @PostMapping("/post/write")
-    public ResponseEntity<Result<String>> writePost(@RequestBody Post post) throws MalformedURLException {
-        if (post.validDescription()) {
-            return new ResponseEntity<>(new Result<>("description's length is less then 5", true), HttpStatus.BAD_REQUEST);
-        }
-
+    public ResponseEntity<Result<String>> writePost(@RequestBody @Valid Post post) throws MalformedURLException {
         try {
             Long postId = postService.writePost(post.getDescription());
         } catch (IllegalArgumentException e) {
