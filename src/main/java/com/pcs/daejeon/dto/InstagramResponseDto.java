@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ApiResponseDto {
+public class InstagramResponseDto {
 
     private String status;
     private String msg;
