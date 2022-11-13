@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Getter
-public class Post extends BasicTime {
+public class Post extends BasicEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
