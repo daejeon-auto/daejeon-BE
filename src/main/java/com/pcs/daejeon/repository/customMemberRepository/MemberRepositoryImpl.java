@@ -26,7 +26,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 )
                 .fetchOne();
 
-        return result == null;
+        return result != 0;
     }
 
     @Override
@@ -36,7 +36,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .from(member)
                 .where(member.loginId.eq(loginId))
                 .fetchOne();
-        return aLong == null;
+
+        return aLong != 0;
     }
 
     public Member createMember(SignUpDto signUpDto) {

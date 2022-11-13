@@ -42,14 +42,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/logout")
                 .invalidateHttpSession(true);
-//                .and()
+//            .and()
 //                .exceptionHandling().accessDeniedHandler()
     }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
-    };
+    }
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler(){
