@@ -27,12 +27,12 @@ class PostRepositoryImplTest {
     @Autowired
     PostService postService;
 
-    @BeforeEach
-    public void testDataInsert() {
-        for (int i = 1; i <= 30; i++) {
-            em.persist(new Post("Test.dev" + i));
-        }
-    }
+//    @BeforeEach
+//    public void testDataInsert() {
+//        for (int i = 1; i <= 30; i++) {
+//            em.persist(new Post("Test.dev" + i));
+//        }
+//    }
 
 //    @Test
 //    public void paging() {
@@ -54,5 +54,13 @@ class PostRepositoryImplTest {
         Post postById = postService.findPostById(postId);
 
         assertThat(postById.getDescription()).isEqualTo("this is test value");
+    }
+    @Test
+    public void writeFailTest() {
+        Long postId = postService.writePost("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+        Post postById = postService.findPostById(postId);
+
+        assertThat(postById.getDescription()).isEqualTo("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     }
 }
