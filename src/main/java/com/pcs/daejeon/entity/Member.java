@@ -62,6 +62,10 @@ public class Member extends BasicTime {
     @NotEmpty(message = "비밀번호는 필수 입력 값입니다.")
     private String password;
 
+    public void setMemberType(MemberType memberType) {
+        this.memberType = memberType;
+    }
+
     public Member(String name, String birthDay, String phoneNumber, String studentNumber, String password, String loginId, AuthType authType) {
         this.name = name;
         this.birthDay = birthDay;
