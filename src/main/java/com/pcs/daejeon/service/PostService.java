@@ -35,6 +35,8 @@ public class PostService {
 //    private final IGClient client;
 
     public Long writePost(String description) {
+        description = description.replace("\n", " ");
+
         boolean isOk = isBadDesc(description);
         if (!isOk) {
             throw new IllegalArgumentException("bad words");
