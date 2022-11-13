@@ -27,7 +27,7 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/posts")
-    public Result<Post> getPostPage(@PageableDefault(size = 20) Pageable pageable) {
+    public Result<Post> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
         QueryResults<Post> post = postService.findPagedPost(pageable);
         Stream<PostDto> postDto = post.getResults()
                 .stream()
@@ -59,7 +59,21 @@ public class PostController {
         return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
     }
 
-    @PostMapping("/post/accept/{id}")
+    @PostMapping("/post/report/{id}")
+    public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId) {
+
+        try {
+            postService.reportPost(postId);
+
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/admin/post/accept/{id}")
     public ResponseEntity<Result<String>> acceptPost(@PathVariable("id") Long id) {
         try {
             postService.acceptPost(id);
@@ -69,7 +83,7 @@ public class PostController {
             return new ResponseEntity<Result<String>>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping("/post/reject/{id}")
+    @PostMapping("/admin/post/reject/{id}")
     public ResponseEntity<Result<String>> rejectedPost(@PathVariable("id") Long id) {
         try {
             postService.rejectPost(id);
@@ -88,7 +102,6 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            System.out.println("e = " + e);
             return new ResponseEntity<>(new Result("server error", true), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new Result("post not found", true), HttpStatus.NOT_FOUND);

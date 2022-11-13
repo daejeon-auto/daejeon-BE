@@ -7,7 +7,6 @@ import lombok.Getter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -25,6 +24,7 @@ public class Post extends BasicEntity {
     private String description;
 
     private int liked;
+    private int reported;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -41,6 +41,9 @@ public class Post extends BasicEntity {
         this.liked++;
         return this.liked;
     }
+    public void addReported() {
+        this.reported++;
+    }
 
     public Post(String description) {
         this.description = description;
@@ -49,6 +52,5 @@ public class Post extends BasicEntity {
     @PrePersist
     public void prePersist() {
         this.postType = PostType.ACCEPTED;
-        this.liked = 0;
     }
 }

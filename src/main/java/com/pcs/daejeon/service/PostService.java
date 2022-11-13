@@ -90,6 +90,15 @@ public class PostService {
         post.setPostType(PostType.REJECTED);
     }
 
+    public void reportPost(Long postId) {
+        Optional<Post> post = postRepository.findById(postId);
+        if (post.isEmpty()) {
+            throw new IllegalStateException("post not found");
+        }
+
+        post.get().addReported();
+    }
+
     public void acceptPost(Long postId) {
         Post post = findPostById(postId);
 
