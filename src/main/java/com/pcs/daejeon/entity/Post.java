@@ -25,6 +25,10 @@ public class Post extends BasicEntity {
 
     private int liked;
 
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member createByMember;
+
     public Post() {}
 
     public void setPostType(PostType postType) {
