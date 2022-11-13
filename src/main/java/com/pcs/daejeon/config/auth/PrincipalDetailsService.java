@@ -18,9 +18,9 @@ public class PrincipalDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
         Member member = memberRepository.findByLoginId(loginId);
-        if (member != null) {
-            return new PrincipalDetails(member);
+        if (member == null) {
+            throw new IllegalStateException("not found member");
         }
-        return null;
+        return new PrincipalDetails(member);
     }
 }

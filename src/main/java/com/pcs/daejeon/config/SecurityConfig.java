@@ -1,21 +1,16 @@
 package com.pcs.daejeon.config;
 
-import com.pcs.daejeon.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -41,7 +36,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .usernameParameter("loginId")
                 .loginProcessingUrl("/login")
-                .successHandler(authenticationSuccessHandler());
+                .successHandler(authenticationSuccessHandler())
+                .failureHandler(authenticationFailureHandler())
+            .and()
+                .logout()
+                .logoutUrl("/logout")
+                .invalidateHttpSession(true);
+//                .and()
+//                .exceptionHandling().accessDeniedHandler()
     }
 
     @Bean
@@ -52,5 +54,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler(){
         return new CustomUrlAuthenticationSuccessHandler();
+    }
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler(){
+        return new CustomUrlAuthenticationFailHandler();
     }
 }
