@@ -29,6 +29,16 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         return result == null;
     }
 
+    @Override
+    public boolean validLoginId(String loginId) {
+        Long aLong = query
+                .select(member.count())
+                .from(member)
+                .where(member.loginId.eq(loginId))
+                .fetchOne();
+        return aLong == null;
+    }
+
     public Member createMember(SignUpDto signUpDto, PasswordEncoder pwdEncoder) {
         return new Member(
                 signUpDto.getName(),

@@ -40,12 +40,9 @@ class MemberServiceTest {
                 "koldin"
         );
 
-        Member member = memberRepository.createMember(signUpDto, passwordEncoder);
-
-        Member saveMember = memberService.saveMember(member);
+        Member saveMember = memberService.saveMember(signUpDto);
         Optional<Member> findMember = memberRepository.findById(saveMember.getId());
 
-        assertThat(findMember.get().getId()).isEqualTo(member.getId());
-        assertThat(findMember.get().getStudentNumber()).isEqualTo(member.getStudentNumber());
+        assertThat(findMember.get().getStudentNumber()).isEqualTo(signUpDto.getStudentNumber());
     }
 }

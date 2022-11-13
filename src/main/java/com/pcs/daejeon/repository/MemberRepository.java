@@ -10,4 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+
+    Member findByLoginId(String id);
 }

@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public interface MemberRepositoryCustom {
 
     boolean validStudentNum(String stdNum);
+    boolean validLoginId(String loginId);
 
     Member createMember(SignUpDto signUpDto, PasswordEncoder pwdEncoder);
 }
