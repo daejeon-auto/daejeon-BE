@@ -1,5 +1,7 @@
 package com.pcs.daejeon.config;
 
+import com.pcs.daejeon.config.handler.CustomUrlAuthenticationFailHandler;
+import com.pcs.daejeon.config.handler.CustomUrlAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -26,7 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
+        http.csrf().disable().httpBasic();
         http
                 .authorizeRequests()
                 .antMatchers("/post/**").authenticated()
@@ -42,8 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/logout")
                 .invalidateHttpSession(true);
-//            .and()
-//                .exceptionHandling().accessDeniedHandler()
     }
 
     @Bean
