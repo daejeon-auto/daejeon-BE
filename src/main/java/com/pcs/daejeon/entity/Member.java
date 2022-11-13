@@ -51,7 +51,7 @@ public class Member extends BasicTime {
     @OneToMany(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
-            mappedBy = "member")
+            mappedBy = "createByMember")
     private List<Post> post;
 
     @NotEmpty(message = "비밀번호는 필수 입력 값입니다.")
