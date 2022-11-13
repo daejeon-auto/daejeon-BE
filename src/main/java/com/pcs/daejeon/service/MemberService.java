@@ -29,7 +29,9 @@ public class MemberService {
             throw new IllegalStateException("student already sign up");
         }
 
-        Member member = memberRepository.createMember(signUpDto, passwordEncoder); // password encode
+
+        Member member = memberRepository.createMember(signUpDto); // password encode
+        System.out.println(member.getPassword());
         return memberRepository.save(member);
     }
 

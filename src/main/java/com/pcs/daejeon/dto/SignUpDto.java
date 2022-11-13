@@ -2,11 +2,13 @@ package com.pcs.daejeon.dto;
 
 import com.pcs.daejeon.entity.type.AuthType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Getter
+@NoArgsConstructor
 public class SignUpDto {
     @NotNull
     private String name;
@@ -23,10 +25,12 @@ public class SignUpDto {
     private String studentNumber;
 
     @NotNull
-    private String pwd;
+    private String password;
 
     @NotNull
     private String loginId;
+
+    // TODO: invited code
 
     public SignUpDto(String name, String birthDay, String phoneNumber, AuthType authType, String studentNumber, String pwd, String loginId) {
         this.name = name;
@@ -34,7 +38,7 @@ public class SignUpDto {
         this.phoneNumber = phoneNumber;
         this.authType = authType;
         this.studentNumber = studentNumber;
-        this.pwd = pwd;
+        this.password = pwd;
         this.loginId = loginId;
     }
 }
