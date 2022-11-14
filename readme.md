@@ -103,4 +103,13 @@
     loginId : String
     password: String
   }
+  data: "success" | error...
+  ```
+
++ logout
+  ```
+  Path: /logout
+  
+  Method: Post
+  data: null | error
   ```
