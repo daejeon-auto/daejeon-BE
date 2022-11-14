@@ -4,9 +4,14 @@ import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.dto.PostDto;
 import com.pcs.daejeon.dto.PostListDto;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.QLike;
+import com.pcs.daejeon.entity.QPost;
 import com.pcs.daejeon.service.PostService;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.MultipartStream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -28,21 +33,23 @@ public class PostController {
 
     @GetMapping("/posts")
     public Result<Post> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
-        QueryResults<Post> post = postService.findPagedPost(pageable);
-        Stream<PostDto> postDto = post.getResults()
+        QueryResults<Tuple> posts = postService.findPagedPost(pageable);
+
+        Stream<PostDto> postDto = posts.getResults()
                 .stream()
                 .map(o -> {
+                    Post post = o.get(QPost.post);
                     return new PostDto(
-                            o.getId(),
-                            o.getDescription(),
-                            o.getCreatedDate(),
-                            o.getLiked()
+                            post.getId(),
+                            post.getDescription(),
+                            post.getCreatedDate(),
+                            o.get(QLike.like).getPost().getId()
                     );
                 });
         Result<Post> postResult = new Result(new PostListDto(
                 postDto,
-                post.getTotal(),
-                (post.getTotal() / 20) + 1
+                posts.getTotal(),
+                (posts.getTotal() / 20) + 1
         ));
 
         return postResult;

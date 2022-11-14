@@ -1,13 +1,19 @@
 package com.pcs.daejeon.service;
 
+import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.entity.Like;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.type.PostType;
+import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -32,6 +38,7 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
 //    private final IGClient client;
 
     public Long writePost(String description) {
@@ -107,7 +114,7 @@ public class PostService {
         post.setPostType(PostType.ACCEPTED);
     }
 
-    public QueryResults<Post> findPagedPost(Pageable page) {
+    public QueryResults<Tuple> findPagedPost(Pageable page) {
         return postRepository.pagingPost(page);
     }
 
@@ -119,16 +126,28 @@ public class PostService {
         return findPost.get();
     }
 
+
     public void addLike(Long postId) throws IOException, URISyntaxException {
+        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getPrincipal();
         Optional<Post> post = postRepository.findById(postId);
-        if (post.isEmpty()) {
-            throw new IllegalArgumentException("post not found");
+        if (!post.isPresent()) {
+            throw new IllegalStateException("post not found");
         }
 
-        int likedCount = post.get().addLiked();
+        if (likeRepository.validLike(member.getMember(), postId)) {
+            throw new IllegalStateException("member already liked this post");
+        }
 
+        Like like = new Like(member.getMember(), post.get());
+        likeRepository.save(like);
+
+        Long likedCount = likeRepository.countByPost(post.get());
         if (likedCount == 15) {
             drawImage(post.get().getDescription());
+//            uploadToInstagram();
         }
     }
 
@@ -149,9 +168,7 @@ public class PostService {
             imageGenerator.loadHtml(code);
             imageGenerator.saveAsImage(System.getProperty("user.dir")+"/src/textImage.png");
             convertPngToJpg();
-//            uploadToInstagram();
         } catch (IllegalArgumentException e) {
-            System.out.println("e = " + e);
             throw e;
         } catch (Exception e) {
             e.printStackTrace();

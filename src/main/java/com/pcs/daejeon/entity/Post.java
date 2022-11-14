@@ -23,13 +23,15 @@ public class Post extends BasicEntity {
     @NotNull
     private String description;
 
-    private int liked;
     private int reported;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     @JsonIgnore
     private Member createByMember;
+
+    @OneToOne(mappedBy = "post")
+    private Like like;
 
     public Post() {}
 
@@ -37,10 +39,6 @@ public class Post extends BasicEntity {
         this.postType = postType;
     }
 
-    public int addLiked() {
-        this.liked++;
-        return this.liked;
-    }
     public void addReported() {
         this.reported++;
     }

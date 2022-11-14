@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -61,6 +62,10 @@ public class Member extends BasicTime {
 
     @NotEmpty(message = "비밀번호는 필수 입력 값입니다.")
     private String password;
+
+    @OneToMany(mappedBy = "likedBy")
+    @JsonIgnore
+    private List<Like> like = new ArrayList<>();
 
     public void setMemberType(MemberType memberType) {
         this.memberType = memberType;
