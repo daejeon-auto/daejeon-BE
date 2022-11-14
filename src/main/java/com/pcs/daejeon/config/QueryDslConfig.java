@@ -1,4 +1,4 @@
-package com.pcs.daejeon;
+package com.pcs.daejeon.config;
 
 import com.github.instagram4j.instagram4j.IGClient;
 import com.github.instagram4j.instagram4j.exceptions.IGLoginException;

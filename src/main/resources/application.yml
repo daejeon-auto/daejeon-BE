@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://containers-us-west-61.railway.app:7470/railway
+    url: jdbc:postgresql://containers-us-west-130.railway.app:6583/railway
     username: postgres
-    password: ASFsw2CHeA9LmLNa8KYA
+    password: hPa329Kg7fCZwLP4PLLs
 
   jpa:
     database: postgresql
@@ -15,10 +15,12 @@ spring:
         default_batch_fetch_size: 100
         show_sql: true
         format_sql: true
+  security.basic.enabled: false
 
 logging.level:
   org.hibernate.SQL: debug
 # org.hibernate.type: trace
+
 server:
   port: 80
   servlet:

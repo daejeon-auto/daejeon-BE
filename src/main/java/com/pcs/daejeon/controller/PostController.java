@@ -1,26 +1,27 @@
 package com.pcs.daejeon.controller;
 
+import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.dto.PostDto;
 import com.pcs.daejeon.dto.PostListDto;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.QLike;
+import com.pcs.daejeon.entity.QPost;
 import com.pcs.daejeon.service.PostService;
 import com.querydsl.core.QueryResults;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.MultipartStream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.stream.Stream;
 
 @RestController
@@ -31,35 +32,31 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/posts")
-    public Result<Post> getPostPage(@PageableDefault(size = 20) Pageable pageable) {
-        QueryResults<Post> post = postService.findPagedPost(pageable);
-        Stream<PostDto> postDto = post.getResults()
+    public Result<Post> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
+        QueryResults<Tuple> posts = postService.findPagedPost(pageable);
+
+        Stream<PostDto> postDto = posts.getResults()
                 .stream()
                 .map(o -> {
+                    Post post = o.get(QPost.post);
                     return new PostDto(
-                            o.getId(),
-                            o.getDescription(),
-                            o.getCreatedDate(),
-                            o.getLiked()
+                            post.getId(),
+                            post.getDescription(),
+                            post.getCreatedDate(),
+                            o.get(QLike.like).getPost().getId()
                     );
                 });
         Result<Post> postResult = new Result(new PostListDto(
                 postDto,
-                post.getTotal(),
-                (post.getTotal() / 20)
+                posts.getTotal(),
+                (posts.getTotal() / 20) + 1
         ));
 
         return postResult;
     }
 
     @PostMapping("/post/write")
-    public ResponseEntity<Result<String>> writePost(@RequestBody Post post) throws MalformedURLException {
-        // TODO: is login
-
-        if (post.validDescription()) {
-            return new ResponseEntity<>(new Result<>("description's length is less then 5", true), HttpStatus.BAD_REQUEST);
-        }
-
+    public ResponseEntity<Result<String>> writePost(@RequestBody @Valid Post post) throws MalformedURLException {
         try {
             Long postId = postService.writePost(post.getDescription());
         } catch (IllegalArgumentException e) {
@@ -69,7 +66,21 @@ public class PostController {
         return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
     }
 
-    @PostMapping("/post/accept/{id}")
+    @PostMapping("/post/report/{id}")
+    public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId) {
+
+        try {
+            postService.reportPost(postId);
+
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/admin/post/accept/{id}")
     public ResponseEntity<Result<String>> acceptPost(@PathVariable("id") Long id) {
         try {
             postService.acceptPost(id);
@@ -79,7 +90,7 @@ public class PostController {
             return new ResponseEntity<Result<String>>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping("/post/reject/{id}")
+    @PostMapping("/admin/post/reject/{id}")
     public ResponseEntity<Result<String>> rejectedPost(@PathVariable("id") Long id) {
         try {
             postService.rejectPost(id);
@@ -96,26 +107,13 @@ public class PostController {
         try {
             postService.addLike(id);
 
-            return new ResponseEntity<>(new Result("success"), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            System.out.println("e = " + e);
             return new ResponseEntity<>(new Result("server error", true), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new Result("post not found", true), HttpStatus.NOT_FOUND);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    @Data
-    @AllArgsConstructor
-    static class Result<T> {
-        private T data;
-        private boolean hasError;
-
-        public Result(T data) {
-            this.data = data;
-            this.hasError = false;
         }
     }
 }

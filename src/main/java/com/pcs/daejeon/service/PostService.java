@@ -1,19 +1,19 @@
 package com.pcs.daejeon.service;
 
-import com.github.instagram4j.instagram4j.IGClient;
-import com.github.instagram4j.instagram4j.requests.IGRequest;
-import com.github.instagram4j.instagram4j.requests.media.MediaConfigureTimelineRequest;
-import com.github.instagram4j.instagram4j.requests.upload.RuploadPhotoRequest;
-import com.github.instagram4j.instagram4j.responses.media.MediaResponse;
-import com.github.instagram4j.instagram4j.responses.media.RuploadPhotoResponse;
+import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.entity.Like;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.PostType;
+import com.pcs.daejeon.entity.type.PostType;
+import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,13 +25,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,9 +38,12 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
 //    private final IGClient client;
 
     public Long writePost(String description) {
+        description = description.replace("\n", " ");
+
         boolean isOk = isBadDesc(description);
         if (!isOk) {
             throw new IllegalArgumentException("bad words");
@@ -99,13 +99,22 @@ public class PostService {
         post.setPostType(PostType.REJECTED);
     }
 
+    public void reportPost(Long postId) {
+        Optional<Post> post = postRepository.findById(postId);
+        if (post.isEmpty()) {
+            throw new IllegalStateException("post not found");
+        }
+
+        post.get().addReported();
+    }
+
     public void acceptPost(Long postId) {
         Post post = findPostById(postId);
 
         post.setPostType(PostType.ACCEPTED);
     }
 
-    public QueryResults<Post> findPagedPost(Pageable page) {
+    public QueryResults<Tuple> findPagedPost(Pageable page) {
         return postRepository.pagingPost(page);
     }
 
@@ -117,16 +126,28 @@ public class PostService {
         return findPost.get();
     }
 
+
     public void addLike(Long postId) throws IOException, URISyntaxException {
+        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getPrincipal();
         Optional<Post> post = postRepository.findById(postId);
-        if (post.isEmpty()) {
-            throw new IllegalArgumentException("post not found");
+        if (!post.isPresent()) {
+            throw new IllegalStateException("post not found");
         }
 
-        int likedCount = post.get().addLiked();
+        if (likeRepository.validLike(member.getMember(), postId)) {
+            throw new IllegalStateException("member already liked this post");
+        }
 
+        Like like = new Like(member.getMember(), post.get());
+        likeRepository.save(like);
+
+        Long likedCount = likeRepository.countByPost(post.get());
         if (likedCount == 15) {
             drawImage(post.get().getDescription());
+//            uploadToInstagram();
         }
     }
 
@@ -147,9 +168,7 @@ public class PostService {
             imageGenerator.loadHtml(code);
             imageGenerator.saveAsImage(System.getProperty("user.dir")+"/src/textImage.png");
             convertPngToJpg();
-//            uploadToInstagram();
         } catch (IllegalArgumentException e) {
-            System.out.println("e = " + e);
             throw e;
         } catch (Exception e) {
             e.printStackTrace();

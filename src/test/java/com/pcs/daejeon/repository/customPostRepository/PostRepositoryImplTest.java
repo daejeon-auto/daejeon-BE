@@ -1,15 +1,12 @@
-package com.pcs.daejeon.repository.customRepository;
+package com.pcs.daejeon.repository.customPostRepository;
 
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.service.PostService;
-import com.querydsl.core.QueryResults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -30,12 +27,12 @@ class PostRepositoryImplTest {
     @Autowired
     PostService postService;
 
-    @BeforeEach
-    public void testDataInsert() {
-        for (int i = 1; i <= 30; i++) {
-            em.persist(new Post("Test.dev" + i));
-        }
-    }
+//    @BeforeEach
+//    public void testDataInsert() {
+//        for (int i = 1; i <= 30; i++) {
+//            em.persist(new Post("Test.dev" + i));
+//        }
+//    }
 
 //    @Test
 //    public void paging() {
@@ -57,5 +54,13 @@ class PostRepositoryImplTest {
         Post postById = postService.findPostById(postId);
 
         assertThat(postById.getDescription()).isEqualTo("this is test value");
+    }
+    @Test
+    public void writeFailTest() {
+        Long postId = postService.writePost("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+        Post postById = postService.findPostById(postId);
+
+        assertThat(postById.getDescription()).isEqualTo("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     }
 }

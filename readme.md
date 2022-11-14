@@ -51,7 +51,7 @@
   
 + reject Post
   ```
-  Path: /post/reject/{postId}
+  Path: /admin/post/reject/{postId}
   postId: Long | number
     
   Method: Post
@@ -60,10 +60,56 @@
   
 + accept Post
   ```
-  Path: /post/accept/{postId}
+  Path: /admin/post/accept/{postId}
   postId: Long | number
     
   Method: Post
   data: "success" | error...
   ```
 
++ report Post
+  ```
+  Path: /post/report/{postId}
+  postId: Long | number
+  
+  Method: Post
+  data: "success" | error...
+  ```
+  
+## ACCOUNT
+
+  --- 
++ sign-up
+  ```
+  Path: /sign-up
+  
+  Method: Post
+  Body: {
+    loginId      : String
+    password     : String
+    name         : String
+    birthDay     : String
+    phoneNumber  : String
+    authType     : String(DIRECT, INDIRECT)
+    studentNumber: String
+  }
+  ```
++ login
+  ```
+  Path: /login
+  
+  Method: Post
+  Body: {
+    loginId : String
+    password: String
+  }
+  data: "success" | error...
+  ```
+
++ logout
+  ```
+  Path: /logout
+  
+  Method: Post
+  data: null | error
+  ```

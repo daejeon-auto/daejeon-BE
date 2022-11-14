@@ -1,11 +1,11 @@
 package com.pcs.daejeon.dto;
 
+import com.pcs.daejeon.entity.Like;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-
 @AllArgsConstructor
 @Setter @Getter
 public class PostDto {
@@ -13,5 +13,5 @@ public class PostDto {
     private Long postId;
     private String description;
     private LocalDateTime created;
-    private int liked;
+    private Long likedPostId;
 }
