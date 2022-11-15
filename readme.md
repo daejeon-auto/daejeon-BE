@@ -114,3 +114,20 @@
   Method: Post
   data: null | error
   ```
+
++ generate code
+  ```
+  Path: /code/generate
+  
+  Methid: Post
+  
+  data: code: String | error
+  ```
++ get code list
+  ```
+  Path: /code/list
+  
+  Methid: Post
+  
+  data: codes: List<String> | error
+  ```
