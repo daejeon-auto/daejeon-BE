@@ -2,8 +2,7 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.dto.SignUpDto;
 import com.pcs.daejeon.entity.ReferCode;
-import com.pcs.daejeon.entity.member.IndirectMember;
-import com.pcs.daejeon.entity.member.Member;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.repository.MemberRepository;
@@ -31,7 +30,7 @@ public class MemberService {
         Member member = memberRepository.createMember(signUpDto); // password encode
         if (member.getAuthType() == AuthType.INDIRECT) {
             ReferCode referCode = referCodeRepository.findUnusedReferCode(signUpDto.getReferCode());
-            referCode.useCode((IndirectMember) member);
+            referCode.useCode(member);
             member.setMemberType(MemberType.ACCEPT);
         }
 

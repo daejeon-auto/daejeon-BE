@@ -1,6 +1,6 @@
 package com.pcs.daejeon.repository.customImpl;
 
-import com.pcs.daejeon.entity.member.Member;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.repository.custom.LikeRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

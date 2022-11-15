@@ -1,6 +1,6 @@
 package com.pcs.daejeon.repository;
 
-import com.pcs.daejeon.entity.member.Member;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.repository.custom.MemberRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

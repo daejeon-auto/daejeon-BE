@@ -1,7 +1,7 @@
 package com.pcs.daejeon.repository.custom;
 
 import com.pcs.daejeon.dto.SignUpDto;
-import com.pcs.daejeon.entity.member.Member;
+import com.pcs.daejeon.entity.Member;
 
 public interface MemberRepositoryCustom {
 

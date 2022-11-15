@@ -1,7 +1,5 @@
 package com.pcs.daejeon.entity;
 
-import com.pcs.daejeon.entity.member.DirectMember;
-import com.pcs.daejeon.entity.member.IndirectMember;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,15 +19,15 @@ public class ReferCode extends BasicTime {
     private String code;
 
     @OneToOne(mappedBy = "usedCode")
-    private IndirectMember usedBy = null;
+    private Member usedBy = null;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
-    private DirectMember createdBy;
+    private Member createdBy;
 
     private boolean isUsed;
 
-    public void generateCode(DirectMember member) {
+    public void generateCode(Member member) {
         this.code = makeShortUUID();
         this.createdBy = member;
         member.getReferCodes().add(this);
@@ -41,7 +39,7 @@ public class ReferCode extends BasicTime {
         return Long.toString(l, Character.MAX_RADIX);
     }
 
-    public void useCode(IndirectMember member) {
+    public void useCode(Member member) {
 
         this.isUsed = true;
         this.usedBy = member;

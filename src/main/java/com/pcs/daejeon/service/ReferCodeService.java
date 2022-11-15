@@ -2,7 +2,6 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.ReferCode;
-import com.pcs.daejeon.entity.member.DirectMember;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.repository.ReferCodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +26,10 @@ public class ReferCodeService {
             throw new IllegalStateException("this account is not signed up with direct");
         }
 
-        if (referCodeRepository.findReferCodeCount((DirectMember) member.getMember()) > 3) {
+        if (referCodeRepository.findReferCodeCount(member.getMember()) > 3) {
             throw new IllegalStateException("too many code");
         }
-        referCode.generateCode((DirectMember) member.getMember());
+        referCode.generateCode(member.getMember());
         referCodeRepository.save(referCode);
 
         return referCode.getCode();
