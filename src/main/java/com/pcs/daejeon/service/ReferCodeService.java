@@ -44,7 +44,7 @@ public class ReferCodeService {
                 .getAuthentication()
                 .getPrincipal();
 
-        List<ReferCode> codeList = referCodeRepository.findAllByCreatedByIsAndUsedIsFalse(member.getMember());
+        List<ReferCode> codeList = referCodeRepository.findAllByCodeList(member.getMember());
 
         return codeList;
     }
