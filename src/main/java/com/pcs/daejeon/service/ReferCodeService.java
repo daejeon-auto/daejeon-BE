@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class ReferCodeService {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
+
         if (member.getMember().getAuthType() == AuthType.INDIRECT) {
             throw new IllegalStateException("this account is not signed up with direct");
         }
@@ -33,5 +36,16 @@ public class ReferCodeService {
         referCodeRepository.save(referCode);
 
         return referCode.getCode();
+    }
+
+    public List<ReferCode> getReferCodeList() {
+        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        List<ReferCode> codeList = referCodeRepository.findAllByCreatedByIsAndUsedIsFalse(member.getMember());
+
+        return codeList;
     }
 }
