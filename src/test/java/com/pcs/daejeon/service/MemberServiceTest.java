@@ -1,7 +1,7 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.dto.SignUpDto;
-import com.pcs.daejeon.entity.member.Member;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.repository.MemberRepository;
 import org.junit.jupiter.api.Test;

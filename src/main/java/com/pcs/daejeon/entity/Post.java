@@ -1,7 +1,6 @@
 package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pcs.daejeon.entity.member.Member;
 import com.pcs.daejeon.entity.type.PostType;
 import lombok.Getter;
 

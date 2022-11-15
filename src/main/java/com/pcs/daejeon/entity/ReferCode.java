@@ -1,9 +1,9 @@
 package com.pcs.daejeon.entity;
 
-import com.pcs.daejeon.entity.member.DirectMember;
-import com.pcs.daejeon.entity.member.IndirectMember;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.nio.ByteBuffer;
@@ -12,6 +12,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor
+@Transactional
 public class ReferCode extends BasicTime {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,18 +22,18 @@ public class ReferCode extends BasicTime {
     private String code;
 
     @OneToOne(mappedBy = "usedCode")
-    private IndirectMember usedBy = null;
+    private Member usedBy = null;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "member_id")
-    private DirectMember createdBy;
+    @JsonIgnore
+    private Member createdBy;
 
     private boolean isUsed;
 
-    public void generateCode(DirectMember member) {
+    public void generateCode(Member member) {
         this.code = makeShortUUID();
         this.createdBy = member;
-        member.getReferCodes().add(this);
     }
 
     private static String makeShortUUID() {
@@ -41,7 +42,7 @@ public class ReferCode extends BasicTime {
         return Long.toString(l, Character.MAX_RADIX);
     }
 
-    public void useCode(IndirectMember member) {
+    public void useCode(Member member) {
 
         this.isUsed = true;
         this.usedBy = member;

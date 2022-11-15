@@ -1,12 +1,9 @@
-package com.pcs.daejeon.entity.member;
+package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pcs.daejeon.entity.BasicTime;
-import com.pcs.daejeon.entity.Like;
-import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
-import com.pcs.daejeon.entity.type.AuthType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +16,6 @@ import java.util.List;
 
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DiscriminatorColumn(name = "dtype")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Member extends BasicTime {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,6 +62,14 @@ public class Member extends BasicTime {
     @OneToMany(mappedBy = "likedBy")
     @JsonIgnore
     private List<Like> like = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "refer_code_id")
+    private ReferCode usedCode;
+
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<ReferCode> referCodes = new ArrayList<>();
 
     public void setMemberType(MemberType memberType) {
         this.memberType = memberType;

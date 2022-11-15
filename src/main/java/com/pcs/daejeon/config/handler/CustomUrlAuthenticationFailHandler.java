@@ -2,6 +2,7 @@ package com.pcs.daejeon.config.handler;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.dto.AccountResDto;
+import com.pcs.daejeon.entity.type.MemberType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
@@ -38,7 +39,12 @@ public class CustomUrlAuthenticationFailHandler extends SimpleUrlAuthenticationF
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
         MediaType jsonMimeType = MediaType.APPLICATION_JSON;
 
+
         AccountResDto jsonResult = AccountResDto.fail("login failed");
+        if (securityUser.getMember().getMemberType() == MemberType.PENDING) {
+            jsonResult = AccountResDto.fail("pending");
+
+        }
         if (jsonConverter.canWrite(jsonResult.getClass(), jsonMimeType)) {
             jsonConverter.write(jsonResult, jsonMimeType, new ServletServerHttpResponse(response));
         }

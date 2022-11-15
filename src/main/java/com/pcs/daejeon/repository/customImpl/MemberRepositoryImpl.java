@@ -1,15 +1,14 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.dto.SignUpDto;
-import com.pcs.daejeon.entity.member.Member;
-import com.pcs.daejeon.entity.member.QMember;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.repository.custom.MemberRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static com.pcs.daejeon.entity.member.QMember.*;
+import static com.pcs.daejeon.entity.QMember.*;
 
 
 @RequiredArgsConstructor

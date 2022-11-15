@@ -1,6 +1,5 @@
 package com.pcs.daejeon.entity;
 
-import com.pcs.daejeon.entity.member.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
