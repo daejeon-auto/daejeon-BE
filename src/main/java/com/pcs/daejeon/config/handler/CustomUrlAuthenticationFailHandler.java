@@ -41,9 +41,11 @@ public class CustomUrlAuthenticationFailHandler extends SimpleUrlAuthenticationF
 
 
         AccountResDto jsonResult = AccountResDto.fail("login failed");
+        if (securityUser == null) {
+            jsonResult = AccountResDto.fail("id or password is not exist");
+        }
         if (securityUser.getMember().getMemberType() == MemberType.PENDING) {
             jsonResult = AccountResDto.fail("pending");
-
         }
         if (jsonConverter.canWrite(jsonResult.getClass(), jsonMimeType)) {
             jsonConverter.write(jsonResult, jsonMimeType, new ServletServerHttpResponse(response));

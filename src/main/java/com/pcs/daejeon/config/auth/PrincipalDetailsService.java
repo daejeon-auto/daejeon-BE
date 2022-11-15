@@ -19,7 +19,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
         Member member = memberRepository.findByLoginId(loginId);
         if (member == null) {
-            throw new IllegalStateException("not found member");
+            throw new UsernameNotFoundException("not found member");
         }
         return new PrincipalDetails(member);
     }
