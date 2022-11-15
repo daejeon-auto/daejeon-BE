@@ -30,7 +30,18 @@ public class SignUpDto {
     @NotNull
     private String loginId;
 
-    // TODO: invited code
+    private String referCode = null;
+
+    public SignUpDto(String name, String birthDay, String phoneNumber, AuthType authType, String studentNumber, String password, String loginId, String referCode) {
+        this.name = name;
+        this.birthDay = birthDay;
+        this.phoneNumber = phoneNumber;
+        this.authType = authType;
+        this.studentNumber = studentNumber;
+        this.password = password;
+        this.loginId = loginId;
+        this.referCode = referCode;
+    }
 
     public SignUpDto(String name, String birthDay, String phoneNumber, AuthType authType, String studentNumber, String pwd, String loginId) {
         this.name = name;

@@ -1,6 +1,6 @@
 package com.pcs.daejeon.config.auth;
 
-import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.member.Member;
 import com.pcs.daejeon.entity.type.MemberType;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

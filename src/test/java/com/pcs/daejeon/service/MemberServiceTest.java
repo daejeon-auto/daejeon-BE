@@ -1,10 +1,9 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.dto.SignUpDto;
-import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.member.Member;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.repository.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional

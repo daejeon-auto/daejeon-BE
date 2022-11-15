@@ -1,8 +1,6 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
-import com.pcs.daejeon.entity.Like;
-import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
 import com.querydsl.core.QueryResults;

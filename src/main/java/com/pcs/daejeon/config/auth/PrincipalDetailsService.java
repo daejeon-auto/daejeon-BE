@@ -1,6 +1,6 @@
 package com.pcs.daejeon.config.auth;
 
-import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.member.Member;
 import com.pcs.daejeon.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

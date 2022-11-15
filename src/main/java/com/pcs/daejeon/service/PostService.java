@@ -2,7 +2,6 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Like;
-import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;

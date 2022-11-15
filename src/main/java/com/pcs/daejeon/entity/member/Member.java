@@ -1,6 +1,9 @@
-package com.pcs.daejeon.entity;
+package com.pcs.daejeon.entity.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pcs.daejeon.entity.BasicTime;
+import com.pcs.daejeon.entity.Like;
+import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.entity.type.AuthType;
@@ -14,9 +17,10 @@ import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Getter
+@Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DiscriminatorColumn(name = "dtype")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Member extends BasicTime {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,9 +40,6 @@ public class Member extends BasicTime {
 
     @Column(nullable = false)
     private String studentNumber;
-
-    @Column(nullable = false)
-    private int referCodeCount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -79,7 +80,6 @@ public class Member extends BasicTime {
         this.password = password;
         this.loginId = loginId;
         this.authType = authType;
-        this.referCodeCount = 0;
         this.role = RoleTier.TIER0;
         this .memberType = MemberType.PENDING;
     }
