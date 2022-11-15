@@ -3,8 +3,8 @@
     default-path: https://pcs-daejeon.herokuapp.com/
     
     default structure: {
-        "data": String | Array,
-        "hasError": boolean
+        data    : String | Array,
+        hasError: boolean
     }
 
 ## POST
@@ -90,8 +90,9 @@
     name         : String
     birthDay     : String
     phoneNumber  : String
-    authType     : String(DIRECT, INDIRECT)
+    authType     : String (DIRECT, INDIRECT)
     studentNumber: String
+    referCode    : String | null (only INDIRECT user)
   }
   ```
 + login
