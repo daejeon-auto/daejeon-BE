@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://containers-us-west-130.railway.app:6583/railway
+    url: jdbc:postgresql://containers-us-west-61.railway.app:7470/railway
     username: postgres
-    password: hPa329Kg7fCZwLP4PLLs
+    password: ASFsw2CHeA9LmLNa8KYA
 
   jpa:
     database: postgresql
@@ -22,7 +22,7 @@ logging.level:
 # org.hibernate.type: trace
 
 server:
-  port: 80
+  port: 443
   servlet:
     session:
       timeout: 30
