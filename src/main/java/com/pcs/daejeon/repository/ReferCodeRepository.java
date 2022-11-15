@@ -19,5 +19,6 @@ public interface ReferCodeRepository extends JpaRepository<ReferCode, Long> {
     @Query("select count(rc) from ReferCode rc where rc.createdBy = :member")
     Long findReferCodeCount(@Param("member") Member member);
 
-    List<ReferCode> findAllByCreatedByIsAndUsedIsFalse(Member member);
+    @Query("select rc from ReferCode rc where rc.createdBy = :member and rc.isUsed = false")
+    List<ReferCode> findAllByCodeList(@Param("member") Member member);
 }

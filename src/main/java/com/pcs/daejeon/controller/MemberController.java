@@ -9,16 +9,16 @@ import com.pcs.daejeon.service.ReferCodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Stream;
 
-@Controller
+@RestController
 @CrossOrigin("*")
 @RequiredArgsConstructor
 public class MemberController {
@@ -55,7 +55,7 @@ public class MemberController {
         try {
             List<ReferCode> referCodeList = referCodeService.getReferCodeList();
             Stream<String> codeListDto = referCodeList.stream()
-                    .map(o -> o.getCode());
+                    .map(ReferCode::getCode);
 
             return new ResponseEntity<>(new Result(codeListDto, false), HttpStatus.OK);
         } catch (Exception e) {
