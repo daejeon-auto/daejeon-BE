@@ -32,6 +32,9 @@ public class MemberService {
         Member member = memberRepository.createMember(signUpDto); // password encode
         if (member.getAuthType() == AuthType.INDIRECT) {
             ReferCode referCode = referCodeRepository.findUnusedReferCode(signUpDto.getReferCode());
+            if (referCode == null) {
+                throw new IllegalStateException("unused refer code not found");
+            }
             referCode.useCode(member);
             member.setMemberType(MemberType.ACCEPT);
         }
