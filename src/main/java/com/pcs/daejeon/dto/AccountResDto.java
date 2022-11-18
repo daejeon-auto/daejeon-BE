@@ -8,6 +8,7 @@ public class AccountResDto {
     public static AccountResDto success(Object data) {
         return new AccountResDto("success", null, data);
     }
+    // TODO login시 member객체가 한번 더 나감(data)
 
     public static AccountResDto success(Object data, String value) {
         return new AccountResDto("success", value, data);

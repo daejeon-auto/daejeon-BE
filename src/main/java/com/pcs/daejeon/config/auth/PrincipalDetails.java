@@ -22,12 +22,7 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collect = new ArrayList<>();
-        collect.add(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return member.getRole().toString();
-            }
-        });
+        collect.add((GrantedAuthority) () -> member.getRole().toString());
         return collect;
     }
 
@@ -48,7 +43,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return member.getMemberType() == MemberType.ACCEPT; // 유저 타입이 ACCEPT가 아닌 사람은 LOCK된 계정으로 인식
+        return member.getMemberType() != MemberType.PENDING; // 유저 타입이 Pendding이면 lock
     }
 
     @Override
