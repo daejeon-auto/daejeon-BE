@@ -38,6 +38,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.5.2'
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.26'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat'
 	implementation 'com.github.hkirk:java-html2image:0.9'
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
