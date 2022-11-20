@@ -95,27 +95,27 @@
     referCode    : String | null (only INDIRECT user)
   }
   ```
-  + login
-    ```
-    Path: /login
++ login
+  ```
+  Path: /login
   
-    Method: Post
-    Body: {
-      loginId : String
-      password: String
-    }
+  Method: Post
+  Body: (form type){
+    loginId : String
+    password: String
+  }
   
-    data: {
-      result : String
-      message: String 
-      data   : Object
-    }
+  data: {
+    result : String
+    message: String 
+    data   : Object
+  }
   
-    Error message
-      id or password not exist: 아이디 혹은 비밀번호가 틀렸음 
-      account is disabled     : 계정이 비활성화 됨
-      account is pending      : 걔정이 승인 대기 상태임
-    ```
+  Error message
+    id or password not exist: 아이디 혹은 비밀번호가 틀렸음 
+    account is disabled     : 계정이 비활성화 됨
+    account is pending      : 걔정이 승인 대기 상태임
+  ```
 
 + logout
   ```
