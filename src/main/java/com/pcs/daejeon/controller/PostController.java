@@ -9,9 +9,7 @@ import com.pcs.daejeon.entity.QPost;
 import com.pcs.daejeon.service.PostService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Expression;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.MultipartStream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -22,6 +20,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @RestController
@@ -39,8 +38,15 @@ public class PostController {
                 .stream()
                 .map(o -> {
                     Post post = o.get(QPost.post);
+                    if (o.get(QLike.like) == null) {
+                        return new PostDto(
+                                Objects.requireNonNull(post).getId(),
+                                post.getDescription(),
+                                post.getCreatedDate()
+                        );
+                    }
                     return new PostDto(
-                            post.getId(),
+                            Objects.requireNonNull(post).getId(),
                             post.getDescription(),
                             post.getCreatedDate(),
                             o.get(QLike.like).getPost().getId()

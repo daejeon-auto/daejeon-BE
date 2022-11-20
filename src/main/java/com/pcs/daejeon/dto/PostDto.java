@@ -1,6 +1,5 @@
 package com.pcs.daejeon.dto;
 
-import com.pcs.daejeon.entity.Like;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,4 +13,10 @@ public class PostDto {
     private String description;
     private LocalDateTime created;
     private Long likedPostId;
+
+    public PostDto(Long postId, String description, LocalDateTime created) {
+        this.postId = postId;
+        this.description = description;
+        this.created = created;
+    }
 }
