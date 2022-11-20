@@ -25,7 +25,6 @@ import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class PostController {
 
     private final PostService postService;
