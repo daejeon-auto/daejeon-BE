@@ -16,8 +16,8 @@ spring:
         show_sql: true
         format_sql: true
 
-logging.level:
-  org.hibernate.SQL: debug
+#logging.level:
+#  org.hibernate.SQL: debug
 # org.hibernate.type: trace
 
 server:
@@ -25,11 +25,15 @@ server:
   servlet:
     session:
       timeout: 30
-#  ssl:
-#    enabled: true
-#    key-alias: ayokeystore
-#    key-store: ayokeystore.pkcs12
-#    key-store-password: '123456'
-#    key-password: '123456'
-#    trust-store: ayotrust.pkcs12
-#    trust-store-password: '123456'
+      cookie:
+        secure: true
+        same-site: none
+        max-age: 3600
+  ssl:
+    enabled: true
+    key-alias: ayokeystore
+    key-store: ayokeystore.pkcs12
+    key-store-password: '123456'
+    key-password: '123456'
+    trust-store: ayotrust.pkcs12
+    trust-store-password: '123456'
