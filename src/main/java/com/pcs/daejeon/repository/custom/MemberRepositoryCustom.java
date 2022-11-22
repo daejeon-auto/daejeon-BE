@@ -8,5 +8,7 @@ public interface MemberRepositoryCustom {
     boolean validStudentNum(String stdNum);
     boolean validLoginId(String loginId);
 
+    Member getLoginMember();
+
     Member createMember(SignUpDto signUpDto);
 }
