@@ -83,7 +83,7 @@ public class Member extends BasicTime {
         this.password = password;
         this.loginId = loginId;
         this.authType = authType;
-        this.role = RoleTier.TIER0;
+        this.role = RoleTier.ROLE_TIER0;
         this .memberType = MemberType.PENDING;
     }
 }

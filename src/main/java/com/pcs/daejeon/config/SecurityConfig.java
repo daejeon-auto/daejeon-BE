@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/post/**").authenticated()
                 .antMatchers("/code/**").authenticated()
-                .antMatchers("/admin/**").access("hasRole('TIER1') or hasRole('TIER2') or hasRole('TIER3')") // 해당 권한을 가진 사람만 접근 가능
+                .antMatchers("/admin/**").hasAnyRole("TIER1", "TIER2", "TIER3") // 해당 권한을 가진 사람만 접근 가능
                 .anyRequest().permitAll() // 다른 주소는 모두 허용
             .and()
                 .formLogin()
