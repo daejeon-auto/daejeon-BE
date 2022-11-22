@@ -8,13 +8,17 @@ import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.ReferCodeRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -42,4 +46,25 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    public void acceptMember(Long memberId) {
+        Optional<Member> byId = memberRepository.findById(memberId);
+        if (byId.isEmpty()) {
+            throw new IllegalStateException("member not found");
+        }
+        Member member = byId.get();
+        member.setMemberType(MemberType.ACCEPT);
+
+        log.info("[accept-member] accept member: id["+ member.getId() +"]"+ memberRepository.getLoginMember().getId());
+    }
+
+    public void rejectMember(Long memberId) {
+        Optional<Member> byId = memberRepository.findById(memberId);
+        if (byId.isEmpty()) {
+            throw new IllegalStateException("member not found");
+        }
+        Member member = byId.get();
+
+        member.setMemberType(MemberType.REJECT);
+        log.info("[reject-member] reject member: id["+ member.getId() +"]"+ memberRepository.getLoginMember().getId());
+    }
 }
