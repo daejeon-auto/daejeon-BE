@@ -2,14 +2,18 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Like;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
+import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,9 +38,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PostService {
 
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
 //    private final IGClient client;
 
@@ -96,6 +102,7 @@ public class PostService {
         Post post = findPostById(postId);
 
         post.setPostType(PostType.REJECTED);
+        log.info("[reject-post] reject post: id["+ post.getId() +"]"+ memberRepository.getLoginMember().getId());
     }
 
     public void reportPost(Long postId) {
@@ -105,12 +112,18 @@ public class PostService {
         }
 
         post.get().addReported();
+
+        Member loginMember = memberRepository.getLoginMember();
+        log.info("[report-post] report post: id["+ post.get().getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"]");
     }
 
     public void acceptPost(Long postId) {
         Post post = findPostById(postId);
 
         post.setPostType(PostType.ACCEPTED);
+
+        Member loginMember = memberRepository.getLoginMember();
+        log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"] --- ");
     }
 
     public QueryResults<Tuple> findPagedPost(Pageable page) {
@@ -127,20 +140,16 @@ public class PostService {
 
 
     public void addLike(Long postId) throws IOException, URISyntaxException {
-        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
-            .getContext()
-            .getAuthentication()
-            .getPrincipal();
         Optional<Post> post = postRepository.findById(postId);
         if (!post.isPresent()) {
             throw new IllegalStateException("post not found");
         }
 
-        if (likeRepository.validLike(member.getMember(), postId)) {
+        if (likeRepository.validLike(memberRepository.getLoginMember(), postId)) {
             throw new IllegalStateException("member already liked this post");
         }
 
-        Like like = new Like(member.getMember(), post.get());
+        Like like = new Like(memberRepository.getLoginMember(), post.get());
         likeRepository.save(like);
 
         Long likedCount = likeRepository.countByPost(post.get());

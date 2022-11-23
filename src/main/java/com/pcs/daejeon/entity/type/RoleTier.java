@@ -1,5 +1,5 @@
 package com.pcs.daejeon.entity.type;
 
 public enum RoleTier {
-    TIER0, TIER1, TIER2, TIER3
+    ROLE_TIER0, ROLE_TIER1, ROLE_TIER2, ROLE_TIER3
 }
