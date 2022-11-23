@@ -14,7 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -29,7 +32,7 @@ public class PostController {
 
     private final PostService postService;
 
-    @GetMapping("/posts")
+    @PostMapping("/posts")
     public Result<Post> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
         QueryResults<Tuple> posts = postService.findPagedPost(pageable);
 
@@ -106,7 +109,7 @@ public class PostController {
         }
     }
 
-    @GetMapping("/post/like/add/{id}")
+    @PostMapping("/post/like/add/{id}")
     public ResponseEntity<Result> addLiked(@PathVariable("id") Long id) {
 
         try {

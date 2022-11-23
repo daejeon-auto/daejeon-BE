@@ -14,7 +14,7 @@
 + Get Post List
   ```
   Path: /posts
-  Method: GET
+  Method: POST
   
   data: {
     postList: List [
@@ -30,7 +30,7 @@
 + Write Post
     ```
     Path: /post/write
-    Method: Post
+    Method: POST
     
     Body: {
         description: String(max: 50, min 5)
@@ -44,7 +44,7 @@
     Path: /post/like/add/{postId}
     postId: Long | number  
   
-    Method: Get
+    Method: POST
 
     data: "success" | error...
     ```
@@ -54,7 +54,7 @@
   Path: /admin/post/reject/{postId}
   postId: Long | number
     
-  Method: Post
+  Method: POST
   data: "success" | error...
   ```
   
@@ -63,7 +63,7 @@
   Path: /admin/post/accept/{postId}
   postId: Long | number
     
-  Method: Post
+  Method: POST
   data: "success" | error...
   ```
 
@@ -72,7 +72,7 @@
   Path: /post/report/{postId}
   postId: Long | number
   
-  Method: Post
+  Method: POST
   data: "success" | error...
   ```
   
@@ -83,7 +83,7 @@
   ```
   Path: /sign-up
   
-  Method: Post
+  Method: POST
   Body: {
     loginId      : String
     password     : String
@@ -99,7 +99,7 @@
   ```
   Path: /login
   
-  Method: Post
+  Method: POST
   Body: (form type){
     loginId : String
     password: String
@@ -121,7 +121,7 @@
   ```
   Path: /logout
   
-  Method: Post
+  Method: POST
   data: null | error
   ```
 
