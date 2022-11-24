@@ -5,9 +5,12 @@ import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Visitor;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,6 +44,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         if (member != null) {
             tupleJPAQuery
                 .on(like.post.id.eq(post.id), like.likedBy.id.eq(member.getMember().getId()));
+        } else {
+            tupleJPAQuery
+                    .on(like.post.id.eq(-1L));
         }
 
         QueryResults<Tuple> result = tupleJPAQuery
