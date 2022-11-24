@@ -44,13 +44,15 @@ public class PostController {
                         return new PostDto(
                                 Objects.requireNonNull(post).getId(),
                                 post.getDescription(),
-                                post.getCreatedDate()
+                                post.getCreatedDate(),
+                                (long) post.getLike().size()
                         );
                     }
                     return new PostDto(
                             Objects.requireNonNull(post).getId(),
                             post.getDescription(),
                             post.getCreatedDate(),
+                            (long) post.getLike().size(),
                             o.get(QLike.like).getPost().getId()
                     );
                 });

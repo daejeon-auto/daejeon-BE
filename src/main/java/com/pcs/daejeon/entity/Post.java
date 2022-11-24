@@ -7,6 +7,7 @@ import lombok.Getter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,8 +31,8 @@ public class Post extends BasicEntity {
     @JsonIgnore
     private Member createByMember;
 
-    @OneToOne(mappedBy = "post")
-    private Like like;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "likedBy")
+    private List<Like> like;
 
     public Post() {}
 
