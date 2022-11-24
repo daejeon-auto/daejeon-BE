@@ -114,9 +114,12 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
+            if (Objects.equals(e.getMessage(), "member already liked this post")) {
+                return new ResponseEntity<>(new Result("already liked", true), HttpStatus.BAD_REQUEST);
+            } else if (Objects.equals(e.getMessage(), "post not found")) {
+                return new ResponseEntity<>(new Result("post not found", true), HttpStatus.NOT_FOUND);
+            }
             return new ResponseEntity<>(new Result("server error", true), HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new Result("post not found", true), HttpStatus.NOT_FOUND);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
