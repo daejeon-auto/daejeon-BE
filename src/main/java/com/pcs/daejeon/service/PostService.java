@@ -146,7 +146,10 @@ public class PostService {
         }
 
         if (likeRepository.validLike(memberRepository.getLoginMember(), postId)) {
-            throw new IllegalStateException("member already liked this post");
+            Member loginMember = memberRepository.getLoginMember();
+            Like like = likeRepository.findByPostAndLikedBy(post.get(), loginMember);
+            likeRepository.delete(like);
+            return;
         }
 
         Like like = new Like(memberRepository.getLoginMember(), post.get());
