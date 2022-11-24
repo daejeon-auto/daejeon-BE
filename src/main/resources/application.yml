@@ -24,7 +24,7 @@ server:
   port: 443
   servlet:
     session:
-      timeout: 30
+      timeout: 43200
       cookie:
         secure: true
         same-site: none
