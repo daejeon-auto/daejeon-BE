@@ -6,6 +6,7 @@ import com.pcs.daejeon.dto.PostListDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QLike;
 import com.pcs.daejeon.entity.QPost;
+import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.service.PostService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
@@ -31,6 +32,7 @@ import java.util.stream.Stream;
 public class PostController {
 
     private final PostService postService;
+    private final PostRepository postRepository;
 
     @PostMapping("/posts")
     public Result<Post> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
@@ -45,14 +47,14 @@ public class PostController {
                                 Objects.requireNonNull(post).getId(),
                                 post.getDescription(),
                                 post.getCreatedDate(),
-                                (long) post.getLike().size()
+                                postRepository.getLikedCount(post)
                         );
                     }
                     return new PostDto(
                             Objects.requireNonNull(post).getId(),
                             post.getDescription(),
                             post.getCreatedDate(),
-                            (long) post.getLike().size(),
+                            postRepository.getLikedCount(post),
                             o.get(QLike.like).getPost().getId()
                     );
                 });

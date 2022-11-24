@@ -1,16 +1,14 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Visitor;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,5 +54,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .fetchResults();
 
         return result;
+    }
+
+    @Override
+    public Long getLikedCount(Post post) {
+        return query.select(like.count())
+                .from(like)
+                .where(like.post.eq(post))
+                .fetchOne();
     }
 }
