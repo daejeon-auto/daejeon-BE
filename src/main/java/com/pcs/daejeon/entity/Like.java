@@ -20,7 +20,7 @@ public class Like extends BasicTime {
     @JoinColumn(name = "member_id")
     private Member likedBy;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 

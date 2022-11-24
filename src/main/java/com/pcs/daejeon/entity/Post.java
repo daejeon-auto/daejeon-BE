@@ -31,7 +31,8 @@ public class Post extends BasicEntity {
     @JsonIgnore
     private Member createByMember;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "likedBy")
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
     private List<Like> like;
 
     public Post() {}

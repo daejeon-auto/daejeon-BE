@@ -37,17 +37,17 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         JPAQuery<Tuple> tupleJPAQuery = query
                 .select(post, like)
                 .from(post)
-                .where(post.postType.eq(PostType.ACCEPTED))
                 .leftJoin(post.like, like);
         if (member != null) {
             tupleJPAQuery
                 .on(like.post.id.eq(post.id), like.likedBy.id.eq(member.getMember().getId()));
         } else {
             tupleJPAQuery
-                    .on(like.post.id.eq(-1L));
+                .on(like.post.id.eq(0L));
         }
 
         QueryResults<Tuple> result = tupleJPAQuery
+                .where(post.postType.eq(PostType.ACCEPTED))
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
                 .limit(20)
