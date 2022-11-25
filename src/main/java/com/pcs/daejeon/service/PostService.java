@@ -1,10 +1,8 @@
 package com.pcs.daejeon.service;
 
-import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Like;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.MemberRepository;
@@ -16,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -128,6 +125,9 @@ public class PostService {
 
     public QueryResults<Tuple> findPagedPost(Pageable page) {
         return postRepository.pagingPost(page);
+    }
+    public QueryResults<Post> findPagedRejectedPost(Pageable page) {
+        return postRepository.pagingRejectPost(page);
     }
 
     public Post findPostById(Long postId) {

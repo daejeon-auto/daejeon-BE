@@ -3,6 +3,7 @@ package com.pcs.daejeon.controller;
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.dto.PostDto;
 import com.pcs.daejeon.dto.PostListDto;
+import com.pcs.daejeon.dto.RejectedPostDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QLike;
 import com.pcs.daejeon.entity.QPost;
@@ -129,6 +130,27 @@ public class PostController {
             return new ResponseEntity<>(new Result("server error", true), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/admin/posts/reject")
+    public ResponseEntity<Result> rejectPostList(@PageableDefault(size = 15) Pageable pageable) {
+        try {
+            QueryResults<Post> pagedRejectedPost = postService.findPagedRejectedPost(pageable);
+
+            Stream<RejectedPostDto> result = pagedRejectedPost.getResults()
+                    .stream()
+                    .map(o -> {
+                        return new RejectedPostDto(
+                                o.getId(),
+                                o.getDescription(),
+                                o.getCreatedDate(),
+                                o.getUpdatedDate()
+                        );
+                    });
+            return new ResponseEntity<>(new Result(result, false), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
         }
     }
 }

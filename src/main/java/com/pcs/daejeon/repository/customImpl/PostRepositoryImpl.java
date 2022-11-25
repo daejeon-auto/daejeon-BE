@@ -57,6 +57,24 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
+    public QueryResults<Post> pagingRejectPost(Pageable page) {
+        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal();
+
+        QueryResults<Post> result = query
+                .selectFrom(post)
+                .where(post.postType.eq(PostType.REJECTED))
+                .orderBy(post.id.desc())
+                .offset(page.getOffset())
+                .limit(20)
+                .fetchResults();
+
+        return result;
+    }
+
+    @Override
     public Long getLikedCount(Post post) {
         return query.select(like.count())
                 .from(like)

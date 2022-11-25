@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface PostRepositoryCustom {
 
     QueryResults<Tuple> pagingPost(Pageable page);
+    QueryResults<Post> pagingRejectPost(Pageable page);
 
     Long getLikedCount(Post post);
 }
