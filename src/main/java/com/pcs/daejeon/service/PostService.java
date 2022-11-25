@@ -3,6 +3,7 @@ package com.pcs.daejeon.service;
 import com.pcs.daejeon.entity.Like;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.Report;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.MemberRepository;
@@ -100,18 +101,6 @@ public class PostService {
 
         post.setPostType(PostType.REJECTED);
         log.info("[reject-post] reject post: id["+ post.getId() +"]"+ memberRepository.getLoginMember().getId());
-    }
-
-    public void reportPost(Long postId) {
-        Optional<Post> post = postRepository.findById(postId);
-        if (post.isEmpty()) {
-            throw new IllegalStateException("post not found");
-        }
-
-        post.get().addReported();
-
-        Member loginMember = memberRepository.getLoginMember();
-        log.info("[report-post] report post: id["+ post.get().getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"]");
     }
 
     public void acceptPost(Long postId) {

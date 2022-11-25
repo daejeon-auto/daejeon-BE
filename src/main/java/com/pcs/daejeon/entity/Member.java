@@ -65,11 +65,14 @@ public class Member extends BasicTime {
 
     @OneToOne
     @JoinColumn(name = "refer_code_id")
+    @JsonIgnore
     private ReferCode usedCode;
 
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<ReferCode> referCodes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reportedBy", cascade = CascadeType.ALL)
+    private List<Report> reports = new ArrayList<>();
 
     public void setMemberType(MemberType memberType) {
         this.memberType = memberType;

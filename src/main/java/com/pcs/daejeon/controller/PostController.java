@@ -9,10 +9,12 @@ import com.pcs.daejeon.entity.QLike;
 import com.pcs.daejeon.entity.QPost;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.service.PostService;
+import com.pcs.daejeon.service.ReportService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,7 @@ public class PostController {
 
     private final PostService postService;
     private final PostRepository postRepository;
+    private final ReportService reportService;
 
     @PostMapping("/posts")
     public Result<Post> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
@@ -80,10 +83,10 @@ public class PostController {
     }
 
     @PostMapping("/post/report/{id}")
-    public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId) {
+    public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId, @Param("reason") String reason) {
 
         try {
-            postService.reportPost(postId);
+            reportService.report(reason, postId);
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {

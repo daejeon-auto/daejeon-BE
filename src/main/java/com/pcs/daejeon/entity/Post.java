@@ -7,6 +7,7 @@ import lombok.Getter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,6 +35,9 @@ public class Post extends BasicEntity {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
     private List<Like> like;
+
+    @OneToMany(mappedBy = "reportedPost", cascade = CascadeType.ALL)
+    private List<Report> reports = new ArrayList<>();
 
     public Post() {}
 
