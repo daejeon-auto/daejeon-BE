@@ -68,10 +68,14 @@ public class Member extends BasicTime {
     @JsonIgnore
     private ReferCode usedCode;
 
-    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "createdBy",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
     private List<ReferCode> referCodes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "reportedBy", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "reportedBy",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
     private List<Report> reports = new ArrayList<>();
 
     public void setMemberType(MemberType memberType) {
