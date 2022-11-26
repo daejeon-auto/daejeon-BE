@@ -36,9 +36,10 @@ public class Report extends BasicTime {
     @CreatedDate
     private LocalDateTime reportedAt;
 
-    public Report(String reason, Member reportedBy) {
+    public Report(String reason, Member reportedBy, Post reportedPost) {
         this.reason = reason;
         this.reportedBy = reportedBy;
+        this.reportedPost = reportedPost;
         reportedAt = LocalDateTime.now();
     }
 }
