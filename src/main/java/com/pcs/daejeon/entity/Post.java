@@ -25,8 +25,6 @@ public class Post extends BasicEntity {
     @NotNull
     private String description;
 
-    private int reported;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     @JsonIgnore
@@ -43,10 +41,6 @@ public class Post extends BasicEntity {
 
     public void setPostType(PostType postType) {
         this.postType = postType;
-    }
-
-    public void addReported() {
-        this.reported++;
     }
 
     public Post(String description) {
