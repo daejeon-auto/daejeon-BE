@@ -48,6 +48,20 @@
 
     data: "success" | error...
     ```
+
++ report post
+  ```
+  Path: /post/report/{postId}
+  postId: Long | number
+  
+  Method: POST
+
+  Body: {
+    reason: String
+  }
+    
+  data: "success" | error...
+  ```
   
 + reject Post
   ```
