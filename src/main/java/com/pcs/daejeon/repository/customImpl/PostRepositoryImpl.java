@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import static com.pcs.daejeon.entity.QLike.like;
 import static com.pcs.daejeon.entity.QPost.post;
+import static com.pcs.daejeon.entity.QReport.report;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
@@ -35,15 +36,19 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         }
 
         JPAQuery<Tuple> tupleJPAQuery = query
-                .select(post, like)
+                .select(post, like, report)
                 .from(post)
                 .leftJoin(post.like, like);
         if (member != null) {
             tupleJPAQuery
-                .on(like.post.id.eq(post.id), like.likedBy.id.eq(member.getMember().getId()));
+                .on(like.post.id.eq(post.id), like.likedBy.id.eq(member.getMember().getId()))
+                .leftJoin(post.reports, report)
+                .on(report.reportedPost.id.eq(post.id), report.reportedBy.id.eq(member.getMember().getId()));
         } else {
             tupleJPAQuery
-                .on(like.post.id.eq(0L));
+                .on(like.post.id.eq(0L))
+                .leftJoin(post.reports, report)
+                .on(report.reportedPost.id.eq(0L));
         }
 
         QueryResults<Tuple> result = tupleJPAQuery

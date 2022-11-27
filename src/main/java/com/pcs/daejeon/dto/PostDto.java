@@ -13,12 +13,6 @@ public class PostDto {
     private String description;
     private LocalDateTime created;
     private Long likedCount;
-    private Long likedPostId;
-
-    public PostDto(Long postId, String description, LocalDateTime created, Long likedCount) {
-        this.postId = postId;
-        this.description = description;
-        this.created = created;
-        this.likedCount = likedCount;
-    }
+    private boolean isLiked;
+    private boolean isReported;
 }

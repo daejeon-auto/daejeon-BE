@@ -8,6 +8,7 @@ import com.pcs.daejeon.dto.ReportReasonDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QLike;
 import com.pcs.daejeon.entity.QPost;
+import com.pcs.daejeon.entity.QReport;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
@@ -46,20 +47,25 @@ public class PostController {
                 .stream()
                 .map(o -> {
                     Post post = o.get(QPost.post);
-                    if (o.get(QLike.like) == null) {
-                        return new PostDto(
-                                Objects.requireNonNull(post).getId(),
-                                post.getDescription(),
-                                post.getCreatedDate(),
-                                postRepository.getLikedCount(post)
-                        );
+
+                    boolean isLiked = false;
+                    boolean isReported = false;
+
+                    if (o.get(QLike.like) != null) {
+                        isLiked = true;
                     }
+                    if (o.get(QReport.report) != null) {
+                        isReported = true;
+                    }
+
+
                     return new PostDto(
                             Objects.requireNonNull(post).getId(),
                             post.getDescription(),
                             post.getCreatedDate(),
                             postRepository.getLikedCount(post),
-                            o.get(QLike.like).getPost().getId()
+                            isLiked,
+                            isReported
                     );
                 });
         Result<Post> postResult = new Result(new PostListDto(

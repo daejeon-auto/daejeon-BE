@@ -18,10 +18,12 @@
   
   data: {
     postList: List [
-        postId     : long / number
+        postId     : long | number
         description: string
         created    : LocalDateTime
         liked      : int
+        isLiked    : boolean
+        isReported : boolean
     ],
     totalPost: long,
     totalPage: long
