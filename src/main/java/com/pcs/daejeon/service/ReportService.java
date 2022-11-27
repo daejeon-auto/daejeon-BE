@@ -7,6 +7,7 @@ import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ReportService {
 
     private final ReportRepository reportRepository;
@@ -39,6 +41,7 @@ public class ReportService {
 
         Report report = new Report(reason, loginMember, post.get());
         reportRepository.save(report);
+        log.info("[add-report] report post: id["+ post.get().getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"] reason: " + reason);
     }
 
     private void removeReport(Long postId) {
@@ -55,5 +58,6 @@ public class ReportService {
         }
 
         reportRepository.delete(report);
+        log.info("[remove-report] remove report post: id["+ post.get().getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"]");
     }
 }
