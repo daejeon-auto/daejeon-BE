@@ -2,10 +2,12 @@ package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.QMember;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import static com.pcs.daejeon.entity.QLike.like;
+import static com.pcs.daejeon.entity.QMember.*;
 import static com.pcs.daejeon.entity.QPost.post;
 import static com.pcs.daejeon.entity.QReport.report;
 
@@ -62,15 +65,24 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public QueryResults<Post> pagingRejectPost(Pageable page) {
+    public QueryResults<Post> pagingRejectPost(Pageable page, Long memberId, Long reportCount) {
         PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
                     .getContext()
                     .getAuthentication()
                     .getPrincipal();
 
+        BooleanExpression codState = post.postType.eq(PostType.REJECTED);
+
+        if (memberId != null) {
+            codState = codState.and(QMember.member.id.eq(memberId));
+        }
+        if (reportCount != null) {
+            codState = codState.and(post.reports.size().eq(Math.toIntExact(reportCount)));
+        }
+
         QueryResults<Post> result = query
                 .selectFrom(post)
-                .where(post.postType.eq(PostType.REJECTED))
+                .where(codState)
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
                 .limit(20)
@@ -87,3 +99,4 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .fetchOne();
     }
 }
+

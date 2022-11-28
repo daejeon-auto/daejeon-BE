@@ -3,6 +3,7 @@ package com.pcs.daejeon.service;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.Report;
+import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.repository.ReportRepository;
@@ -41,6 +42,11 @@ public class ReportService {
 
         Report report = new Report(reason, loginMember, post.get());
         reportRepository.save(report);
+
+        Long reportCount = reportRepository.countByReportedPost(post.get());
+        if (reportCount == 5) {
+            post.get().setPostType(PostType.REJECTED);
+        }
         log.info("[add-report] report post: id["+ post.get().getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"] reason: " + reason);
     }
 

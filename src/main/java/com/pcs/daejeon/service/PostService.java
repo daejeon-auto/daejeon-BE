@@ -3,7 +3,6 @@ package com.pcs.daejeon.service;
 import com.pcs.daejeon.entity.Like;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.Report;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.MemberRepository;
@@ -96,11 +95,11 @@ public class PostService {
     }
 
 
-    public void rejectPost(Long postId) {
+    public void deletePost(Long postId) {
         Post post = findPostById(postId);
 
-        post.setPostType(PostType.REJECTED);
-        log.info("[reject-post] reject post: id["+ post.getId() +"]"+ memberRepository.getLoginMember().getId());
+        post.setPostType(PostType.DELETE);
+        log.info("[delete-post] delete post: id["+ post.getId() +"]"+ memberRepository.getLoginMember().getId());
     }
 
     public void acceptPost(Long postId) {
@@ -115,8 +114,8 @@ public class PostService {
     public QueryResults<Tuple> findPagedPost(Pageable page) {
         return postRepository.pagingPost(page);
     }
-    public QueryResults<Post> findPagedRejectedPost(Pageable page) {
-        return postRepository.pagingRejectPost(page);
+    public QueryResults<Post> findPagedRejectedPost(Pageable page, Long memberId, Long reportCount) {
+        return postRepository.pagingRejectPost(page, memberId, reportCount);
     }
 
     public Post findPostById(Long postId) {

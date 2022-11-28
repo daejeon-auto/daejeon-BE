@@ -9,6 +9,7 @@ import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QLike;
 import com.pcs.daejeon.entity.QPost;
 import com.pcs.daejeon.entity.QReport;
+import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
@@ -19,10 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -91,17 +89,16 @@ public class PostController {
     @PostMapping("/post/report/{id}")
     public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId, @RequestBody @Valid ReportReasonDto reason) {
 
-//        try {
+        try {
             reportService.report(reason.getReason(), postId);
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
-//        }
-//        } catch (IllegalStateException e) {
-//            return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
-//        } catch (Exception e) {
-//            System.out.println("e = " + e);
-//            return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
-//        }
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            System.out.println("e = " + e);
+            return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/admin/post/accept/{id}")
@@ -117,7 +114,7 @@ public class PostController {
     @PostMapping("/admin/post/reject/{id}")
     public ResponseEntity<Result<String>> rejectedPost(@PathVariable("id") Long id) {
         try {
-            postService.rejectPost(id);
+            postService.deletePost(id);
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
@@ -145,9 +142,13 @@ public class PostController {
     }
 
     @PostMapping("/admin/posts/reject")
-    public ResponseEntity<Result> rejectPostList(@PageableDefault(size = 15) Pageable pageable) {
+    public ResponseEntity<Result> rejectPostList(
+            @PageableDefault(size = 15) Pageable pageable,
+            @RequestParam(value = "memberId", required = false) Long memberId,
+            @RequestParam(value = "reportCount", required = false) Long reportCount) {
+
         try {
-            QueryResults<Post> pagedRejectedPost = postService.findPagedRejectedPost(pageable);
+            QueryResults<Post> pagedRejectedPost = postService.findPagedRejectedPost(pageable, memberId, reportCount);
 
             Stream<RejectedPostDto> result = pagedRejectedPost.getResults()
                     .stream()
