@@ -1,5 +1,5 @@
 package com.pcs.daejeon.entity.type;
 
 public enum PostType {
-    REJECTED, ACCEPTED
+    REJECTED, ACCEPTED, DELETE
 }

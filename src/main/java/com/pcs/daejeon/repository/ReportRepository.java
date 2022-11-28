@@ -12,4 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface ReportRepository extends JpaRepository<Report, Long>, ReportRepositoryCustom {
     Report findByReportedPostAndReportedBy(Post reportedPost, Member reportedBy);
+
+    Long countByReportedPost(Post reportedPost);
 }
