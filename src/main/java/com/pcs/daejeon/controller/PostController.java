@@ -91,17 +91,16 @@ public class PostController {
     @PostMapping("/post/report/{id}")
     public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId, @RequestBody @Valid ReportReasonDto reason) {
 
-//        try {
+        try {
             reportService.report(reason.getReason(), postId);
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
-//        }
-//        } catch (IllegalStateException e) {
-//            return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
-//        } catch (Exception e) {
-//            System.out.println("e = " + e);
-//            return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
-//        }
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            System.out.println("e = " + e);
+            return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/admin/post/accept/{id}")
