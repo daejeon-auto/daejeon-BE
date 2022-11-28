@@ -114,8 +114,8 @@ public class PostService {
     public QueryResults<Tuple> findPagedPost(Pageable page) {
         return postRepository.pagingPost(page);
     }
-    public QueryResults<Post> findPagedRejectedPost(Pageable page) {
-        return postRepository.pagingRejectPost(page);
+    public QueryResults<Post> findPagedRejectedPost(Pageable page, Long memberId, Long reportCount) {
+        return postRepository.pagingRejectPost(page, memberId, reportCount);
     }
 
     public Post findPostById(Long postId) {

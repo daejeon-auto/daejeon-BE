@@ -83,11 +83,16 @@
   data: "success" | error...
   ```
 
-+ report Post
++ reject Post list(can search)
   ```
-  Path: /post/report/{postId}
+  Path: /admin/posts/reject
   postId: Long | number
-  
+
+  Param: {
+    memberId   : Long | number [작성자 ID]
+    reportCount: Long | number [신고 횟수]
+  }
+    
   Method: POST
   data: "success" | error...
   ```
