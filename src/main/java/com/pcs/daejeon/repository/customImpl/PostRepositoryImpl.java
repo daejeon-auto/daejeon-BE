@@ -2,7 +2,6 @@ package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.QMember;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
 import com.querydsl.core.QueryResults;
@@ -16,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import static com.pcs.daejeon.entity.QLike.like;
-import static com.pcs.daejeon.entity.QMember.*;
 import static com.pcs.daejeon.entity.QPost.post;
 import static com.pcs.daejeon.entity.QReport.report;
 
@@ -74,7 +72,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         BooleanExpression codState = post.postType.eq(PostType.REJECTED);
 
         if (memberId != null) {
-            codState = codState.and(QMember.member.id.eq(memberId));
+            codState = codState.and(post.createdBy.eq(String.valueOf(memberId)));
         }
         if (reportCount != null) {
             codState = codState.and(post.reports.size().eq(Math.toIntExact(reportCount)));
