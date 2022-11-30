@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
 @Getter @Setter
 public class RejectedPostDto {
 
@@ -13,11 +14,6 @@ public class RejectedPostDto {
     private String description;
     private LocalDateTime created;
     private LocalDateTime updated;
-
-    public RejectedPostDto(Long postId, String description, LocalDateTime created, LocalDateTime updated) {
-        this.postId = postId;
-        this.description = description;
-        this.created = created;
-        this.updated = updated;
-    }
+    private Integer reportedCount;
+    private String createdBy;
 }

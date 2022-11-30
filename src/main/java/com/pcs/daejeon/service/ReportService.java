@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -65,5 +66,9 @@ public class ReportService {
 
         reportRepository.delete(report);
         log.info("[remove-report] remove report post: id["+ post.get().getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"]");
+    }
+
+    public List<Report> getReportList(Long postId) {
+        return reportRepository.findAllByReportedPostId(postId);
     }
 }
