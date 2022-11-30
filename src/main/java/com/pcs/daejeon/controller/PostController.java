@@ -9,7 +9,6 @@ import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QLike;
 import com.pcs.daejeon.entity.QPost;
 import com.pcs.daejeon.entity.QReport;
-import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
@@ -152,14 +151,14 @@ public class PostController {
 
             Stream<RejectedPostDto> result = pagedRejectedPost.getResults()
                     .stream()
-                    .map(o -> {
-                        return new RejectedPostDto(
-                                o.getId(),
-                                o.getDescription(),
-                                o.getCreatedDate(),
-                                o.getUpdatedDate()
-                        );
-                    });
+                    .map(o -> new RejectedPostDto(
+                            o.getId(),
+                            o.getDescription(),
+                            o.getCreatedDate(),
+                            o.getUpdatedDate(),
+                            o.getReports().size(),
+                            o.getCreatedBy()
+                    ));
             return new ResponseEntity<>(new Result(result, false), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
