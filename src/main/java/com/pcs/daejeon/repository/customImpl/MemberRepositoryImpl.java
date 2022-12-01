@@ -57,6 +57,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         return query
                 .selectFrom(member)
                 .where(codState)
+                .orderBy(member.id.desc())
                 .fetch();
     }
 
