@@ -72,8 +72,7 @@ public class AdminController {
                             o.getCreatedDate(),
                             o.getBirthDay(),
                             o.getName(),
-                            o.getStudentNumber(),
-                            o.getUsedCode() != null ? o.getUsedCode().getCode() : ""))
+                            o.getStudentNumber()))
                     .toList();
             return new ResponseEntity<>(new Result(pendingMemberDtos, false), HttpStatus.OK);
         } catch (Exception e) {

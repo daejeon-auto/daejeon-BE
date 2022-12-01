@@ -13,5 +13,4 @@ public class PendingMemberDto {
     private String birthday;
     private String name;
     private String std_number;
-    private String refer_code;
 }
