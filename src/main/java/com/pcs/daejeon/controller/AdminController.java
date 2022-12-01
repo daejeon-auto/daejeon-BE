@@ -6,6 +6,7 @@ import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.report.ReportListDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Report;
+import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.ReportService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ public class AdminController {
 
     private final ReportService reportService;
     private final MemberService memberService;
+
+    private final MemberRepository memberRepository;
 
     @PostMapping("/admin/reports/{id}")
     public ResponseEntity<Result> getReportList(@PathVariable("id") Long postId) {
@@ -85,6 +88,8 @@ public class AdminController {
         try {
             memberService.acceptPendingMember(pendingMemberDto);
 
+            log.info("[accept-pending-member] accept userName = "+pendingMemberDto.getName()+" | student number = "
+                    +pendingMemberDto.getStd_number()+" || by adminId = "+memberRepository.getLoginMember().getId());
             return new ResponseEntity<>(new Result("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result( "member not found", true), HttpStatus.NOT_FOUND);
@@ -99,6 +104,8 @@ public class AdminController {
         try {
             memberService.rejectPendingMember(pendingMemberDto);
 
+            log.info("[reject-pending-member] reject userName = "+pendingMemberDto.getName()+" | student number = "
+                    +pendingMemberDto.getStd_number()+" || by adminId = "+memberRepository.getLoginMember().getId());
             return new ResponseEntity<>(new Result("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result( "member not found", true), HttpStatus.NOT_FOUND);
