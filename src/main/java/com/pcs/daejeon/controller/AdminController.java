@@ -12,11 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -75,6 +73,35 @@ public class AdminController {
                             o.getStudentNumber()))
                     .toList();
             return new ResponseEntity<>(new Result(pendingMemberDtos, false), HttpStatus.OK);
+        } catch (Exception e) {
+            log.debug("e = " + e);
+            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/admin/pending-member/accept")
+    public ResponseEntity<Result> acceptPendingMember(@RequestBody @Valid PendingMemberDto pendingMemberDto) {
+
+        try {
+            memberService.acceptPendingMember(pendingMemberDto);
+
+            return new ResponseEntity<>(new Result("success", false), HttpStatus.ACCEPTED);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result( "member not found", true), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.debug("e = " + e);
+            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("/admin/pending-member/reject")
+    public ResponseEntity<Result> rejectPendingMember(@RequestBody @Valid PendingMemberDto pendingMemberDto) {
+
+        try {
+            memberService.rejectPendingMember(pendingMemberDto);
+
+            return new ResponseEntity<>(new Result("success", false), HttpStatus.ACCEPTED);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result( "member not found", true), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.debug("e = " + e);
             return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
