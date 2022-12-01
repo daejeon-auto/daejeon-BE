@@ -51,7 +51,7 @@ public class AdminController {
         try {
             List<Member> members = memberService.getMembers();
             List<MemberListDto> memberListDto = members.stream()
-                    .map(o -> new MemberListDto(o.getId(), o.getUsedCode().toString()))
+                    .map(o -> new MemberListDto(o.getId(), o.getUsedCode() != null ? o.getUsedCode().getCode() : ""))
                     .toList();
 
             return new ResponseEntity<>(new Result(memberListDto, false), HttpStatus.OK);
