@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static com.pcs.daejeon.entity.QMember.*;
+import java.util.List;
+
+import static com.pcs.daejeon.entity.QMember.member;
 
 
 @RequiredArgsConstructor
@@ -44,6 +46,16 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         return aLong != 0;
     }
 
+    @Override
+    public List<Member> getMemberList() {
+        return query
+                .selectFrom(member)
+                .where(member.memberType.ne(MemberType.GRADUATE), member.memberType.ne(MemberType.PENDING))
+                .fetch();
+    }
+
+    // TODO: PENDING 유저만 주는 메소드 만들기
+
     public Member createMember(SignUpDto signUpDto) {
         return new Member(
                 signUpDto.getName(),
@@ -56,7 +68,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         );
     }
 
-
     public Member getLoginMember() {
         PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
                 .getContext()
@@ -64,4 +75,5 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .getPrincipal();
         return member.getMember();
     }
+
 }

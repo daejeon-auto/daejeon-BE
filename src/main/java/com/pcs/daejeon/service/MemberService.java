@@ -1,8 +1,8 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.dto.SignUpDto;
-import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.repository.MemberRepository;
@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -66,5 +67,9 @@ public class MemberService {
 
         member.setMemberType(MemberType.REJECT);
         log.info("[reject-member] reject member: id["+ member.getId() +"]"+ memberRepository.getLoginMember().getId());
+    }
+
+    public List<Member> getMembers() {
+        return memberRepository.getMemberList();
     }
 }
