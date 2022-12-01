@@ -74,6 +74,6 @@ public class MemberService {
     }
 
     public List<Member> getPendingMembers() {
-        return memberRepository.findByMemberTypePendingOrderByCreatedDateAsc();
+        return memberRepository.findAllByMemberTypeOrderByCreatedDateAsc(MemberType.PENDING);
     }
 }
