@@ -1,8 +1,9 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
-import com.pcs.daejeon.dto.MemberListDto;
-import com.pcs.daejeon.dto.ReportListDto;
+import com.pcs.daejeon.dto.member.MemberListDto;
+import com.pcs.daejeon.dto.member.PendingMemberDto;
+import com.pcs.daejeon.dto.report.ReportListDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Report;
 import com.pcs.daejeon.service.MemberService;
@@ -55,6 +56,26 @@ public class AdminController {
                     .toList();
 
             return new ResponseEntity<>(new Result(memberListDto, false), HttpStatus.OK);
+        } catch (Exception e) {
+            log.debug("e = " + e);
+            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/admin/members/pending")
+    public ResponseEntity<Result> getPendingMembers() {
+        try {
+            List<Member> pendingMembers = memberService.getPendingMembers();
+
+            List<PendingMemberDto> pendingMemberDtos = pendingMembers.stream()
+                    .map(o -> new PendingMemberDto(
+                            o.getCreatedDate(),
+                            o.getBirthDay(),
+                            o.getName(),
+                            o.getStudentNumber(),
+                            o.getUsedCode() != null ? o.getUsedCode().getCode() : ""))
+                    .toList();
+            return new ResponseEntity<>(new Result(pendingMemberDtos, false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
             return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
