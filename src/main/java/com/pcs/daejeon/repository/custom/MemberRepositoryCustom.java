@@ -1,6 +1,6 @@
 package com.pcs.daejeon.repository.custom;
 
-import com.pcs.daejeon.dto.SignUpDto;
+import com.pcs.daejeon.dto.account.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 
 import java.util.List;

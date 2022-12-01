@@ -1,4 +1,4 @@
-package com.pcs.daejeon.dto;
+package com.pcs.daejeon.dto.member;
 
 import com.pcs.daejeon.entity.type.MemberType;
 import lombok.AllArgsConstructor;

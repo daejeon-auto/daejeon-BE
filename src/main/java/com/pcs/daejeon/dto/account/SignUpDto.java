@@ -1,10 +1,11 @@
-package com.pcs.daejeon.dto;
+package com.pcs.daejeon.dto.account;
 
 import com.pcs.daejeon.entity.type.AuthType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 
 @Getter

@@ -1,7 +1,7 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
-import com.pcs.daejeon.dto.SignUpDto;
+import com.pcs.daejeon.dto.account.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.repository.custom.MemberRepositoryCustom;
@@ -60,8 +60,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .orderBy(member.id.desc())
                 .fetch();
     }
-
-    // TODO: PENDING 유저만 주는 메소드 만들기
 
     public Member createMember(SignUpDto signUpDto) {
         return new Member(

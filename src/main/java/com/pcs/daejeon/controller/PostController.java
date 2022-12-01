@@ -1,10 +1,10 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
-import com.pcs.daejeon.dto.PostDto;
-import com.pcs.daejeon.dto.PostListDto;
-import com.pcs.daejeon.dto.RejectedPostDto;
-import com.pcs.daejeon.dto.ReportReasonDto;
+import com.pcs.daejeon.dto.post.PostDto;
+import com.pcs.daejeon.dto.post.PostListDto;
+import com.pcs.daejeon.dto.post.RejectedPostDto;
+import com.pcs.daejeon.dto.report.ReportReasonDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QLike;
 import com.pcs.daejeon.entity.QPost;

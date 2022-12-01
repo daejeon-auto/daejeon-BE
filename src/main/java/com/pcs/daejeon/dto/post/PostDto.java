@@ -1,19 +1,18 @@
-package com.pcs.daejeon.dto;
+package com.pcs.daejeon.dto.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-
 @AllArgsConstructor
-@Getter @Setter
-public class RejectedPostDto {
+@Setter @Getter
+public class PostDto {
 
     private Long postId;
     private String description;
     private LocalDateTime created;
-    private LocalDateTime updated;
-    private Integer reportedCount;
-    private String createdBy;
+    private Long likedCount;
+    private Boolean isLiked;
+    private Boolean isReported;
 }

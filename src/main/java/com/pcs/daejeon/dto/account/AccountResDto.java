@@ -1,4 +1,4 @@
-package com.pcs.daejeon.dto;
+package com.pcs.daejeon.dto.account;
 
 public class AccountResDto {
     private String result;

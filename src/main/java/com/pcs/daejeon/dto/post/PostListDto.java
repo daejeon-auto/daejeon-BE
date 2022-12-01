@@ -1,4 +1,4 @@
-package com.pcs.daejeon.dto;
+package com.pcs.daejeon.dto.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

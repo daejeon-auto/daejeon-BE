@@ -1,6 +1,6 @@
 package com.pcs.daejeon.service;
 
-import com.pcs.daejeon.dto.SignUpDto;
+import com.pcs.daejeon.dto.account.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
@@ -71,5 +71,9 @@ public class MemberService {
 
     public List<Member> getMembers(Long memberId) {
         return memberRepository.getMemberList(memberId);
+    }
+
+    public List<Member> getPendingMembers() {
+        return memberRepository.findByMemberTypePendingOrderByCreatedDateAsc();
     }
 }
