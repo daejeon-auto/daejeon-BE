@@ -1,6 +1,6 @@
 package com.pcs.daejeon.service;
 
-import com.pcs.daejeon.dto.account.SignUpDto;
+import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.repository.MemberRepository;

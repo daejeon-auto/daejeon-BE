@@ -1,4 +1,4 @@
-package com.pcs.daejeon.dto.account;
+package com.pcs.daejeon.dto.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

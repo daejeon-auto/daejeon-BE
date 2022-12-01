@@ -1,4 +1,4 @@
-package com.pcs.daejeon.dto.account;
+package com.pcs.daejeon.dto.member;
 
 import com.pcs.daejeon.entity.type.AuthType;
 import lombok.Getter;

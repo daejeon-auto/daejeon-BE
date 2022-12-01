@@ -1,6 +1,6 @@
 package com.pcs.daejeon.config.handler;
 
-import com.pcs.daejeon.dto.account.AccountResDto;
+import com.pcs.daejeon.dto.security.AccountResDto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
