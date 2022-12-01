@@ -1,10 +1,10 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
-import com.pcs.daejeon.dto.PostDto;
-import com.pcs.daejeon.dto.PostListDto;
-import com.pcs.daejeon.dto.RejectedPostDto;
-import com.pcs.daejeon.dto.ReportReasonDto;
+import com.pcs.daejeon.dto.post.PostDto;
+import com.pcs.daejeon.dto.post.PostListDto;
+import com.pcs.daejeon.dto.post.RejectedPostDto;
+import com.pcs.daejeon.dto.report.ReportReasonDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QLike;
 import com.pcs.daejeon.entity.QPost;
@@ -15,6 +15,7 @@ import com.pcs.daejeon.service.ReportService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class PostController {
 
     private final PostService postService;
@@ -78,11 +80,12 @@ public class PostController {
     public ResponseEntity<Result<String>> writePost(@RequestBody @Valid Post post) throws MalformedURLException {
         try {
             Long postId = postService.writePost(post.getDescription());
+
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
+            log.debug("e = " + e);
             return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
         }
-
-        return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
     }
 
     @PostMapping("/post/report/{id}")
@@ -95,7 +98,7 @@ public class PostController {
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            System.out.println("e = " + e);
+            log.debug("e = " + e);
             return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
         }
     }
@@ -107,6 +110,7 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
+            log.debug("e = " + e);
             return new ResponseEntity<Result<String>>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -117,6 +121,7 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
+            log.debug("e = " + e);
             return new ResponseEntity<Result<String>>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -134,8 +139,11 @@ public class PostController {
             } else if (Objects.equals(e.getMessage(), "post not found")) {
                 return new ResponseEntity<>(new Result("post not found", true), HttpStatus.NOT_FOUND);
             }
+
+            log.debug("e = " + e);
             return new ResponseEntity<>(new Result("server error", true), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IOException | URISyntaxException e) {
+            log.debug("e = " + e);
             throw new RuntimeException(e);
         }
     }
@@ -161,6 +169,7 @@ public class PostController {
                     ));
             return new ResponseEntity<>(new Result(result, false), HttpStatus.OK);
         } catch (Exception e) {
+            log.debug("e = " + e);
             return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
         }
     }

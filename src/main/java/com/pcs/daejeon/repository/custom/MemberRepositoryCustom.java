@@ -1,7 +1,9 @@
 package com.pcs.daejeon.repository.custom;
 
-import com.pcs.daejeon.dto.SignUpDto;
+import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
+
+import java.util.List;
 
 public interface MemberRepositoryCustom {
 
@@ -11,4 +13,6 @@ public interface MemberRepositoryCustom {
     Member getLoginMember();
 
     Member createMember(SignUpDto signUpDto);
+
+    List<Member> getMemberList(Long memberId);
 }

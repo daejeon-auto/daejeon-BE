@@ -1,12 +1,13 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
-import com.pcs.daejeon.dto.SignUpDto;
+import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.ReferCodeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -33,7 +35,8 @@ public class MemberController {
             Member save = memberService.saveMember(signUpDto);
             return new ResponseEntity<>(new Result(save.getId(), false), HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(new Result(e, true), HttpStatus.BAD_REQUEST);
+            log.debug("e = " + e);
+            return new ResponseEntity<>(new Result("error", true), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -46,6 +49,7 @@ public class MemberController {
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result(e.getMessage(), true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            log.debug("e = " + e);
             return new ResponseEntity<>(new Result("fail to generate code", true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -59,6 +63,7 @@ public class MemberController {
 
             return new ResponseEntity<>(new Result(codeListDto, false), HttpStatus.OK);
         } catch (Exception e) {
+            log.debug("e = " + e);
             return new ResponseEntity<>(new Result(e.getMessage(), true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -74,6 +79,7 @@ public class MemberController {
                 return new ResponseEntity<>(new Result("not found member", true), HttpStatus.NOT_FOUND);
             }
 
+            log.debug("e = " + e);
             return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -89,6 +95,7 @@ public class MemberController {
                 return new ResponseEntity<>(new Result("not found member", true), HttpStatus.NOT_FOUND);
             }
 
+            log.debug("e = " + e);
             return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
         }
     }

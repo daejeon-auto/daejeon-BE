@@ -1,8 +1,9 @@
 package com.pcs.daejeon.service;
 
-import com.pcs.daejeon.dto.SignUpDto;
-import com.pcs.daejeon.entity.ReferCode;
+import com.pcs.daejeon.dto.member.PendingMemberDto;
+import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.repository.MemberRepository;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -66,5 +69,43 @@ public class MemberService {
 
         member.setMemberType(MemberType.REJECT);
         log.info("[reject-member] reject member: id["+ member.getId() +"]"+ memberRepository.getLoginMember().getId());
+    }
+
+    public List<Member> getMembers(Long memberId) {
+        return memberRepository.getMemberList(memberId);
+    }
+
+    public List<Member> getPendingMembers() {
+        return memberRepository.findAllByMemberTypeOrderByCreatedDateAsc(MemberType.PENDING);
+    }
+
+    public void acceptPendingMember(@Valid PendingMemberDto pendingMemberDto) {
+        Member member = memberRepository.findByNameAndBirthDayAndStudentNumberAndCreatedDate(
+                pendingMemberDto.getName(),
+                pendingMemberDto.getBirthday(),
+                pendingMemberDto.getStd_number(),
+                pendingMemberDto.getCreated_date()
+        );
+
+        if (member == null) {
+            throw new IllegalStateException("not found member");
+        }
+
+        member.setMemberType(MemberType.ACCEPT);
+    }
+
+    public void rejectPendingMember(PendingMemberDto pendingMemberDto) {
+        Member member = memberRepository.findByNameAndBirthDayAndStudentNumberAndCreatedDate(
+                pendingMemberDto.getName(),
+                pendingMemberDto.getBirthday(),
+                pendingMemberDto.getStd_number(),
+                pendingMemberDto.getCreated_date()
+        );
+
+        if (member == null) {
+            throw new IllegalStateException("not found member");
+        }
+
+        member.setMemberType(MemberType.REJECT);
     }
 }
