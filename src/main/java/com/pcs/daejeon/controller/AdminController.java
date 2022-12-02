@@ -7,6 +7,7 @@ import com.pcs.daejeon.dto.member.PersonalInfo;
 import com.pcs.daejeon.dto.report.ReportListDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Report;
+import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.ReportService;
@@ -133,7 +134,22 @@ public class AdminController {
                     member.getUsedCode() != null ? member.getUsedCode().getCode() : ""
             );
 
+            log.info("[call-personal-info] call by adminId = "+memberRepository.getLoginMember().getId());
             return new ResponseEntity<>(new Result(personalInfo, false), HttpStatus.OK);
+        } catch (Exception e) {
+            log.debug("e = " + e);
+            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/admin/member/set-role/{id}/{role}")
+    public ResponseEntity<Result> setRole(@PathVariable("id") Long memberId, @PathVariable("role") RoleTier tier) {
+
+        try {
+            Member member = memberService.setMemberRole(memberId, tier);
+
+            log.info("[set-role] set role memberId = "+member.getId()+" changed role = "+member.getRole().toString()+" by adminId = "+memberRepository.getLoginMember().getId());
+            return new ResponseEntity<>(new Result("success", false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
             return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);

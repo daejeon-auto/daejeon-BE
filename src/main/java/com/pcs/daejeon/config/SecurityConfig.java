@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/post/**").authenticated()
                 .antMatchers("/code/**").authenticated()
                 .antMatchers("/admin/**").hasAnyRole("TIER1", "TIER2") // 해당 권한을 가진 사람만 접근 가능
-                .antMatchers("/admin/personal-info/**").hasAnyRole("TIER2")
+                .antMatchers("/admin/personal-info/**", "/admin/member/set-role/**").hasAnyRole("TIER2")
                 .anyRequest().permitAll() // 다른 주소는 모두 허용
             .and()
                 .formLogin()

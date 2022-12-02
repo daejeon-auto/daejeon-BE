@@ -6,6 +6,7 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
+import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.ReferCodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -117,5 +118,17 @@ public class MemberService {
         }
 
         return byId.get();
+    }
+
+    public Member setMemberRole(Long memberId, RoleTier tier) {
+        Optional<Member> member = memberRepository.findById(memberId);
+
+        if (member.isEmpty()) {
+            throw new IllegalStateException("not found member");
+        }
+
+        member.get().setRole(tier);
+
+        return member.get();
     }
 }
