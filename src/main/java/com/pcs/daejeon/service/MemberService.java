@@ -108,4 +108,14 @@ public class MemberService {
 
         member.setMemberType(MemberType.REJECT);
     }
+
+    public Member findPersonalInfo(Long memberId) {
+        Optional<Member> byId = memberRepository.findById(memberId);
+
+        if (byId.isEmpty()) {
+            throw new IllegalStateException("not found member");
+        }
+
+        return byId.get();
+    }
 }

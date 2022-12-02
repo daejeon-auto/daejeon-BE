@@ -3,6 +3,7 @@ package com.pcs.daejeon.controller;
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.dto.member.MemberListDto;
 import com.pcs.daejeon.dto.member.PendingMemberDto;
+import com.pcs.daejeon.dto.member.PersonalInfo;
 import com.pcs.daejeon.dto.report.ReportListDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Report;
@@ -109,6 +110,30 @@ public class AdminController {
             return new ResponseEntity<>(new Result("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result( "member not found", true), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.debug("e = " + e);
+            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/admin/personal-info/{id}")
+    public ResponseEntity<Result> callPersonalInfo(@PathVariable("id") Long memberId) {
+
+        try {
+            Member member = memberService.findPersonalInfo(memberId);
+
+            PersonalInfo personalInfo = new PersonalInfo(
+                    member.getId(),
+                    member.getCreatedDate(),
+                    member.getBirthDay(),
+                    member.getName(),
+                    member.getPhoneNumber(),
+                    member.getStudentNumber(),
+                    member.getRole(),
+                    member.getUsedCode() != null ? member.getUsedCode().getCode() : ""
+            );
+
+            return new ResponseEntity<>(new Result(personalInfo, false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
             return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
