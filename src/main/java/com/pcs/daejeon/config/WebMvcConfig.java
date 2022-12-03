@@ -19,6 +19,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("https://localhost:3000", "https://pcs-daejeon-test.vercel.app")
                 .allowCredentials(true)
+                .exposedHeaders("isLogin")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","));
     }
 }
