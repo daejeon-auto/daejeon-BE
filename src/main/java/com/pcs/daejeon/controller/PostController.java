@@ -39,7 +39,7 @@ public class PostController {
     private final ReportService reportService;
 
     @PostMapping("/posts")
-    public Result<Post> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
+    public ResponseEntity getPostPage(@PageableDefault(size = 15) Pageable pageable) {
         QueryResults<Tuple> posts = postService.findPagedPost(pageable);
 
         Stream<PostDto> postDto = posts.getResults()
@@ -73,7 +73,9 @@ public class PostController {
                 (posts.getTotal() / 20) + 1
         ));
 
-        return postResult;
+        return ResponseEntity
+                .ok().header("isLogin", "false")
+                .body(postResult);
     }
 
     @PostMapping("/post/write")
