@@ -29,6 +29,7 @@ server:
         secure: true
         same-site: none
         max-age: 3600
+        http-only: off
 #  ssl:
 #    enabled: true
 #    key-alias: ayokeystore
