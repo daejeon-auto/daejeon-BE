@@ -20,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -73,8 +75,16 @@ public class PostController {
                 (posts.getTotal() / 20) + 1
         ));
 
+        Boolean isLogin = false;
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof UserDetails) {
+                isLogin = true;
+            }
+        }
+
         return ResponseEntity
-                .ok().header("isLogin", "false")
+                .ok().header("isLogin", isLogin.toString())
                 .body(postResult);
     }
 
