@@ -1,9 +1,7 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
-import com.pcs.daejeon.dto.post.PostDto;
-import com.pcs.daejeon.dto.post.PostListDto;
-import com.pcs.daejeon.dto.post.RejectedPostDto;
+import com.pcs.daejeon.dto.post.*;
 import com.pcs.daejeon.dto.report.ReportReasonDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QLike;
@@ -28,6 +26,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -184,5 +183,29 @@ public class PostController {
             log.debug("e = " + e);
             return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/member/posts")
+    public ResponseEntity<Result> getWrotePosts(@PageableDefault Pageable pageable) {
+
+         try {
+             QueryResults<Post> pagedPostByMemberId = postService.findPagedPostByMemberId(pageable);
+
+             List<MyPostDto> postDtos = pagedPostByMemberId.getResults().stream()
+                 .map(o -> new MyPostDto(
+                             Objects.requireNonNull(o).getId(),
+                             o.getDescription(),
+                             o.getCreatedDate(),
+                             postRepository.getLikedCount(o)
+                     )).toList();
+
+             MyPostListDto myPostListDto = new MyPostListDto(postDtos,
+                     pagedPostByMemberId.getTotal(),
+                     (pagedPostByMemberId.getTotal() / 20) + 1);
+             return new ResponseEntity<>(new Result(myPostListDto,false), HttpStatus.OK);
+         } catch (Exception e) {
+             log.debug("e = " + e);
+             return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
+         }
     }
 }
