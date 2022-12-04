@@ -1,9 +1,11 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
+import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
+import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.ReferCodeService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import java.util.stream.Stream;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final ReferCodeService referCodeService;
 
     @PostMapping("/sign-up")
@@ -95,6 +98,26 @@ public class MemberController {
                 return new ResponseEntity<>(new Result("not found member", true), HttpStatus.NOT_FOUND);
             }
 
+            log.debug("e = " + e);
+            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/member/info")
+    public ResponseEntity<Result> memberInfo() {
+
+        try {
+            Member loginMember = memberRepository.getLoginMember();
+
+            MemberInfoDto memberInfoDto = new MemberInfoDto(
+                    loginMember.getName(),
+                    loginMember.getStudentNumber(),
+                    loginMember.getBirthDay(),
+                    loginMember.getPhoneNumber()
+            );
+
+            return new ResponseEntity<>(new Result(memberInfoDto, false), HttpStatus.ACCEPTED);
+        } catch (Exception e) {
             log.debug("e = " + e);
             return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
         }
