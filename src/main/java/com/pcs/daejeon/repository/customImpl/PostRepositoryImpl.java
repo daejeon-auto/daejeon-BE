@@ -59,7 +59,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .where(post.postType.eq(PostType.ACCEPTED))
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
-                .limit(20)
+                .limit(page.getPageSize())
                 .fetchResults();
 
         return result;
@@ -101,7 +101,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .where(codState)
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
-                .limit(20)
+                .limit(page.getPageSize())
                 .fetchResults();
 
         return result;
