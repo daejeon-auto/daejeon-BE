@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.CorsUtils;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -39,7 +41,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/post/**").authenticated()
                 .antMatchers("/code/**").authenticated()
-                .antMatchers("/admin/**").hasAnyRole("TIER1", "TIER2", "TIER3") // 해당 권한을 가진 사람만 접근 가능
+                .antMatchers("/member/**").authenticated()
+                .antMatchers("/admin/**").hasAnyRole("TIER1", "TIER2") // 해당 권한을 가진 사람만 접근 가능
+                .antMatchers("/admin/personal-info/**", "/admin/member/set-role/**").hasAnyRole("TIER2")
                 .anyRequest().permitAll() // 다른 주소는 모두 허용
             .and()
                 .formLogin()
@@ -50,6 +54,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
                 .logout()
                 .logoutUrl("/logout")
+                .logoutSuccessHandler(((request, response, authentication) -> {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                }))
                 .invalidateHttpSession(true)
             .and()
                 .exceptionHandling()

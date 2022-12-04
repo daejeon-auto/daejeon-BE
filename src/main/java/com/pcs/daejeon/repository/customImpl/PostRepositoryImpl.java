@@ -1,6 +1,7 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
@@ -20,6 +21,8 @@ import static com.pcs.daejeon.entity.QReport.report;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
+
+    // TODO fetch Result 전부 없애기
 
     private final JPAQueryFactory query;
 
@@ -56,7 +59,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .where(post.postType.eq(PostType.ACCEPTED))
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
-                .limit(20)
+                .limit(page.getPageSize())
+                .fetchResults();
+
+        return result;
+    }
+
+    @Override
+    public QueryResults<Post> pagingPostByMemberId(Pageable page, Member member) {
+
+        JPAQuery<Post> limit = query
+                .selectFrom(post)
+                .where(post.createByMember.id.eq(member.getId()))
+                .orderBy(post.id.desc())
+                .offset(page.getOffset())
+                .limit(page.getPageSize());
+        QueryResults<Post> result = limit
                 .fetchResults();
 
         return result;
@@ -83,7 +101,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .where(codState)
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
-                .limit(20)
+                .limit(page.getPageSize())
                 .fetchResults();
 
         return result;

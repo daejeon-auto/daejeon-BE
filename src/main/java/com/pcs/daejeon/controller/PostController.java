@@ -1,9 +1,7 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
-import com.pcs.daejeon.dto.post.PostDto;
-import com.pcs.daejeon.dto.post.PostListDto;
-import com.pcs.daejeon.dto.post.RejectedPostDto;
+import com.pcs.daejeon.dto.post.*;
 import com.pcs.daejeon.dto.report.ReportReasonDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QLike;
@@ -20,12 +18,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -39,7 +40,7 @@ public class PostController {
     private final ReportService reportService;
 
     @PostMapping("/posts")
-    public Result<Post> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
+    public ResponseEntity getPostPage(@PageableDefault(size = 15) Pageable pageable) {
         QueryResults<Tuple> posts = postService.findPagedPost(pageable);
 
         Stream<PostDto> postDto = posts.getResults()
@@ -73,7 +74,17 @@ public class PostController {
                 (posts.getTotal() / 20) + 1
         ));
 
-        return postResult;
+        Boolean isLogin = false;
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof UserDetails) {
+                isLogin = true;
+            }
+        }
+
+        return ResponseEntity
+                .ok().header("isLogin", isLogin.toString())
+                .body(postResult);
     }
 
     @PostMapping("/post/write")
@@ -172,5 +183,29 @@ public class PostController {
             log.debug("e = " + e);
             return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/member/posts")
+    public ResponseEntity<Result> getWrotePosts(@PageableDefault Pageable pageable) {
+
+         try {
+             QueryResults<Post> pagedPostByMemberId = postService.findPagedPostByMemberId(pageable);
+
+             List<MyPostDto> postDtos = pagedPostByMemberId.getResults().stream()
+                 .map(o -> new MyPostDto(
+                             Objects.requireNonNull(o).getId(),
+                             o.getDescription(),
+                             o.getCreatedDate(),
+                             postRepository.getLikedCount(o)
+                     )).toList();
+
+             MyPostListDto myPostListDto = new MyPostListDto(postDtos,
+                     pagedPostByMemberId.getTotal(),
+                     (pagedPostByMemberId.getTotal() / 20) + 1);
+             return new ResponseEntity<>(new Result(myPostListDto,false), HttpStatus.OK);
+         } catch (Exception e) {
+             log.debug("e = " + e);
+             return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
+         }
     }
 }

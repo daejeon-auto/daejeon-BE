@@ -114,6 +114,11 @@ public class PostService {
     public QueryResults<Tuple> findPagedPost(Pageable page) {
         return postRepository.pagingPost(page);
     }
+
+    public QueryResults<Post> findPagedPostByMemberId(Pageable pageable) {
+        Member loginMember = memberRepository.getLoginMember();
+        return postRepository.pagingPostByMemberId(pageable, loginMember);
+    }
     public QueryResults<Post> findPagedRejectedPost(Pageable page, Long memberId, Long reportCount) {
         return postRepository.pagingRejectPost(page, memberId, reportCount);
     }
