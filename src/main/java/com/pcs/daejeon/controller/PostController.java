@@ -10,10 +10,10 @@ import com.pcs.daejeon.entity.QReport;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -41,9 +41,9 @@ public class PostController {
 
     @PostMapping("/posts")
     public ResponseEntity getPostPage(@PageableDefault(size = 15) Pageable pageable) {
-        QueryResults<Tuple> posts = postService.findPagedPost(pageable);
+        Page<Tuple> posts = postService.findPagedPost(pageable);
 
-        Stream<PostDto> postDto = posts.getResults()
+        Stream<PostDto> postDto = posts.getContent()
                 .stream()
                 .map(o -> {
                     Post post = o.get(QPost.post);
@@ -70,8 +70,8 @@ public class PostController {
                 });
         Result<Post> postResult = new Result(new PostListDto(
                 postDto,
-                posts.getTotal(),
-                (posts.getTotal() / 20) + 1
+                posts.getTotalElements(),
+                posts.getTotalPages()
         ));
 
         Boolean isLogin = false;
@@ -166,9 +166,9 @@ public class PostController {
             @RequestParam(value = "reportCount", required = false) Long reportCount) {
 
         try {
-            QueryResults<Post> pagedRejectedPost = postService.findPagedRejectedPost(pageable, memberId, reportCount);
+            Page<Post> pagedRejectedPost = postService.findPagedRejectedPost(pageable, memberId, reportCount);
 
-            Stream<RejectedPostDto> result = pagedRejectedPost.getResults()
+            Stream<RejectedPostDto> result = pagedRejectedPost.getContent()
                     .stream()
                     .map(o -> new RejectedPostDto(
                             o.getId(),
@@ -189,9 +189,9 @@ public class PostController {
     public ResponseEntity<Result> getWrotePosts(@PageableDefault Pageable pageable) {
 
          try {
-             QueryResults<Post> pagedPostByMemberId = postService.findPagedPostByMemberId(pageable);
+             Page<Post> pagedPostByMemberId = postService.findPagedPostByMemberId(pageable);
 
-             List<MyPostDto> postDtos = pagedPostByMemberId.getResults().stream()
+             List<MyPostDto> postDtos = pagedPostByMemberId.getContent().stream()
                  .map(o -> new MyPostDto(
                              Objects.requireNonNull(o).getId(),
                              o.getDescription(),
@@ -200,8 +200,8 @@ public class PostController {
                      )).toList();
 
              MyPostListDto myPostListDto = new MyPostListDto(postDtos,
-                     pagedPostByMemberId.getTotal(),
-                     (pagedPostByMemberId.getTotal() / 20) + 1);
+                     pagedPostByMemberId.getTotalElements(),
+                     pagedPostByMemberId.getTotalPages());
              return new ResponseEntity<>(new Result(myPostListDto,false), HttpStatus.OK);
          } catch (Exception e) {
              log.debug("e = " + e);

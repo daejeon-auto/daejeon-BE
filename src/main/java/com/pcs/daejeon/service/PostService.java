@@ -7,11 +7,11 @@ import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -111,15 +111,15 @@ public class PostService {
         log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"] --- ");
     }
 
-    public QueryResults<Tuple> findPagedPost(Pageable page) {
+    public Page<Tuple> findPagedPost(Pageable page) {
         return postRepository.pagingPost(page);
     }
 
-    public QueryResults<Post> findPagedPostByMemberId(Pageable pageable) {
+    public Page<Post> findPagedPostByMemberId(Pageable pageable) {
         Member loginMember = memberRepository.getLoginMember();
         return postRepository.pagingPostByMemberId(pageable, loginMember);
     }
-    public QueryResults<Post> findPagedRejectedPost(Pageable page, Long memberId, Long reportCount) {
+    public Page<Post> findPagedRejectedPost(Pageable page, Long memberId, Long reportCount) {
         return postRepository.pagingRejectPost(page, memberId, reportCount);
     }
 
