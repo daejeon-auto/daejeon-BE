@@ -35,8 +35,10 @@ dependencies {
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.5.2'
-	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.26'
+	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.27'
+	implementation("com.h2database:h2")
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat'
 	implementation 'com.github.hkirk:java-html2image:0.9'
 	runtimeOnly 'org.postgresql:postgresql'
