@@ -76,7 +76,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         List<Post> content = query
                 .selectFrom(post)
-                .where(post.createByMember.id.eq(member.getId()))
+                .where(post.createdBy.eq(member.getId().toString()))
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
