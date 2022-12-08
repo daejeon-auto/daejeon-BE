@@ -1,9 +1,11 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QPost;
 import com.pcs.daejeon.entity.type.PostType;
+import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.Tuple;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +35,12 @@ class PostRepositoryImplTest {
     PostRepository postRepository;
 
     @Autowired
+    MemberRepository memberRepository;
+
+    @Autowired
     EntityManager em;
+
+    PageRequest pageable = PageRequest.of(0, 10);
 
     @BeforeEach
     public void initData() {
@@ -44,8 +51,7 @@ class PostRepositoryImplTest {
 
     @Test
     public void unloggedInPagingPost() {
-        PageRequest page = PageRequest.of(0, 10);
-        Page<Tuple> post = postRepository.pagingPost(page);
+        Page<Tuple> post = postRepository.pagingPost(pageable);
 
         assertThat(post.getTotalElements()).isEqualTo(100L);
         assertThat(post.getTotalPages()).isEqualTo(100 / 10);
@@ -57,8 +63,6 @@ class PostRepositoryImplTest {
 
     @Test
     public void 신고된_글_리스트() {
-        PageRequest pageable = PageRequest.of(0, 10);
-
         // == reject post 생성 ==
         Page<Tuple> tuples = postRepository.pagingPost(pageable);
 
@@ -77,4 +81,19 @@ class PostRepositoryImplTest {
         }
     }
 
+    @Test
+    public void 내가_쓴_글_리스트() {
+        Post post = new Post("test글 작성");
+        Post save = postRepository.save(post);
+
+        em.flush();
+        em.clear();
+
+        Member loginMember = memberRepository.getLoginMember();
+        Page<Post> posts = postRepository.pagingPostByMemberId(pageable, loginMember);
+
+        Post findPost = posts.getContent().get(0);
+
+        assertThat(save.getId()).isEqualTo(findPost.getId());
+    }
 }
