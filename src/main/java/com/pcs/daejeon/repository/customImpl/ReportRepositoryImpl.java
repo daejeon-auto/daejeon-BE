@@ -23,12 +23,12 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
     private final MemberRepository memberRepository;
 
     @Override
-    public boolean validReport() {
+    public boolean validReport(Long postId) {
         Member member = memberRepository.getLoginMember();
 
         Report result = jpaQueryFactory
                 .selectFrom(report)
-                .where(report.reportedBy.id.eq(member.getId()), report.reportedPost.id.eq(member.getId()))
+                .where(report.reportedBy.id.eq(member.getId()), report.reportedPost.id.eq(postId))
                 .fetchOne();
         return result == null;
     }
