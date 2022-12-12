@@ -107,7 +107,7 @@ public class MemberService {
             throw new IllegalStateException("not found member");
         }
 
-        member.setMemberType(MemberType.REJECT);
+        memberRepository.delete(member);
     }
 
     public Member findPersonalInfo(Long memberId) {

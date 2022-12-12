@@ -41,7 +41,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         Long aLong = query
                 .select(member.count())
                 .from(member)
-                .where(member.loginId.eq(loginId))
+                .where(
+                        member.loginId.eq(loginId),
+                        member.memberType.ne(MemberType.GRADUATE)
+                )
                 .fetchOne();
 
         return aLong != 0;
