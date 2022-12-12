@@ -37,6 +37,11 @@ public class MemberController {
         try {
             Member save = memberService.saveMember(signUpDto);
             return new ResponseEntity<>(new Result(save.getId(), false), HttpStatus.CREATED);
+        } catch (IllegalStateException e) {
+            if (Objects.equals(e.getMessage(), "student already sign up")) {
+                return new ResponseEntity<>(new Result(e.getMessage(), true), HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(new Result("error", true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.debug("e = " + e);
             return new ResponseEntity<>(new Result("error", true), HttpStatus.BAD_REQUEST);
