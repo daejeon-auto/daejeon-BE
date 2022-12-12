@@ -4,15 +4,21 @@ import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.dto.member.MemberListDto;
 import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.PersonalInfo;
+import com.pcs.daejeon.dto.post.RejectedPostDto;
 import com.pcs.daejeon.dto.report.ReportListDto;
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.Report;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.MemberService;
+import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +34,7 @@ public class AdminController {
 
     private final ReportService reportService;
     private final MemberService memberService;
+    private final PostService postService;
 
     private final MemberRepository memberRepository;
 
@@ -153,6 +160,32 @@ public class AdminController {
         } catch (Exception e) {
             log.debug("e = " + e);
             return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/admin/posts")
+    public ResponseEntity<Result> rejectPostList(
+            @PageableDefault(size = 15) Pageable pageable,
+            @RequestParam(value = "memberId", required = false) Long memberId,
+            @RequestParam(value = "reportCount", required = false) Long reportCount) {
+
+        try {
+            Page<Post> searchPost = postService.searchPost(pageable, memberId, reportCount);
+
+            Stream<RejectedPostDto> result = searchPost.getContent()
+                    .stream()
+                    .map(o -> new RejectedPostDto(
+                            o.getId(),
+                            o.getDescription(),
+                            o.getCreatedDate(),
+                            o.getUpdatedDate(),
+                            o.getReports().size(),
+                            o.getCreatedBy()
+                    ));
+            return new ResponseEntity<>(new Result(result, false), HttpStatus.OK);
+        } catch (Exception e) {
+            log.debug("e = " + e);
+            return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
         }
     }
 }

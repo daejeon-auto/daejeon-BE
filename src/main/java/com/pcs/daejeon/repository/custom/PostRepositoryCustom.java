@@ -13,6 +13,7 @@ public interface PostRepositoryCustom {
     Page<Tuple> pagingPost(Pageable page);
     Page<Post> pagingPostByMemberId(Pageable page, Member member);
     Page<Post> pagingRejectPost(Pageable page, Long memberId, Long reportCount);
+    Page<Post> searchPost(Pageable page, Long memberId, Long reportCount);
 
     Long getLikedCount(Post post);
 }
