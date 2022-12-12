@@ -26,7 +26,7 @@ public class ReportService {
     private final PostRepository postRepository;
 
     public void report(String reason, Long postId) {
-        if (reportRepository.validReport()) {
+        if (reportRepository.validReport(postId)) {
             addReport(reason, postId);
             return;
         }

@@ -8,5 +8,5 @@ public interface ReportRepositoryCustom {
      * if already reported, return false
      * if you can create report, return true
      */
-    boolean validReport();
+    boolean validReport(Long postId);
 }

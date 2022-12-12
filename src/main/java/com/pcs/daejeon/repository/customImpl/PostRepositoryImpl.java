@@ -5,15 +5,18 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.List;
 
 import static com.pcs.daejeon.entity.QLike.like;
 import static com.pcs.daejeon.entity.QPost.post;
@@ -22,12 +25,10 @@ import static com.pcs.daejeon.entity.QReport.report;
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
 
-    // TODO fetch Result 전부 없애기
-
     private final JPAQueryFactory query;
 
     @Override
-    public QueryResults<Tuple> pagingPost(Pageable page) {
+    public Page<Tuple> pagingPost(Pageable page) {
         PrincipalDetails member = null;
         if (SecurityContextHolder.getContext().getAuthentication() != null &&
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal()!= null &&
@@ -55,56 +56,65 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .on(report.reportedPost.id.eq(0L));
         }
 
-        QueryResults<Tuple> result = tupleJPAQuery
+        List<Tuple> result = tupleJPAQuery
                 .where(post.postType.eq(PostType.ACCEPTED))
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
-                .fetchResults();
+                .fetch();
 
-        return result;
+        JPAQuery<Long> total = query
+                .select(post.count())
+                .from(post)
+                .where(post.postType.eq(PostType.ACCEPTED));
+
+        return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }
 
     @Override
-    public QueryResults<Post> pagingPostByMemberId(Pageable page, Member member) {
+    public Page<Post> pagingPostByMemberId(Pageable page, Member member) {
 
-        JPAQuery<Post> limit = query
+        List<Post> content = query
                 .selectFrom(post)
-                .where(post.createByMember.id.eq(member.getId()))
+                .where(post.createdBy.eq(member.getId().toString()))
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
-                .limit(page.getPageSize());
-        QueryResults<Post> result = limit
-                .fetchResults();
+                .limit(page.getPageSize())
+                .fetch();
 
-        return result;
+        JPAQuery<Long> total = query
+                .select(post.count())
+                .from(post)
+                .where(post.createByMember.id.eq(member.getId()));
+
+        return PageableExecutionUtils.getPage(content, page, total::fetchOne);
     }
 
     @Override
-    public QueryResults<Post> pagingRejectPost(Pageable page, Long memberId, Long reportCount) {
+    public Page<Post> pagingRejectPost(Pageable page, Long memberId, Long reportCount) {
         PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
                     .getContext()
                     .getAuthentication()
                     .getPrincipal();
 
-        BooleanExpression codState = post.postType.eq(PostType.REJECTED);
-
-        if (memberId != null) {
-            codState = codState.and(post.createdBy.eq(String.valueOf(memberId)));
-        }
-        if (reportCount != null) {
-            codState = codState.and(post.reports.size().eq(Math.toIntExact(reportCount)));
-        }
-
-        QueryResults<Post> result = query
+        List<Post> result = query
                 .selectFrom(post)
-                .where(codState)
+                .where(
+                        post.postType.eq(PostType.REJECTED),
+                        memberIdEq(memberId),
+                        reportCountEq(reportCount)
+                )
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
-                .fetchResults();
+                .fetch();
 
-        return result;
+        JPAQuery<Long> total = query
+                .select(post.count())
+                .from(post)
+                .where(post.postType.eq(PostType.REJECTED));
+
+        return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }
 
     @Override
@@ -113,6 +123,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .from(like)
                 .where(like.post.eq(post))
                 .fetchOne();
+    }
+
+    private BooleanExpression memberIdEq(Long memberId) {
+        return memberId != null ? post.createdBy.eq(String.valueOf(memberId)) : null;
+    }
+    private BooleanExpression reportCountEq(Long reportCount) {
+        return reportCount != null ? post.reports.size().eq(Math.toIntExact(reportCount)) : null;
     }
 }
 

@@ -5,6 +5,9 @@ spring:
     username: postgres
     password: pU8DtkaPac3IrrVNRkiP
 
+  profiles:
+    active: real
+
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -13,6 +16,10 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 100
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 #        show_sql: true
 #        format_sql: true
 
