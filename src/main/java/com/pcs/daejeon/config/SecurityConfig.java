@@ -60,7 +60,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .invalidateHttpSession(true)
             .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .and()
+            .sessionManagement()
+                .sessionFixation().changeSessionId()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(true);
+
     }
 
     @Bean
