@@ -127,7 +127,8 @@ public class MemberController {
                     loginMember.getName(),
                     loginMember.getStudentNumber(),
                     loginMember.getBirthDay(),
-                    loginMember.getPhoneNumber()
+                    loginMember.getPhoneNumber(),
+                    loginMember.getAuthType()
             );
 
             return new ResponseEntity<>(new Result<>(memberInfoDto, false), HttpStatus.ACCEPTED);
