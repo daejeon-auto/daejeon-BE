@@ -6,6 +6,7 @@ import com.pcs.daejeon.dto.member.ReferCodeDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
+import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.ReferCodeService;
@@ -36,8 +37,11 @@ public class MemberController {
 
         try {
             Member save = memberService.saveMember(signUpDto);
-            for (int i = 0; i < 3; i++) {
-                referCodeService.generateCode(save);
+
+            if (save.getAuthType().equals(AuthType.DIRECT)) {
+                for (int i = 0; i < 3; i++) {
+                    referCodeService.generateCode(save);
+                }
             }
 
             return new ResponseEntity<>(new Result<>(save.getId(), false), HttpStatus.CREATED);
@@ -45,6 +49,12 @@ public class MemberController {
             if (Objects.equals(e.getMessage(), "student already sign up")) {
                 return new ResponseEntity<>(new Result<>(null, true), HttpStatus.CONFLICT);
             }
+
+            if (Objects.equals(e.getMessage(), "unused refer code not found")) {
+                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
+            }
+
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error("e = " + e);
