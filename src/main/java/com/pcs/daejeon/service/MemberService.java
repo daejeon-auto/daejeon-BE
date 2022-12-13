@@ -43,8 +43,9 @@ public class MemberService {
             if (referCode == null) {
                 throw new IllegalStateException("unused refer code not found");
             }
-            referCode.useCode(member);
+
             member.setMemberType(MemberType.ACCEPT);
+            member.setUsedCode(referCode);
         }
 
         return memberRepository.save(member);

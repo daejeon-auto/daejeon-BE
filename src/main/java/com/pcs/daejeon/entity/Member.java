@@ -86,6 +86,10 @@ public class Member extends BasicTime {
         this.role = role;
     }
 
+    public void setUsedCode(ReferCode usedCode) {
+        this.usedCode = usedCode;
+    }
+
     public Member(String name, String birthDay, String phoneNumber, String studentNumber, String password, String loginId, AuthType authType) {
         this.name = name;
         this.birthDay = birthDay;
