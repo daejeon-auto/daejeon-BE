@@ -93,7 +93,7 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -108,7 +108,7 @@ public class PostController {
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
         }
     }
@@ -120,7 +120,7 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -131,7 +131,7 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -150,10 +150,10 @@ public class PostController {
                 return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
             }
 
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IOException | URISyntaxException e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             throw new RuntimeException(e);
         }
     }
@@ -179,7 +179,7 @@ public class PostController {
                     ));
             return new ResponseEntity<>(new Result<>(result, false), HttpStatus.OK);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -203,7 +203,7 @@ public class PostController {
                      pagedPostByMemberId.getTotalPages());
              return new ResponseEntity<>(new Result<>(myPostListDto,false), HttpStatus.OK);
          } catch (Exception e) {
-             log.debug("e = " + e);
+             log.error("e = " + e);
              return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
          }
     }

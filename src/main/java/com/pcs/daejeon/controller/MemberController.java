@@ -43,7 +43,7 @@ public class MemberController {
             }
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -57,7 +57,7 @@ public class MemberController {
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("fail to generate code", true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -77,7 +77,7 @@ public class MemberController {
 
             return new ResponseEntity<>(new Result<>(result, false), HttpStatus.OK);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -93,10 +93,10 @@ public class MemberController {
                 return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
             }
 
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -112,7 +112,7 @@ public class MemberController {
                 return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
             }
 
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -132,7 +132,7 @@ public class MemberController {
 
             return new ResponseEntity<>(new Result<>(memberInfoDto, false), HttpStatus.ACCEPTED);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }

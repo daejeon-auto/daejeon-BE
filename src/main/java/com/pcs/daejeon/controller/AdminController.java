@@ -51,7 +51,7 @@ public class AdminController {
 
             return new ResponseEntity<>(new Result<>(reportListDto, false), HttpStatus.OK);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -67,7 +67,7 @@ public class AdminController {
 
             return new ResponseEntity<>(new Result<>(memberListDto, false), HttpStatus.OK);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -86,7 +86,7 @@ public class AdminController {
                     .toList();
             return new ResponseEntity<>(new Result<>(pendingMemberDtos, false), HttpStatus.OK);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -103,7 +103,7 @@ public class AdminController {
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -119,7 +119,7 @@ public class AdminController {
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -144,7 +144,7 @@ public class AdminController {
             log.info("[call-personal-info] call by adminId = "+memberRepository.getLoginMember().getId());
             return new ResponseEntity<>(new Result<>(personalInfo, false), HttpStatus.OK);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -158,7 +158,7 @@ public class AdminController {
             log.info("[set-role] set role memberId = "+member.getId()+" changed role = "+member.getRole().toString()+" by adminId = "+memberRepository.getLoginMember().getId());
             return new ResponseEntity<>(new Result<>("success", false), HttpStatus.OK);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("server error", true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -184,7 +184,7 @@ public class AdminController {
                     ));
             return new ResponseEntity<>(new Result<>(result, false), HttpStatus.OK);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
