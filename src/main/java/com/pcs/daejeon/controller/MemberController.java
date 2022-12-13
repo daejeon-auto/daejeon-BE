@@ -36,6 +36,10 @@ public class MemberController {
 
         try {
             Member save = memberService.saveMember(signUpDto);
+            for (int i = 0; i < 3; i++) {
+                referCodeService.generateCode(save);
+            }
+
             return new ResponseEntity<>(new Result<>(save.getId(), false), HttpStatus.CREATED);
         } catch (IllegalStateException e) {
             if (Objects.equals(e.getMessage(), "student already sign up")) {
@@ -48,19 +52,19 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/code/generate")
-    public ResponseEntity<Result<String>> generateCode() {
-        try {
-            String code = referCodeService.generateCode();
-
-            return new ResponseEntity<>(new Result<>(code, false), HttpStatus.CREATED);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>("fail to generate code", true), HttpStatus.BAD_REQUEST);
-        }
-    }
+//    @PostMapping("/code/generate")
+//    public ResponseEntity<Result<String>> generateCode() {
+//        try {
+//            String code = referCodeService.generateCode();
+//
+//            return new ResponseEntity<>(new Result<>(code, false), HttpStatus.CREATED);
+//        } catch (IllegalStateException e) {
+//            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
+//        } catch (Exception e) {
+//            log.error("e = " + e);
+//            return new ResponseEntity<>(new Result<>("fail to generate code", true), HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
     @PostMapping("/code/list")
     public ResponseEntity<Result<List<ReferCodeDto>>> getCodeList() {
