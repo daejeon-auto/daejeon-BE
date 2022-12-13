@@ -116,6 +116,26 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }
+    @Override
+    public Page<Post> searchPost(Pageable page, Long memberId, Long reportCount) {
+        List<Post> result = query
+                .selectFrom(post)
+                .where(
+                        memberIdEq(memberId),
+                        reportCountEq(reportCount)
+                )
+                .orderBy(post.id.desc())
+                .offset(page.getOffset())
+                .limit(page.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> total = query
+                .select(post.count())
+                .from(post)
+                .where(post.postType.eq(PostType.REJECTED));
+
+        return PageableExecutionUtils.getPage(result, page, total::fetchOne);
+    }
 
     @Override
     public Long getLikedCount(Post post) {

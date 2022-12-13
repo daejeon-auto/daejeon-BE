@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/code/**").authenticated()
                 .antMatchers("/member/**").authenticated()
                 .antMatchers("/admin/**").hasAnyRole("TIER1", "TIER2") // 해당 권한을 가진 사람만 접근 가능
-                .antMatchers("/admin/personal-info/**", "/admin/member/set-role/**").hasAnyRole("TIER2")
+                .antMatchers("/admin/personal-info/**", "/admin/member/set-role/**", "/admin/posts").hasAnyRole("TIER2")
                 .anyRequest().permitAll() // 다른 주소는 모두 허용
             .and()
                 .formLogin()
@@ -60,7 +60,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .invalidateHttpSession(true)
             .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .and()
+            .sessionManagement()
+                .sessionFixation().changeSessionId()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(true);
+
     }
 
     @Bean

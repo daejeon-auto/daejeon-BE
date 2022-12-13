@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +39,7 @@ public class PostController {
     private final ReportService reportService;
 
     @PostMapping("/posts")
-    public ResponseEntity getPostPage(@PageableDefault(size = 15) Pageable pageable) {
+    public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
         Page<Tuple> posts = postService.findPagedPost(pageable);
 
         Stream<PostDto> postDto = posts.getContent()
@@ -68,13 +67,13 @@ public class PostController {
                             isReported
                     );
                 });
-        Result<Post> postResult = new Result(new PostListDto(
+        Result<PostListDto> postResult = new Result<>(new PostListDto(
                 postDto,
                 posts.getTotalElements(),
                 posts.getTotalPages()
         ));
 
-        Boolean isLogin = false;
+        boolean isLogin = false;
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if (principal instanceof UserDetails) {
@@ -83,18 +82,18 @@ public class PostController {
         }
 
         return ResponseEntity
-                .ok().header("isLogin", isLogin.toString())
+                .ok().header("isLogin", Boolean.toString(isLogin))
                 .body(postResult);
     }
 
     @PostMapping("/post/write")
-    public ResponseEntity<Result<String>> writePost(@RequestBody @Valid Post post) throws MalformedURLException {
+    public ResponseEntity<Result<String>> writePost(@RequestBody @Valid Post post) {
         try {
-            Long postId = postService.writePost(post.getDescription());
+            postService.writePost(post.getDescription());
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
         }
     }
@@ -109,7 +108,7 @@ public class PostController {
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
         }
     }
@@ -121,8 +120,8 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            log.debug("e = " + e);
-            return new ResponseEntity<Result<String>>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PostMapping("/admin/post/reject/{id}")
@@ -132,13 +131,13 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            log.debug("e = " + e);
-            return new ResponseEntity<Result<String>>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/post/like/add/{id}")
-    public ResponseEntity<Result> addLiked(@PathVariable("id") Long id) {
+    public ResponseEntity<Result<String>> addLiked(@PathVariable("id") Long id) {
 
         try {
             postService.addLike(id);
@@ -146,21 +145,21 @@ public class PostController {
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
             if (Objects.equals(e.getMessage(), "member already liked this post")) {
-                return new ResponseEntity<>(new Result("already liked", true), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.CONFLICT);
             } else if (Objects.equals(e.getMessage(), "post not found")) {
-                return new ResponseEntity<>(new Result("post not found", true), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
             }
 
-            log.debug("e = " + e);
-            return new ResponseEntity<>(new Result("server error", true), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IOException | URISyntaxException e) {
-            log.debug("e = " + e);
+            log.error("e = " + e);
             throw new RuntimeException(e);
         }
     }
 
     @PostMapping("/admin/posts/reject")
-    public ResponseEntity<Result> rejectPostList(
+    public ResponseEntity<Result<Stream<RejectedPostDto>>> rejectPostList(
             @PageableDefault(size = 15) Pageable pageable,
             @RequestParam(value = "memberId", required = false) Long memberId,
             @RequestParam(value = "reportCount", required = false) Long reportCount) {
@@ -178,15 +177,15 @@ public class PostController {
                             o.getReports().size(),
                             o.getCreatedBy()
                     ));
-            return new ResponseEntity<>(new Result(result, false), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>(result, false), HttpStatus.OK);
         } catch (Exception e) {
-            log.debug("e = " + e);
-            return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/member/posts")
-    public ResponseEntity<Result> getWrotePosts(@PageableDefault Pageable pageable) {
+    public ResponseEntity<Result<MyPostListDto>> getWrotePosts(@PageableDefault Pageable pageable) {
 
          try {
              Page<Post> pagedPostByMemberId = postService.findPagedPostByMemberId(pageable);
@@ -202,10 +201,10 @@ public class PostController {
              MyPostListDto myPostListDto = new MyPostListDto(postDtos,
                      pagedPostByMemberId.getTotalElements(),
                      pagedPostByMemberId.getTotalPages());
-             return new ResponseEntity<>(new Result(myPostListDto,false), HttpStatus.OK);
+             return new ResponseEntity<>(new Result<>(myPostListDto,false), HttpStatus.OK);
          } catch (Exception e) {
-             log.debug("e = " + e);
-             return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
+             log.error("e = " + e);
+             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
          }
     }
 }

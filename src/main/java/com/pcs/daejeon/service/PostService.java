@@ -123,6 +123,10 @@ public class PostService {
         return postRepository.pagingRejectPost(page, memberId, reportCount);
     }
 
+    public Page<Post> searchPost(Pageable pageable, Long memberId, Long reportCount) {
+        return postRepository.searchPost(pageable, memberId, reportCount);
+    }
+
     public Post findPostById(Long postId) {
         Optional<Post> findPost = postRepository.findById(postId);
         if (findPost.isEmpty()) {

@@ -1,6 +1,7 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.repository.ReferCodeRepository;
@@ -18,25 +19,39 @@ public class ReferCodeService {
 
     private final ReferCodeRepository referCodeRepository;
 
-    public String generateCode() {
+    public void generateCode(Member member) {
         ReferCode referCode = new ReferCode();
-        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        if (member.getMember().getAuthType() == AuthType.INDIRECT) {
+        if (member.getAuthType() == AuthType.INDIRECT) {
             throw new IllegalStateException("this account is not signed up with direct");
         }
 
-        if (referCodeRepository.findReferCodeCount(member.getMember()) > 3) {
+        if (referCodeRepository.findReferCodeCount(member) > 3) {
             throw new IllegalStateException("too many code");
         }
-        referCode.generateCode(member.getMember());
+        referCode.generateCode(member);
         referCodeRepository.save(referCode);
-
-        return referCode.getCode();
     }
+
+//    =========== 기존 code generator ============
+//    public String generateCode() {
+//        ReferCode referCode = new ReferCode();
+//        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
+//                .getContext()
+//                .getAuthentication()
+//                .getPrincipal();
+//
+//        if (member.getMember().getAuthType() == AuthType.INDIRECT) {
+//            throw new IllegalStateException("this account is not signed up with direct");
+//        }
+//
+//        if (referCodeRepository.findReferCodeCount(member.getMember()) > 3) {
+//            throw new IllegalStateException("too many code");
+//        }
+//        referCode.generateCode(member.getMember());
+//        referCodeRepository.save(referCode);
+//
+//        return referCode.getCode();
+//    }
 
     public List<ReferCode> getReferCodeList() {
         PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
