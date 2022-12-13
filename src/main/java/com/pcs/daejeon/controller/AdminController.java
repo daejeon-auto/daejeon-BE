@@ -39,7 +39,7 @@ public class AdminController {
     private final MemberRepository memberRepository;
 
     @PostMapping("/admin/reports/{id}")
-    public ResponseEntity<Result> getReportList(@PathVariable("id") Long postId) {
+    public ResponseEntity<Result<Stream<ReportListDto>>> getReportList(@PathVariable("id") Long postId) {
         try {
             List<Report> reportList = reportService.getReportList(postId);
             Stream<ReportListDto> reportListDto = reportList.stream()
@@ -49,31 +49,31 @@ public class AdminController {
                             o.getReportedAt()
                     ));
 
-            return new ResponseEntity<>(new Result(reportListDto, false), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>(reportListDto, false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result("", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
 
     @PostMapping("/admin/members")
-    public ResponseEntity<Result> getMembers(@RequestParam(value = "memberId", required = false) Long memberId) {
+    public ResponseEntity<Result<List<MemberListDto>>> getMembers(@RequestParam(value = "memberId", required = false) Long memberId) {
         try {
             List<Member> members = memberService.getMembers(memberId);
             List<MemberListDto> memberListDto = members.stream()
                     .map(o -> new MemberListDto(o.getId(), o.getMemberType(), o.getUsedCode() != null ? o.getUsedCode().getCode() : ""))
                     .toList();
 
-            return new ResponseEntity<>(new Result(memberListDto, false), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>(memberListDto, false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/admin/members/pending")
-    public ResponseEntity<Result> getPendingMembers() {
+    public ResponseEntity<Result<List<PendingMemberDto>>> getPendingMembers() {
         try {
             List<Member> pendingMembers = memberService.getPendingMembers();
 
@@ -84,48 +84,48 @@ public class AdminController {
                             o.getName(),
                             o.getStudentNumber()))
                     .toList();
-            return new ResponseEntity<>(new Result(pendingMemberDtos, false), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>(pendingMemberDtos, false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/admin/pending-member/accept")
-    public ResponseEntity<Result> acceptPendingMember(@RequestBody @Valid PendingMemberDto pendingMemberDto) {
+    public ResponseEntity<Result<String>> acceptPendingMember(@RequestBody @Valid PendingMemberDto pendingMemberDto) {
 
         try {
             memberService.acceptPendingMember(pendingMemberDto);
 
             log.info("[accept-pending-member] accept userName = "+pendingMemberDto.getName()+" | student number = "
                     +pendingMemberDto.getStd_number()+" || by adminId = "+memberRepository.getLoginMember().getId());
-            return new ResponseEntity<>(new Result("success", false), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result( "member not found", true), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
     @PostMapping("/admin/pending-member/reject")
-    public ResponseEntity<Result> rejectPendingMember(@RequestBody @Valid PendingMemberDto pendingMemberDto) {
+    public ResponseEntity<Result<String>> rejectPendingMember(@RequestBody @Valid PendingMemberDto pendingMemberDto) {
 
         try {
             memberService.rejectPendingMember(pendingMemberDto);
 
             log.info("[reject-pending-member] reject userName = "+pendingMemberDto.getName()+" | student number = "
                     +pendingMemberDto.getStd_number()+" || by adminId = "+memberRepository.getLoginMember().getId());
-            return new ResponseEntity<>(new Result("success", false), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result( "member not found", true), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/admin/personal-info/{id}")
-    public ResponseEntity<Result> callPersonalInfo(@PathVariable("id") Long memberId) {
+    public ResponseEntity<Result<PersonalInfo>> callPersonalInfo(@PathVariable("id") Long memberId) {
 
         try {
             Member member = memberService.findPersonalInfo(memberId);
@@ -142,29 +142,29 @@ public class AdminController {
             );
 
             log.info("[call-personal-info] call by adminId = "+memberRepository.getLoginMember().getId());
-            return new ResponseEntity<>(new Result(personalInfo, false), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>(personalInfo, false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/admin/member/set-role/{id}/{role}")
-    public ResponseEntity<Result> setRole(@PathVariable("id") Long memberId, @PathVariable("role") RoleTier tier) {
+    public ResponseEntity<Result<String>> setRole(@PathVariable("id") Long memberId, @PathVariable("role") RoleTier tier) {
 
         try {
             Member member = memberService.setMemberRole(memberId, tier);
 
             log.info("[set-role] set role memberId = "+member.getId()+" changed role = "+member.getRole().toString()+" by adminId = "+memberRepository.getLoginMember().getId());
-            return new ResponseEntity<>(new Result("success", false), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>("server error", true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/admin/posts")
-    public ResponseEntity<Result> rejectPostList(
+    public ResponseEntity<Result<Stream<RejectedPostDto>>> rejectPostList(
             @PageableDefault(size = 15) Pageable pageable,
             @RequestParam(value = "memberId", required = false) Long memberId,
             @RequestParam(value = "reportCount", required = false) Long reportCount) {
@@ -182,10 +182,10 @@ public class AdminController {
                             o.getReports().size(),
                             o.getCreatedBy()
                     ));
-            return new ResponseEntity<>(new Result(result, false), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>(result, false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result("failed", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 }

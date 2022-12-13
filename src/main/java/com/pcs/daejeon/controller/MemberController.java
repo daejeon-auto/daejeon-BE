@@ -32,38 +32,38 @@ public class MemberController {
     private final ReferCodeService referCodeService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Result> signUp(@RequestBody @Valid SignUpDto signUpDto) {
+    public ResponseEntity<Result<Long>> signUp(@RequestBody @Valid SignUpDto signUpDto) {
 
         try {
             Member save = memberService.saveMember(signUpDto);
-            return new ResponseEntity<>(new Result(save.getId(), false), HttpStatus.CREATED);
+            return new ResponseEntity<>(new Result<>(save.getId(), false), HttpStatus.CREATED);
         } catch (IllegalStateException e) {
             if (Objects.equals(e.getMessage(), "student already sign up")) {
-                return new ResponseEntity<>(new Result(e.getMessage(), true), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.CONFLICT);
             }
-            return new ResponseEntity<>(new Result("error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result("error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/code/generate")
-    public ResponseEntity<Result> generateCode() {
+    public ResponseEntity<Result<String>> generateCode() {
         try {
             String code = referCodeService.generateCode();
 
-            return new ResponseEntity<>(new Result(code, false), HttpStatus.CREATED);
+            return new ResponseEntity<>(new Result<>(code, false), HttpStatus.CREATED);
         } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result(e.getMessage(), true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result("fail to generate code", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>("fail to generate code", true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/code/list")
-    public ResponseEntity<Result> getCodeList() {
+    public ResponseEntity<Result<List<ReferCodeDto>>> getCodeList() {
         try {
             List<ReferCode> referCodeList = referCodeService.getReferCodeList();
             List<ReferCodeDto> result = referCodeList.stream()
@@ -75,47 +75,50 @@ public class MemberController {
                             o.isUsed()
                     )).toList();
 
-            return new ResponseEntity<>(new Result(result, false), HttpStatus.OK);
+            return new ResponseEntity<>(new Result<>(result, false), HttpStatus.OK);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result(e.getMessage(), true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/admin/member/accept/{id}")
-    public ResponseEntity<Result> acceptMember(@PathVariable("id") Long id) {
+    public ResponseEntity<Result<String>> acceptMember(@PathVariable("id") Long id) {
         try {
             memberService.acceptMember(id);
 
-            return new ResponseEntity<>(new Result("success", false), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e ) {
             if (Objects.equals(e.getMessage(), "member not found")) {
-                return new ResponseEntity<>(new Result("not found member", true), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
             }
 
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            log.debug("e = " + e);
+            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/admin/member/reject/{id}")
-    public ResponseEntity<Result> rejectMember(@PathVariable("id") Long id) {
+    public ResponseEntity<Result<String>> rejectMember(@PathVariable("id") Long id) {
         try {
             memberService.rejectMember(id);
 
-            return new ResponseEntity<>(new Result("success", false), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e ) {
             if (Objects.equals(e.getMessage(), "member not found")) {
-                return new ResponseEntity<>(new Result("not found member", true), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
             }
 
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/member/info")
-    public ResponseEntity<Result> memberInfo() {
+    public ResponseEntity<Result<MemberInfoDto>> memberInfo() {
 
         try {
             Member loginMember = memberRepository.getLoginMember();
@@ -127,10 +130,10 @@ public class MemberController {
                     loginMember.getPhoneNumber()
             );
 
-            return new ResponseEntity<>(new Result(memberInfoDto, false), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(new Result<>(memberInfoDto, false), HttpStatus.ACCEPTED);
         } catch (Exception e) {
             log.debug("e = " + e);
-            return new ResponseEntity<>(new Result( "server error", true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
 }
