@@ -70,7 +70,7 @@ public class MemberController {
                     .map(o -> new ReferCodeDto(
                             o.getId(),
                             o.getCode(),
-                            o.getUsedBy().getName(),
+                            o.getUsedBy() != null ? o.getUsedBy().getName() : null,
                             o.getCreatedDate(),
                             o.isUsed()
                     )).toList();
