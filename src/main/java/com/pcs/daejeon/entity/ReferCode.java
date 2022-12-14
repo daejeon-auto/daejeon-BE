@@ -42,9 +42,7 @@ public class ReferCode extends BasicTime {
         return Long.toString(l, Character.MAX_RADIX);
     }
 
-    public void useCode(Member member) {
-
+    public void setIsUsed() {
         this.isUsed = true;
-        this.usedBy = member;
     }
 }

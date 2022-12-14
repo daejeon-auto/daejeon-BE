@@ -45,7 +45,7 @@ public class MemberService {
             }
 
             member.setMemberType(MemberType.ACCEPT);
-            member.setUsedCode(referCode);
+            member.useCode(referCode);
         }
 
         return memberRepository.save(member);
