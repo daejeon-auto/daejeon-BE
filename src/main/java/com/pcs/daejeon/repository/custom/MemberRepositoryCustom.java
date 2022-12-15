@@ -14,5 +14,5 @@ public interface MemberRepositoryCustom {
 
     Member createMember(SignUpDto signUpDto);
 
-    List<Member> getMemberList(Long memberId);
+    List<Member> getMemberList(Long memberId, boolean onlyAdmin);
 }
