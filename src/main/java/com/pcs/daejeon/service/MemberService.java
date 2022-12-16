@@ -73,8 +73,8 @@ public class MemberService {
         log.info("[reject-member] reject member: id["+ member.getId() +"]"+ memberRepository.getLoginMember().getId());
     }
 
-    public List<Member> getMembers(Long memberId) {
-        return memberRepository.getMemberList(memberId);
+    public List<Member> getMembers(Long memberId, boolean onlyAdmin) {
+        return memberRepository.getMemberList(memberId, onlyAdmin);
     }
 
     public List<Member> getPendingMembers() {

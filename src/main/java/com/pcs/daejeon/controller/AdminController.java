@@ -58,9 +58,12 @@ public class AdminController {
 
 
     @PostMapping("/admin/members")
-    public ResponseEntity<Result<List<MemberListDto>>> getMembers(@RequestParam(value = "memberId", required = false) Long memberId) {
+    public ResponseEntity<Result<List<MemberListDto>>> getMembers(
+            @RequestParam(value = "memberId", required = false) Long memberId,
+            @RequestParam(value = "onlyAdmin", required = false) boolean onlyAdmin) {
+
         try {
-            List<Member> members = memberService.getMembers(memberId);
+            List<Member> members = memberService.getMembers(memberId, onlyAdmin);
             List<MemberListDto> memberListDto = members.stream()
                     .map(o -> new MemberListDto(o.getId(), o.getMemberType(), o.getUsedCode() != null ? o.getUsedCode().getCode() : ""))
                     .toList();
