@@ -33,7 +33,12 @@ class MemberRepositoryImplTest {
                 AuthType.DIRECT,
                 "20202",
                 "password",
-                "test");
+                "test",
+                "부산컴퓨터과학고등학교",
+                "부산",
+                "인스타아이디",
+                "인스타비밀번호"
+        );
 
         Member member = memberRepository.createMember(signUpDto);
 

@@ -2,6 +2,7 @@ package com.pcs.daejeon;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
@@ -33,7 +34,8 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 "20201",
                 "password",
                 "loginId",
-                AuthType.DIRECT
+                AuthType.DIRECT,
+                new School("부산컴퓨터과학고등학교", "부산 중구", "인스타아이디", "패스워드")
         );
         member.setRole(RoleTier.ROLE_TIER2);
         memberRepository.save(member);

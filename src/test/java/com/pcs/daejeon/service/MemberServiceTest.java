@@ -27,15 +27,19 @@ class MemberServiceTest {
     PasswordEncoder passwordEncoder;
 
     @Test
-    public void signUpTest() {
+    public void 코드_없이_회원가입() {
         SignUpDto signUpDto = new SignUpDto(
                 "test1",
                 "20050323",
-                "01027729778",
+                "01012341234",
                 AuthType.DIRECT,
-                "20201",
-                "koldin13579",
-                "koldin"
+                "20203",
+                "testPassword",
+                "testId3",
+                "부산컴퓨터과학고등학교",
+                "부산",
+                "인스타아이디",
+                "인스타비밀번호"
         );
 
         Member saveMember = memberService.saveMember(signUpDto);
