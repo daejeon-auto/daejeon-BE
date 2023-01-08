@@ -78,6 +78,10 @@ public class Member extends BasicTime {
             fetch = FetchType.LAZY)
     private List<Report> reports = new ArrayList<>();
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "student")
+    private School school;
+
     public void setMemberType(MemberType memberType) {
         this.memberType = memberType;
     }
