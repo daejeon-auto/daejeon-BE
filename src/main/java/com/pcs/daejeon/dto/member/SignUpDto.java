@@ -60,7 +60,17 @@ public class SignUpDto {
         this.school = new School(schoolName, locate, instaId, instaPwd);
     }
 
-    public SignUpDto(String name, String birthDay, String phoneNumber, AuthType authType, String studentNumber, String pwd, String loginId) {
+    public SignUpDto(String name,
+                     String birthDay,
+                     String phoneNumber,
+                     AuthType authType,
+                     String studentNumber,
+                     String pwd,
+                     String loginId,
+                     String schoolName,
+                     String locate,
+                     String instaId,
+                     String instaPwd) {
         this.name = name;
         this.birthDay = birthDay;
         this.phoneNumber = phoneNumber;
@@ -68,5 +78,6 @@ public class SignUpDto {
         this.studentNumber = studentNumber;
         this.password = pwd;
         this.loginId = loginId;
+        this.school = new School(schoolName, locate, instaId, instaPwd);
     }
 }
