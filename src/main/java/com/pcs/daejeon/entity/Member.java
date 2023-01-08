@@ -78,7 +78,7 @@ public class Member extends BasicTime {
             fetch = FetchType.LAZY)
     private List<Report> reports = new ArrayList<>();
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "student")
     private School school;
 
@@ -95,7 +95,7 @@ public class Member extends BasicTime {
         usedCode.setIsUsed();
     }
 
-    public Member(String name, String birthDay, String phoneNumber, String studentNumber, String password, String loginId, AuthType authType) {
+    public Member(String name, String birthDay, String phoneNumber, String studentNumber, String password, String loginId, AuthType authType, School school) {
         this.name = name;
         this.birthDay = birthDay;
         this.phoneNumber = phoneNumber;
@@ -103,7 +103,8 @@ public class Member extends BasicTime {
         this.password = password;
         this.loginId = loginId;
         this.authType = authType;
+        this.school = school;
         this.role = RoleTier.ROLE_TIER0;
-        this .memberType = MemberType.PENDING;
+        this.memberType = MemberType.PENDING;
     }
 }

@@ -1,5 +1,6 @@
 package com.pcs.daejeon.dto.member;
 
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,9 @@ public class SignUpDto {
     private String studentNumber;
 
     @NotNull
+    private School school;
+
+    @NotNull
     private String password;
 
     @NotNull
@@ -33,7 +37,18 @@ public class SignUpDto {
 
     private String referCode = null;
 
-    public SignUpDto(String name, String birthDay, String phoneNumber, AuthType authType, String studentNumber, String password, String loginId, String referCode) {
+    public SignUpDto(String name,
+                     String birthDay,
+                     String phoneNumber,
+                     AuthType authType,
+                     String studentNumber,
+                     String password,
+                     String loginId,
+                     String schoolName,
+                     String locate,
+                     String instaId,
+                     String instaPwd,
+                     String referCode) {
         this.name = name;
         this.birthDay = birthDay;
         this.phoneNumber = phoneNumber;
@@ -42,6 +57,7 @@ public class SignUpDto {
         this.password = password;
         this.loginId = loginId;
         this.referCode = referCode;
+        this.school = new School(schoolName, locate, instaId, instaPwd);
     }
 
     public SignUpDto(String name, String birthDay, String phoneNumber, AuthType authType, String studentNumber, String pwd, String loginId) {

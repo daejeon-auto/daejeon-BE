@@ -78,7 +78,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 signUpDto.getStudentNumber(),
                 pwdEncoder.encode(signUpDto.getPassword()),
                 signUpDto.getLoginId(),
-                signUpDto.getAuthType()
+                signUpDto.getAuthType(),
+                signUpDto.getSchool()
         );
     }
 

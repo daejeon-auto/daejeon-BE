@@ -62,20 +62,6 @@ public class MemberController {
         }
     }
 
-//    @PostMapping("/code/generate")
-//    public ResponseEntity<Result<String>> generateCode() {
-//        try {
-//            String code = referCodeService.generateCode();
-//
-//            return new ResponseEntity<>(new Result<>(code, false), HttpStatus.CREATED);
-//        } catch (IllegalStateException e) {
-//            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
-//        } catch (Exception e) {
-//            log.error("e = " + e);
-//            return new ResponseEntity<>(new Result<>("fail to generate code", true), HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
     @PostMapping("/code/list")
     public ResponseEntity<Result<List<ReferCodeDto>>> getCodeList() {
         try {
