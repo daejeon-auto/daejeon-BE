@@ -4,9 +4,11 @@ import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.entity.Like;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +39,14 @@ class LikeRepositoryImplTest {
     @Autowired
     PostRepository postRepository;
 
+    @Autowired
+    SchoolRepository schoolRepository;
+
     @Test
     public void 이미_좋야요를_눌렀을때() {
 
         Member member = memberRepository.getLoginMember();
+        schoolRepository.save(member.getSchool());
         Post helloWorld = new Post("hello world", member.getSchool());
         postRepository.save(helloWorld);
 
@@ -59,6 +65,7 @@ class LikeRepositoryImplTest {
     public void 좋아요를_처음_등록할때() {
 
         Member member = memberRepository.getLoginMember();
+        schoolRepository.save(member.getSchool());
         Post helloWorld = new Post("hello world", member.getSchool());
         postRepository.save(helloWorld);
 
