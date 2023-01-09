@@ -1,8 +1,6 @@
 package com.pcs.daejeon.repository.customImpl;
 
-import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.QReport;
-import com.pcs.daejeon.entity.Report;
+import com.pcs.daejeon.entity.*;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.ReportRepository;
 import com.pcs.daejeon.repository.custom.ReportRepositoryCustom;
@@ -26,9 +24,14 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
     public boolean validReport(Long postId) {
         Member member = memberRepository.getLoginMember();
 
+        QMember reportedBy = new QMember("reportedBy");
+        QPost reportedPost = new QPost("reportedPost");
+
         Report result = jpaQueryFactory
                 .selectFrom(report)
-                .where(report.reportedBy.id.eq(member.getId()), report.reportedPost.id.eq(postId))
+                .innerJoin(report.reportedBy, reportedBy)
+                .innerJoin(report.reportedPost, reportedPost)
+                .where(reportedBy.id.eq(member.getId()), reportedPost.id.eq(postId))
                 .fetchOne();
         return result == null;
     }
