@@ -39,7 +39,7 @@ public class Post extends BasicEntity {
 
     // 어느 학교의 게시글인지 확인
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "post")
+    @JoinColumn(name = "school_id")
     private School school;
 
     public Post() {}
