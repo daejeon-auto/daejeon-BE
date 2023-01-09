@@ -3,6 +3,8 @@ package com.pcs.daejeon.repository.customImpl;
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.QMember;
+import com.pcs.daejeon.entity.QPost;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
 import com.querydsl.core.Tuple;
@@ -19,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 
 import static com.pcs.daejeon.entity.QLike.like;
+import static com.pcs.daejeon.entity.QMember.*;
 import static com.pcs.daejeon.entity.QPost.post;
 import static com.pcs.daejeon.entity.QReport.report;
 
@@ -40,20 +43,30 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                     .getPrincipal();
         }
 
+        QPost likePost = new QPost("likePost");
+        QPost reportedPost = new QPost("reportedPost");
+        QMember likedBy = new QMember("likedBy");
+        QMember reportedBy = new QMember("reportedBy");
+
         JPAQuery<Tuple> tupleJPAQuery = query
                 .select(post, like, report)
                 .from(post)
                 .leftJoin(post.like, like);
         if (member != null) {
             tupleJPAQuery
-                .on(like.post.id.eq(post.id), like.likedBy.id.eq(member.getMember().getId()))
-                .leftJoin(post.reports, report)
-                .on(report.reportedPost.id.eq(post.id), report.reportedBy.id.eq(member.getMember().getId()));
+                    .leftJoin(like.post, likePost)
+                    .leftJoin(like.likedBy, likedBy)
+                    .on(likePost.id.eq(post.id), likedBy.id.eq(member.getMember().getId()))
+                    .leftJoin(post.reports, report)
+                    .leftJoin(report.reportedPost, reportedPost)
+                    .leftJoin(report.reportedBy, reportedBy)
+                    .on(reportedPost.id.eq(post.id), reportedBy.id.eq(member.getMember().getId()));
         } else {
             tupleJPAQuery
                 .on(like.post.id.eq(0L))
                 .leftJoin(post.reports, report)
-                .on(report.reportedPost.id.eq(0L));
+                .leftJoin(report.reportedPost, reportedPost)
+                .on(reportedPost.id.eq(0L));
         }
 
         List<Tuple> result = tupleJPAQuery
@@ -67,6 +80,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .select(post.count())
                 .from(post)
                 .where(post.postType.eq(PostType.ACCEPTED));
+
+
+        List<Post> fetch = query
+                .selectFrom(post)
+                .where(post.postType.eq(PostType.ACCEPTED))
+                .fetch();
+        System.out.println("fetch = " + fetch);
 
         return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }

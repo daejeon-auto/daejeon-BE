@@ -8,15 +8,18 @@ import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
 import com.querydsl.core.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -24,12 +27,14 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
 @Rollback
 @WithMockCustomUser
+@AutoConfigureMockMvc
 class PostRepositoryImplTest {
 
     @Autowired
@@ -41,24 +46,32 @@ class PostRepositoryImplTest {
     @Autowired
     EntityManager em;
 
+    @Autowired
+    SchoolRepository schoolRepository;
+
+    @Autowired
+    private MockMvc mvc;
+
     PageRequest pageable = PageRequest.of(0, 10);
 
     @BeforeEach
     public void initData() {
+            School school = new School(
+                    "테스트학교",
+                    "지역",
+                    "인스타아이디",
+                    "인스타비밀번호"
+            );
+            schoolRepository.save(school);
         for (int i = 0; i < 100; i++) {
-            postRepository.save(
-                    new Post("test value " + i,
-                            new School(
-                                    "테스트학교",
-                                    "지역",
-                                    "인스타아이디",
-                                    "인스타비밀번호"
-                            )));
+            postRepository.save(new Post("test value " + i, school));
         }
     }
 
     @Test
-    public void unloggedInPagingPost() {
+    public void 로그인_안했을시_페이징() throws Exception {
+        mvc.perform(logout());
+
         Page<Tuple> post = postRepository.pagingPost(pageable);
 
         assertThat(post.getTotalElements()).isEqualTo(100L);
