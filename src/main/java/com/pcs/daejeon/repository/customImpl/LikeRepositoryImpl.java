@@ -1,6 +1,7 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.QMember;
 import com.pcs.daejeon.repository.custom.LikeRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,14 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
                 .from(like)
                 .where(like.likedBy.eq(member), like.post.id.eq(postId))
                 .fetchOne();
-        return aLong != 0;
+
+        Integer schoolValid = query
+                .selectOne()
+                .from(QMember.member)
+                .where(
+                        QMember.member.school.id.eq(like.post.school.id)
+                )
+                .fetchOne();
+        return aLong != 0 && schoolValid != 0;
     }
 }

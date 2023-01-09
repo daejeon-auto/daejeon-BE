@@ -24,6 +24,12 @@ public class School extends BasicTime {
     @JsonIgnore
     private List<Member> student;
 
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            mappedBy = "school")
+    @JsonIgnore
+    private List<Post> post;
+
     private String name;
     private String locate;
 

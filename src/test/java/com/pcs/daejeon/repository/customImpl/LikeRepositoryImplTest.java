@@ -38,10 +38,10 @@ class LikeRepositoryImplTest {
     PostRepository postRepository;
 
     @Test
-    public void valid_fail() {
+    public void 이미_좋야요를_눌렀을때() {
 
         Member member = memberRepository.getLoginMember();
-        Post helloWorld = new Post("hello world");
+        Post helloWorld = new Post("hello world", member.getSchool());
         postRepository.save(helloWorld);
 
         Optional<Post> post = postRepository.findById(helloWorld.getId());
@@ -50,16 +50,16 @@ class LikeRepositoryImplTest {
 
         likeRepository.save(like);
 
-        boolean valid = likeRepository.validLike(member, helloWorld.getId());
+         boolean valid = likeRepository.validLike(member, helloWorld.getId());
 
         assertThat(valid).isTrue();
     }
 
     @Test
-    public void valid_success() {
+    public void 좋아요를_처음_등록할때() {
 
         Member member = memberRepository.getLoginMember();
-        Post helloWorld = new Post("hello world");
+        Post helloWorld = new Post("hello world", member.getSchool());
         postRepository.save(helloWorld);
 
         boolean valid = likeRepository.validLike(member, helloWorld.getId());

@@ -1,6 +1,7 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.Report;
 import com.pcs.daejeon.repository.MemberRepository;
@@ -36,7 +37,8 @@ class ReportRepositoryImplTest {
 
     @Test
     public void 신고_가능() {
-        Post post = new Post("test글 작성");
+        Member loginMember = memberRepository.getLoginMember();
+        Post post = new Post("test글 작성", loginMember.getSchool());
 
         Post save = postRepository.save(post);
 
@@ -47,7 +49,8 @@ class ReportRepositoryImplTest {
 
     @Test
     public void 신고_불가능() {
-        Post post = new Post("test글 작성");
+        Member member = memberRepository.getLoginMember();
+        Post post = new Post("test글 작성", member.getSchool());
         Post save = postRepository.save(post);
 
         Report report = new Report("test", memberRepository.getLoginMember(), post);

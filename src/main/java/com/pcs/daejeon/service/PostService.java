@@ -51,7 +51,8 @@ public class PostService {
             throw new IllegalArgumentException("bad words");
         }
 
-        Post save = postRepository.save(new Post(description));
+        Member loginMember = memberRepository.getLoginMember();
+        Post save = postRepository.save(new Post(description, loginMember.getSchool()));
         return save.getId();
     }
 

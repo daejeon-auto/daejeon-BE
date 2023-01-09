@@ -4,6 +4,7 @@ import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QPost;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
@@ -45,7 +46,14 @@ class PostRepositoryImplTest {
     @BeforeEach
     public void initData() {
         for (int i = 0; i < 100; i++) {
-            postRepository.save(new Post("test value " + i));
+            postRepository.save(
+                    new Post("test value " + i,
+                            new School(
+                                    "테스트학교",
+                                    "지역",
+                                    "인스타아이디",
+                                    "인스타비밀번호"
+                            )));
         }
     }
 
@@ -83,7 +91,8 @@ class PostRepositoryImplTest {
 
     @Test
     public void 내가_쓴_글_리스트() {
-        Post post = new Post("test글 작성");
+        Member member = memberRepository.getLoginMember();
+        Post post = new Post("test글 작성", member.getSchool());
         Post save = postRepository.save(post);
 
         em.flush();
