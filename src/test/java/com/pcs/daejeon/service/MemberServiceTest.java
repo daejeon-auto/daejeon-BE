@@ -46,5 +46,6 @@ class MemberServiceTest {
         Optional<Member> findMember = memberRepository.findById(saveMember.getId());
 
         assertThat(findMember.get().getStudentNumber()).isEqualTo(signUpDto.getStudentNumber());
+        assertThat(MemberType.PENDING).isEqualTo(findMember.get().getMemberType());
     }
 }
