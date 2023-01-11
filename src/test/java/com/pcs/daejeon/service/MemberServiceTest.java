@@ -1,24 +1,33 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
+import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.ReferCodeRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 
 @SpringBootTest
 @Transactional
@@ -33,8 +42,6 @@ class MemberServiceTest {
     ReferCodeService referCodeService;
     @Autowired
     PasswordEncoder passwordEncoder;
-    @Autowired
-    MockMvc mvc;
 
     private class CreateTestMember {
         private Member saveMember;
@@ -113,5 +120,37 @@ class MemberServiceTest {
 
         assertThat(findMember.get().getStudentNumber()).isEqualTo(signUpDto.getStudentNumber());
         assertThat(MemberType.ACCEPT).isEqualTo(findMember.get().getMemberType());
+    }
+
+    @Test
+    public void 회원_승인_200() {
+        CreateTestMember member = new CreateTestMember();
+
+        memberService.acceptMember(member.saveMember.getId());
+
+        assertThat(member.saveMember.getMemberType()).isEqualTo(MemberType.ACCEPT);
+    }
+
+    @Test
+    public void 회원_승인_404() {
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            memberService.acceptMember(100L);
+        });
+    }
+
+    @Test
+    public void 회원_거절_200() {
+        CreateTestMember member = new CreateTestMember();
+
+        memberService.rejectMember(member.saveMember.getId());
+
+        assertThat(member.saveMember.getMemberType()).isEqualTo(MemberType.REJECT);
+    }
+
+    @Test
+    public void 회원_거절_404() {
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            memberService.acceptMember(100L);
+        });
     }
 }
