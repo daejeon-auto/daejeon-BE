@@ -86,6 +86,9 @@ class MemberServiceTest {
     }
 
 
+
+
+    // === 추천 코드 회원가입 ===
     @Test
     public void 코드_없이_회원가입() {
         CreateTestMember member = new CreateTestMember();
@@ -121,7 +124,10 @@ class MemberServiceTest {
         assertThat(findMember.get().getStudentNumber()).isEqualTo(signUpDto.getStudentNumber());
         assertThat(MemberType.ACCEPT).isEqualTo(findMember.get().getMemberType());
     }
+    // === 추천 코드 회원가입 ===
 
+
+    // === 회원 승인, 거절 관련 ===
     @Test
     public void 회원_승인_200() {
         CreateTestMember member = new CreateTestMember();
@@ -153,4 +159,5 @@ class MemberServiceTest {
             memberService.acceptMember(100L);
         });
     }
+    // === 회원 승인, 거절 관련 ===
 }
