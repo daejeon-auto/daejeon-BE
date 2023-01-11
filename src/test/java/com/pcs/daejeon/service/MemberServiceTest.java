@@ -58,7 +58,7 @@ class MemberServiceTest {
         public CreateTestMember() {
             SignUpDto signUpDto = new SignUpDto(
                     "test1",
-                    "20050323",
+                    "200000101",
                     "01012341234",
                     AuthType.DIRECT,
                     ""+(int) (Math.random()*100000),
@@ -85,10 +85,16 @@ class MemberServiceTest {
         }
     }
 
+    // === 회원가입 ===
+    @Test
+    public void 회원가입_실패_존재하는_계정() {
+        CreateTestMember createTestMember = new CreateTestMember();
 
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            memberService.saveMember(createTestMember.signUpDto);
+        });
+    }
 
-
-    // === 추천 코드 회원가입 ===
     @Test
     public void 코드_없이_회원가입() {
         CreateTestMember member = new CreateTestMember();
@@ -105,7 +111,7 @@ class MemberServiceTest {
 
         SignUpDto signUpDto = new SignUpDto(
                 "test1",
-                "20050323",
+                "200000101",
                 "01012341234",
                 AuthType.INDIRECT,
                 "20203",
@@ -140,7 +146,7 @@ class MemberServiceTest {
     @Test
     public void 회원_승인_404() {
         Assertions.assertThrows(IllegalStateException.class, () -> {
-            memberService.acceptMember(100L);
+            memberService.acceptMember(0L);
         });
     }
 
