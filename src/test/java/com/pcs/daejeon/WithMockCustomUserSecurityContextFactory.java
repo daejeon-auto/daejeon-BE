@@ -4,8 +4,10 @@ import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
+import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
+import com.pcs.daejeon.service.ReferCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,6 +23,9 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    ReferCodeService referCodeService;
 
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser annotation) {
@@ -38,7 +43,9 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 new School("부산컴퓨터과학고등학교", "부산 중구", "인스타아이디", "패스워드")
         );
         member.setRole(RoleTier.ROLE_TIER2);
+        member.setMemberType(MemberType.ACCEPT);
         memberRepository.save(member);
+        referCodeService.generateCode(member);
 
         final UsernamePasswordAuthenticationToken authenticationToken
                 = new UsernamePasswordAuthenticationToken(new PrincipalDetails(
