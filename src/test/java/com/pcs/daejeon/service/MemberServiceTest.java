@@ -33,27 +33,59 @@ class MemberServiceTest {
     ReferCodeService referCodeService;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    MockMvc mvc;
+
+    private class CreateTestMember {
+        private Member saveMember;
+        private SignUpDto signUpDto;
+
+        public Member getSaveMember() {
+            return saveMember;
+        }
+
+        public SignUpDto getSignUpDto() {
+            return signUpDto;
+        }
+
+        public CreateTestMember() {
+            SignUpDto signUpDto = new SignUpDto(
+                    "test1",
+                    "20050323",
+                    "01012341234",
+                    AuthType.DIRECT,
+                    ""+(int) (Math.random()*100000),
+                    "testPassword",
+                    "testId"+(int) (Math.random()*100),
+                    "부산컴퓨터과학고등학교",
+                    "부산",
+                    "인스타아이디",
+                    "인스타비밀번호"
+            );
+
+            try {
+                Member saveMember = memberService.saveMember(signUpDto);
+                this.saveMember = saveMember;
+                this.signUpDto = signUpDto;
+                return;
+            } catch(Exception e) {
+                // 만일 같은 값을 가져 already signed up 에러가 뜨면 새로 랜덤값을 뽑음
+                CreateTestMember member = new CreateTestMember();
+                this.saveMember = member.saveMember;
+                this.signUpDto = member.signUpDto;
+                return;
+            }
+        }
+    }
+
 
     @Test
     public void 코드_없이_회원가입() {
-        SignUpDto signUpDto = new SignUpDto(
-                "test1",
-                "20050323",
-                "01012341234",
-                AuthType.DIRECT,
-                "20203",
-                "testPassword",
-                "testId3",
-                "부산컴퓨터과학고등학교",
-                "부산",
-                "인스타아이디",
-                "인스타비밀번호"
-        );
+        CreateTestMember member = new CreateTestMember();
 
-        Member saveMember = memberService.saveMember(signUpDto);
-        Optional<Member> findMember = memberRepository.findById(saveMember.getId());
+        Optional<Member> findMember = memberRepository.findById(member.saveMember.getId());
 
-        assertThat(findMember.get().getStudentNumber()).isEqualTo(signUpDto.getStudentNumber());
+        assertThat(findMember.get().getStudentNumber()).isEqualTo(member.signUpDto.getStudentNumber());
         assertThat(MemberType.PENDING).isEqualTo(findMember.get().getMemberType());
     }
 
