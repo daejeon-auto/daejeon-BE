@@ -130,7 +130,47 @@ class MemberServiceTest {
         assertThat(findMember.get().getStudentNumber()).isEqualTo(signUpDto.getStudentNumber());
         assertThat(MemberType.ACCEPT).isEqualTo(findMember.get().getMemberType());
     }
-    // === 추천 코드 회원가입 ===
+
+    @Test
+    public void 중복코드_회원가입() {
+        List<ReferCode> referCodeList = referCodeService.getReferCodeList();
+
+        SignUpDto signUpDto = new SignUpDto(
+                "test1",
+                "200000101",
+                "01012341234",
+                AuthType.INDIRECT,
+                "20786",
+                "testPassword",
+                "testId0921939",
+                "부산컴퓨터과학고등학교",
+                "부산",
+                "인스타아이디",
+                "인스타비밀번호",
+                referCodeList.get(0).getCode()
+        );
+        memberService.saveMember(signUpDto);
+
+        SignUpDto signUpDto2 = new SignUpDto(
+                "test1",
+                "200000101",
+                "01012341234",
+                AuthType.INDIRECT,
+                "12323",
+                "testPassword",
+                "testId23212",
+                "부산컴퓨터과학고등학교",
+                "부산",
+                "인스타아이디",
+                "인스타비밀번호",
+                referCodeList.get(0).getCode()
+        );
+
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+           memberService.saveMember(signUpDto2);
+        });
+    }
+    // === 회원가입 ===
 
 
     // === 회원 승인, 거절 관련 ===
