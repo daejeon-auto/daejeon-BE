@@ -205,5 +205,35 @@ class MemberServiceTest {
             memberService.acceptMember(100L);
         });
     }
+
+    @Test
+    public void 승인대기회원_승인_200() {
+        CreateTestMember createTestMember = new CreateTestMember();
+
+        Member member = createTestMember.saveMember;
+        memberService.acceptPendingMember(new PendingMemberDto(
+                member.getCreatedDate(),
+                member.getBirthDay(),
+                member.getName(),
+                member.getStudentNumber()
+        ));
+
+        assertThat(member.getMemberType()).isEqualTo(MemberType.ACCEPT);
+    }
+
+    @Test
+    public void 승인대기회원_승인_404() {
+        CreateTestMember createTestMember = new CreateTestMember();
+
+        Member member = createTestMember.saveMember;
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            memberService.acceptPendingMember(new PendingMemberDto(
+                    member.getCreatedDate(),
+                    member.getBirthDay(),
+                    "",
+                    member.getStudentNumber()
+            ));
+        });
+    }
     // === 회원 승인, 거절 관련 ===
 }
