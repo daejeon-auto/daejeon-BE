@@ -7,27 +7,19 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
-import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
-import com.pcs.daejeon.repository.ReferCodeRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 
 @SpringBootTest
 @Transactional
@@ -47,14 +39,6 @@ class MemberServiceTest {
         private Member saveMember;
         private SignUpDto signUpDto;
 
-        public Member getSaveMember() {
-            return saveMember;
-        }
-
-        public SignUpDto getSignUpDto() {
-            return signUpDto;
-        }
-
         public CreateTestMember() {
             SignUpDto signUpDto = new SignUpDto(
                     "test1",
@@ -71,16 +55,13 @@ class MemberServiceTest {
             );
 
             try {
-                Member saveMember = memberService.saveMember(signUpDto);
-                this.saveMember = saveMember;
+                this.saveMember = memberService.saveMember(signUpDto);
                 this.signUpDto = signUpDto;
-                return;
             } catch(Exception e) {
                 // 만일 같은 값을 가져 already signed up 에러가 뜨면 새로 랜덤값을 뽑음
                 CreateTestMember member = new CreateTestMember();
                 this.saveMember = member.saveMember;
                 this.signUpDto = member.signUpDto;
-                return;
             }
         }
     }
@@ -90,9 +71,7 @@ class MemberServiceTest {
     public void 회원가입_실패_존재하는_계정() {
         CreateTestMember createTestMember = new CreateTestMember();
 
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            memberService.saveMember(createTestMember.signUpDto);
-        });
+        Assertions.assertThrows(IllegalStateException.class, () -> memberService.saveMember(createTestMember.signUpDto));
     }
 
     @Test
@@ -166,9 +145,7 @@ class MemberServiceTest {
                 referCodeList.get(0).getCode()
         );
 
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-           memberService.saveMember(signUpDto2);
-        });
+        Assertions.assertThrows(IllegalStateException.class, () -> memberService.saveMember(signUpDto2));
     }
     // === 회원가입 ===
 
@@ -185,9 +162,7 @@ class MemberServiceTest {
 
     @Test
     public void 회원_승인_404() {
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            memberService.acceptMember(0L);
-        });
+        Assertions.assertThrows(IllegalStateException.class, () -> memberService.acceptMember(0L));
     }
 
     @Test
@@ -201,9 +176,7 @@ class MemberServiceTest {
 
     @Test
     public void 회원_거절_404() {
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            memberService.acceptMember(100L);
-        });
+        Assertions.assertThrows(IllegalStateException.class, () -> memberService.acceptMember(100L));
     }
 
     @Test
