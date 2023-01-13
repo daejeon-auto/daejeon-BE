@@ -54,7 +54,7 @@ class PostServiceTest {
     @Test
     @DisplayName("글 작성 실패 - 욕설 포함")
     void writePost400BadWord() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> postService.writePost("시발"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> postService.writePost("시발----------"));
     }
 
     @Test
