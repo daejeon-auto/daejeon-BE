@@ -46,8 +46,8 @@ public class PostService {
     public Long writePost(String description) {
         description = description.replace("\n", " ");
 
-        boolean isOk = isBadDesc(description);
-        if (!isOk) {
+        boolean isBad = isBadDesc(description);
+        if (isBad) {
             throw new IllegalArgumentException("bad words");
         }
 
@@ -86,10 +86,10 @@ public class PostService {
                 resultMap.getBody().get("race") == "1" ||
                 resultMap.getBody().get("religion") == "1"
             ) {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new IllegalStateException("description valid api server error");
         }
