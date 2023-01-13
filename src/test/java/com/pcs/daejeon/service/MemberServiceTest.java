@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,8 @@ class MemberServiceTest {
     ReferCodeService referCodeService;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    EntityManager em;
 
     private class CreateTestMember {
         private Member saveMember;
@@ -201,6 +204,40 @@ class MemberServiceTest {
         Member member = createTestMember.saveMember;
         Assertions.assertThrows(IllegalStateException.class, () -> {
             memberService.acceptPendingMember(new PendingMemberDto(
+                    member.getCreatedDate(),
+                    member.getBirthDay(),
+                    "",
+                    member.getStudentNumber()
+            ));
+        });
+    }
+    @Test
+    public void 승인대기회원_거절_200() {
+        CreateTestMember createTestMember = new CreateTestMember();
+
+        Member member = createTestMember.saveMember;
+        Long memberId = member.getId();
+
+        memberService.rejectPendingMember(new PendingMemberDto(
+                member.getCreatedDate(),
+                member.getBirthDay(),
+                member.getName(),
+                member.getStudentNumber()
+        ));
+
+        em.flush();
+        em.clear();
+
+        assertThat(memberRepository.findById(memberId)).isEqualTo(Optional.empty());
+    }
+
+    @Test
+    public void 승인대기회원_거절_404() {
+        CreateTestMember createTestMember = new CreateTestMember();
+
+        Member member = createTestMember.saveMember;
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            memberService.rejectPendingMember(new PendingMemberDto(
                     member.getCreatedDate(),
                     member.getBirthDay(),
                     "",
