@@ -7,6 +7,7 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
+import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -246,4 +247,19 @@ class MemberServiceTest {
         });
     }
     // === 회원 승인, 거절 관련 ===
+
+    // === 회원 권한 수정 ===
+    @Test
+    public void 회원_권한_수정_200() {
+        CreateTestMember createTestMember = new CreateTestMember();
+        memberService.setMemberRole(createTestMember.saveMember.getId(), RoleTier.ROLE_TIER2);
+
+        assertThat(createTestMember.saveMember.getRole()).isEqualTo(RoleTier.ROLE_TIER2);
+    }
+
+    @Test
+    public void 회원_권한_수정_404() {
+        Assertions.assertThrows(IllegalStateException.class, () -> memberService.setMemberRole(0L, RoleTier.ROLE_TIER2));
+    }
+    // === 회원 권한 수정 ===
 }
