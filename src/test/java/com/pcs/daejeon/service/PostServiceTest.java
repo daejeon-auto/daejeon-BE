@@ -2,23 +2,29 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.PostRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
+import com.querydsl.core.Tuple;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolationException;
+import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -32,12 +38,28 @@ class PostServiceTest {
 
     @Autowired
     PostRepository postRepository;
+    @Autowired
+    SchoolRepository schoolRepository;
 
     @Autowired
     MockMvc mvc;
 
     @Autowired
     EntityManager em;
+
+    @BeforeEach
+    public void initData() {
+        School school = new School(
+                "테스트학교",
+                "지역",
+                "인스타아이디",
+                "인스타비밀번호"
+        );
+        schoolRepository.save(school);
+        for (int i = 0; i < 100; i++) {
+            postRepository.save(new Post("test value " + i, school));
+        }
+    }
 
     @Test
     @DisplayName("글 작성 성공")
@@ -103,7 +125,12 @@ class PostServiceTest {
     }
 
     @Test
+    @DisplayName("글 가져오기 성공")
     void findPagedPost() {
+        List<Tuple> post = postService.findPagedPost(PageRequest.of(0, 15)).getContent();
+
+        Assertions.assertFalse(post.isEmpty());
+        assertThat(post.size()).isEqualTo(15);
     }
 
     @Test
@@ -120,9 +147,5 @@ class PostServiceTest {
 
     @Test
     void findPostById() {
-    }
-
-    @Test
-    void addLike() {
     }
 }
