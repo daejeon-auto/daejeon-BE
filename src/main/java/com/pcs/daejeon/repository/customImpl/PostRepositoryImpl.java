@@ -21,7 +21,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 
 import static com.pcs.daejeon.entity.QLike.like;
-import static com.pcs.daejeon.entity.QMember.*;
 import static com.pcs.daejeon.entity.QPost.post;
 import static com.pcs.daejeon.entity.QReport.report;
 
@@ -81,13 +80,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .from(post)
                 .where(post.postType.eq(PostType.ACCEPTED));
 
-
-        List<Post> fetch = query
-                .selectFrom(post)
-                .where(post.postType.eq(PostType.ACCEPTED))
-                .fetch();
-        System.out.println("fetch = " + fetch);
-
         return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }
 
@@ -112,10 +104,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     @Override
     public Page<Post> pagingRejectPost(Pageable page, Long memberId, Long reportCount) {
-        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
-                    .getContext()
-                    .getAuthentication()
-                    .getPrincipal();
+//        todo: MEMBER로그인 기능 필요 없는거 확인 되면 삭제
+        //        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
+//                    .getContext()
+//                    .getAuthentication()
+//                    .getPrincipal();
 
         List<Post> result = query
                 .selectFrom(post)

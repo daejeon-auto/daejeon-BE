@@ -46,8 +46,8 @@ public class PostService {
     public Long writePost(String description) {
         description = description.replace("\n", " ");
 
-        boolean isOk = isBadDesc(description);
-        if (!isOk) {
+        boolean isBad = isBadDesc(description);
+        if (isBad) {
             throw new IllegalArgumentException("bad words");
         }
 
@@ -74,22 +74,22 @@ public class PostService {
 
             ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
             if (
-                !resultMap.hasBody() ||
-                resultMap.getBody().get("abuse") == "1" ||
-                resultMap.getBody().get("age") == "1" ||
-                resultMap.getBody().get("binan") == "1" ||
-                resultMap.getBody().get("gender") == "1" ||
-                resultMap.getBody().get("hansome") == "1" ||
-                resultMap.getBody().get("harassment") == "1" ||
-                resultMap.getBody().get("native") == "1" ||
-                resultMap.getBody().get("poli") == "1" ||
-                resultMap.getBody().get("race") == "1" ||
-                resultMap.getBody().get("religion") == "1"
+                resultMap.hasBody() && (
+                resultMap.getBody().get("abuse").equals(1) ||
+                resultMap.getBody().get("age").equals(1) ||
+                resultMap.getBody().get("binan").equals(1) ||
+                resultMap.getBody().get("gender").equals(1) ||
+                resultMap.getBody().get("hansome").equals(1) ||
+                resultMap.getBody().get("harassment").equals(1) ||
+                resultMap.getBody().get("native").equals(1) ||
+                resultMap.getBody().get("poli").equals(1) ||
+                resultMap.getBody().get("race").equals(1) ||
+                resultMap.getBody().get("religion").equals(1))
             ) {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new IllegalStateException("description valid api server error");
         }
