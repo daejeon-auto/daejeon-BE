@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -62,6 +63,52 @@ class ReferCodeServiceTest {
             assertThat(referCode.isUsed()).isEqualTo(false);
             assertThat(referCode.getCreatedBy().getId()).isEqualTo(save.getId());
         }
+    }
+
+    @Test
+    @DisplayName("code생성 실패 - 간접가입")
+    void generateCode400() {
+        School school = new School("부컴과", "부산", "인스타아이디", "패스워드");
+        schoolRepository.save(school);
+        Member save = memberRepository.save(new Member(
+                "test 계정2",
+                "123121",
+                "01012341234",
+                "11233",
+                "password123",
+                "GenerateCode1",
+                AuthType.INDIRECT,
+                school
+        ));
+
+        assertThrows(IllegalStateException.class,
+                () -> referCodeService.generateCode(save),
+                "this account is not signed up with direct");
+    }
+
+    @Test
+    @DisplayName("코드 생성 실패 - 과잉 발급")
+    void generateCodeToMany() {
+        School school = new School("부컴과", "부산", "인스타아이디", "패스워드");
+        schoolRepository.save(school);
+        Member save = memberRepository.save(new Member(
+                "test 계정2",
+                "123121",
+                "01012341234",
+                "11233",
+                "password123",
+                "GenerateCode1",
+                AuthType.DIRECT,
+                school
+        ));
+
+        for (int i = 0; i < 4; i++) {
+            referCodeService.generateCode(save);
+        }
+
+        assertThrows(IllegalStateException.class,
+                () -> referCodeService.generateCode(save),
+                "too many code");
     }
 
     @Test
