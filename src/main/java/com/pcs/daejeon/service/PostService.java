@@ -130,6 +130,7 @@ public class PostService {
     /**
      미신고 게시글도 함께 검색함.
      */
+    // TODO 게시글 아이디 만으로도 검색 가능토록 업데이트
     public Page<Post> searchPost(Pageable pageable, Long memberId, Long reportCount) {
         return postRepository.searchPost(pageable, memberId, reportCount);
     }
