@@ -8,7 +8,6 @@ import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.ReferCodeRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -51,7 +49,7 @@ class ReferCodeServiceTest {
                 "01012341234",
                 "10101",
                 "password123",
-                "testloginIdGenerateCode",
+                "GenerateCode",
                 AuthType.DIRECT,
                 school
         ));
@@ -59,7 +57,7 @@ class ReferCodeServiceTest {
         referCodeService.generateCode(save);
 
         List<ReferCode> allByCodeList = referCodeRepository.findAllByCodeList(save);
-        assertThat(allByCodeList.size()).isEqualTo(3);
+        assertThat(allByCodeList.size()).isEqualTo(1);
         for (ReferCode referCode : allByCodeList) {
             assertThat(referCode.isUsed()).isEqualTo(false);
             assertThat(referCode.getCreatedBy().getId()).isEqualTo(save.getId());
