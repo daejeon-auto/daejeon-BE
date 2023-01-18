@@ -120,6 +120,9 @@ public class PostService {
         Member loginMember = memberRepository.getLoginMember();
         return postRepository.pagingPostByMemberId(pageable, loginMember);
     }
+    /**
+        memberId와 reportCount는 검색을 위한 인자. nullable함
+     */
     public Page<Post> findPagedRejectedPost(Pageable page, Long memberId, Long reportCount) {
         return postRepository.pagingRejectPost(page, memberId, reportCount);
     }
@@ -142,7 +145,7 @@ public class PostService {
 
     public void addLike(Long postId) throws IOException, URISyntaxException {
         Optional<Post> post = postRepository.findById(postId);
-        if (!post.isPresent()) {
+        if (post.isEmpty()) {
             throw new IllegalStateException("post not found");
         }
 
@@ -163,7 +166,7 @@ public class PostService {
         }
     }
 
-    private void drawImage(String description) throws IOException, URISyntaxException {
+    private void drawImage(String description) {
         StringBuilder text = new StringBuilder(description);
         int iterCount = 0;
         for (int i = 1; i <= description.length(); i++) {
@@ -173,7 +176,7 @@ public class PostService {
             }
         }
 
-        String code = "<div style=\"font-family: Malgun Gothic; font-size: 70px;\">"+text.toString()+"</div>";
+        String code = "<div style=\"font-family: Malgun Gothic; font-size: 70px;\">"+text+"</div>";
 
         try {
             HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
