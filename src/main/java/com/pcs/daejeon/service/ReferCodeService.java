@@ -25,7 +25,7 @@ public class ReferCodeService {
             throw new IllegalStateException("this account is not signed up with direct");
         }
 
-        if (referCodeRepository.findReferCodeCount(member) > 3) {
+        if (referCodeRepository.findReferCodeCount(member) >= 3) {
             throw new IllegalStateException("too many code");
         }
         referCode.generateCode(member);
@@ -59,8 +59,6 @@ public class ReferCodeService {
                 .getAuthentication()
                 .getPrincipal();
 
-        List<ReferCode> codeList = referCodeRepository.findAllByCodeList(member.getMember());
-
-        return codeList;
+        return referCodeRepository.findAllByCodeList(member.getMember());
     }
 }
