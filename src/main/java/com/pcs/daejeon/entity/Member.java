@@ -51,8 +51,8 @@ public class Member extends BasicTime {
             mappedBy = "createByMember")
     private List<Post> post;
 
-    @NotEmpty(message = "비밀번호는 필수 입력 값입니다.")
-    @Length(min = 4, max = 16, message = "비밀번호는 4자 이상, 16자 이하로 입력해주세요.")
+    @NotEmpty(message = "아이디는 필수 입력 값입니다.")
+    @Length(min = 4, max = 16, message = "아이디는 4자 이상, 16자 이하로 입력해주세요.")
     @Column(name = "login_id")
     private String loginId;
 
