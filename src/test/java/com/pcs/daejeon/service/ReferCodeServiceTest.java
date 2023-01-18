@@ -41,6 +41,7 @@ class ReferCodeServiceTest {
 
     @Test
     @DisplayName("code생성 성공")
+    @Rollback
     void generateCode() {
         School school = new School("부컴과", "부산", "인스타아이디", "패스워드");
         schoolRepository.save(school);
@@ -88,6 +89,7 @@ class ReferCodeServiceTest {
 
     @Test
     @DisplayName("코드 생성 실패 - 과잉 발급")
+    @Rollback
     void generateCodeToMany() {
         School school = new School("부컴과", "부산", "인스타아이디", "패스워드");
         schoolRepository.save(school);
@@ -113,6 +115,11 @@ class ReferCodeServiceTest {
 
     @Test
     @WithMockCustomUser
+    @DisplayName("추천코드 가져오기")
     void getReferCodeList() {
+        List<ReferCode> referCodeList = referCodeService.getReferCodeList();
+
+        // 계정 생성 당시 추천코드 하나 발급
+        assertThat(referCodeList.size()).isEqualTo(1);
     }
 }
