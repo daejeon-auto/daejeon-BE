@@ -134,7 +134,14 @@ class PostServiceTest {
     }
 
     @Test
+    @DisplayName("로그인한 사용자가 작성한 글 리스트 - 성공")
     void findPagedPostByMemberId() {
+        List<Post> content = postService.findPagedPostByMemberId(PageRequest.of(0, 15)).getContent();
+
+        int i = 99;
+        for (Post post : content) {
+            assertThat(post.getDescription()).isEqualTo("test value " + i--);
+        }
     }
 
     @Test
