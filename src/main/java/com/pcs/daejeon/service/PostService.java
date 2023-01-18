@@ -124,6 +124,9 @@ public class PostService {
         return postRepository.pagingRejectPost(page, memberId, reportCount);
     }
 
+    /**
+     미신고 게시글도 함께 검색함.
+     */
     public Page<Post> searchPost(Pageable pageable, Long memberId, Long reportCount) {
         return postRepository.searchPost(pageable, memberId, reportCount);
     }
