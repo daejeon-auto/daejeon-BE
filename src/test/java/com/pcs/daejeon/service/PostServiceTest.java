@@ -4,6 +4,7 @@ import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
+import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
 import com.querydsl.core.Tuple;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,6 +42,9 @@ class PostServiceTest {
     PostRepository postRepository;
     @Autowired
     SchoolRepository schoolRepository;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @Autowired
     MockMvc mvc;
@@ -145,14 +150,30 @@ class PostServiceTest {
     }
 
     @Test
-    void findPagedRejectedPost() {
+    @DisplayName("신고된 게시글 가져오기 - 게시물 없음")
+    void findPagedRejectedPost404() {
+        Page<Post> pagedRejectedPost = postService.findPagedRejectedPost(PageRequest.of(0, 15), null, null);
+
+        assertThat(pagedRejectedPost.getTotalElements()).isEqualTo(0);
     }
 
-    @Test
-    void searchPost() {
-    }
+    // TODO: 게시글 갖고 올 때 report가 5개 이상이어야 함. 신고는 계정당 하나임으로 해결법 모색
+    // searchPost까지
+//    @Test
+//    @DisplayName("신고된 게시글 가져오기 - 게시물 있음")
+//    void findPagedRejectedPost200() {
+//        Page<Post> pagedRejectedPost = postService.findPagedRejectedPost(PageRequest.of(0, 15), null, null);
+//    }
+
+//    @Test
+//    @DisplayName("신고된 게시글 가져오기 - 검색(memberId, reportCound)")
+//    void findPagedRejectPost_search() {}
 
     @Test
-    void findPostById() {
+    @DisplayName("미신고 게시글 검색 성공")
+    void searchPost200() {
+        Page<Post> posts = postService.searchPost(PageRequest.of(0, 15), memberRepository.getLoginMember().getId(), null);
+
+        assertThat(posts.getSize()).isEqualTo(15);
     }
 }
