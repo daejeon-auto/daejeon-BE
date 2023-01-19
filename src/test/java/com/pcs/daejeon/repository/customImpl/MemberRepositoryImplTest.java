@@ -26,6 +26,7 @@ class MemberRepositoryImplTest {
 
     @Test
     public void 회원가입() {
+        // TODO 학교 아이디로 식별
         SignUpDto signUpDto = new SignUpDto(
                 "test",
                 "010101",
