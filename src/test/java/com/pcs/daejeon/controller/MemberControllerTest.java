@@ -69,6 +69,30 @@ class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("회원가입 실패 - 여러 값들 부족")
+    void signUp400() throws Exception {
+        // name
+        SignUpDto userName = new SignUpDto(
+                "",
+                "200000101",
+                "01012341234",
+                AuthType.DIRECT,
+                "" + (int) (Math.random() * 100000),
+                "testPassword",
+                "testId" + (int) (Math.random() * 100),
+                "부산컴퓨터과학고등학교",
+                "부산",
+                "인스타아이디",
+                "인스타비밀번호"
+        );
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/sign-up")
+                        .content(objectMapper.writeValueAsString(userName))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
     void getCodeList() {
     }
 
