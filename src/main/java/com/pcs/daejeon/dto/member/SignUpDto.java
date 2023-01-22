@@ -7,32 +7,33 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
 public class SignUpDto {
-    @NotNull
+    @NotEmpty
     private String name;
-    @NotNull
+    @NotEmpty
     private String birthDay;
-    @NotNull
+    @NotEmpty
     private String phoneNumber;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     private AuthType authType;
 
-    @NotNull
+    @NotEmpty
     private String studentNumber;
 
     @NotNull
     private School school;
 
-    @NotNull
+    @NotEmpty
     private String password;
 
-    @NotNull
+    @NotEmpty
     private String loginId;
 
     private String referCode = null;
