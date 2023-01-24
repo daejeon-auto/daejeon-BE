@@ -1,12 +1,12 @@
 package com.pcs.daejeon.dto.member;
 
+import com.pcs.daejeon.entity.School;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class PendingMemberDto {
 
     @NotNull
-    private LocalDateTime created_date;
+    private School school;
     @NotNull
     private String birthday;
     @NotNull

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 @Rollback
+@ActiveProfiles("test")
 @WithMockCustomUser
 class MemberServiceTest {
     @Autowired
@@ -189,7 +191,7 @@ class MemberServiceTest {
 
         Member member = createTestMember.saveMember;
         memberService.acceptPendingMember(new PendingMemberDto(
-                member.getCreatedDate(),
+                member.getSchool(),
                 member.getBirthDay(),
                 member.getName(),
                 member.getStudentNumber()
@@ -205,7 +207,7 @@ class MemberServiceTest {
         Member member = createTestMember.saveMember;
         Assertions.assertThrows(IllegalStateException.class, () -> {
             memberService.acceptPendingMember(new PendingMemberDto(
-                    member.getCreatedDate(),
+                    member.getSchool(),
                     member.getBirthDay(),
                     "",
                     member.getStudentNumber()
@@ -220,14 +222,11 @@ class MemberServiceTest {
         Long memberId = member.getId();
 
         memberService.rejectPendingMember(new PendingMemberDto(
-                member.getCreatedDate(),
+                member.getSchool(),
                 member.getBirthDay(),
                 member.getName(),
                 member.getStudentNumber()
         ));
-
-        em.flush();
-        em.clear();
 
         assertThat(memberRepository.findById(memberId)).isEqualTo(Optional.empty());
     }
@@ -239,7 +238,7 @@ class MemberServiceTest {
         Member member = createTestMember.saveMember;
         Assertions.assertThrows(IllegalStateException.class, () -> {
             memberService.rejectPendingMember(new PendingMemberDto(
-                    member.getCreatedDate(),
+                    member.getSchool(),
                     member.getBirthDay(),
                     "",
                     member.getStudentNumber()
