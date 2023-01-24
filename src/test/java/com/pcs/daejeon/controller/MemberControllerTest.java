@@ -80,8 +80,32 @@ class MemberControllerTest {
     @Test
     @DisplayName("유저 승인 성공")
     void acceptMember() throws Exception {
+        SignUpDto user = new SignUpDto(
+                "test1",
+                "200000101",
+                "01012341234",
+                AuthType.DIRECT,
+                "" + (int) (Math.random() * 100000),
+                "testPassword",
+                "testId" + (int) (Math.random() * 100),
+                "부산컴퓨터과학고등학교",
+                "부산",
+                "인스타아이디",
+                "인스타비밀번호"
+        );
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                        .post("/sign-up")
+                        .content(objectMapper.writeValueAsString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.readValue(mvcResult.getResponse().getContentAsString(), Map.class);
+
         mvc.perform(MockMvcRequestBuilders
-                .post("/admin/member/accept/1"))
+                .post("/admin/member/accept/"+map.get("data")))
                 .andExpect(status().isAccepted())
                 .andDo(print());
     }
