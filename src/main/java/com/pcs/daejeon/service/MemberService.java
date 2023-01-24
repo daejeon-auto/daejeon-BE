@@ -82,7 +82,7 @@ public class MemberService {
     }
 
     public void acceptPendingMember(@Valid PendingMemberDto pendingMemberDto) {
-        Member member = memberRepository.findPendingMember(
+        Member member = memberRepository.findByNameAndBirthDayAndStudentNumberAndSchool(
                 pendingMemberDto.getName(),
                 pendingMemberDto.getBirthday(),
                 pendingMemberDto.getStd_number(),
@@ -97,7 +97,7 @@ public class MemberService {
     }
 
     public void rejectPendingMember(PendingMemberDto pendingMemberDto) {
-        Member member = memberRepository.findPendingMember(
+        Member member = memberRepository.findByNameAndBirthDayAndStudentNumberAndSchool(
                 pendingMemberDto.getName(),
                 pendingMemberDto.getBirthday(),
                 pendingMemberDto.getStd_number(),
