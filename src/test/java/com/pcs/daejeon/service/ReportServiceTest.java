@@ -7,7 +7,6 @@ import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.repository.ReportRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +15,10 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -49,7 +49,7 @@ class ReportServiceTest {
         Post post = postRepository.save(new Post("hello world", school));
 
         reportService.report("reason", post.getId());
-        Optional<Report> byId = reportRepository.findById(post.getId());
+        List<Report> byId = reportRepository.findAllByReportedPostId(post.getId());
         assertFalse(byId.isEmpty());
     }
 
@@ -70,7 +70,7 @@ class ReportServiceTest {
     @Test
     @DisplayName("신고 실패 - post 없음")
     void addReport404() {
-        Assertions.assertThrows(IllegalStateException.class,
+        assertThrows(IllegalStateException.class,
                 () -> reportService.report("reason", 0L),
                 "not found post");
     }
