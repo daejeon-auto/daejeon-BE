@@ -20,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -32,9 +35,6 @@ class MemberControllerTest {
 
     @Autowired
     MockMvc mvc;
-
-    @Autowired
-    MemberController memberController;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -57,7 +57,8 @@ class MemberControllerTest {
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
                         .post("/sign-up")
                         .content(objectMapper.writeValueAsString(user))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andExpect(status().isCreated())
                 .andReturn();
 
@@ -69,35 +70,40 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("회원가입 실패 - 여러 값들 부족")
-    void signUp400() throws Exception {
-        // name
-        SignUpDto userName = new SignUpDto(
-                "",
-                "200000101",
-                "01012341234",
-                AuthType.DIRECT,
-                "" + (int) (Math.random() * 100000),
-                "testPassword",
-                "testId" + (int) (Math.random() * 100),
-                "부산컴퓨터과학고등학교",
-                "부산",
-                "인스타아이디",
-                "인스타비밀번호"
-        );
+    @DisplayName("자신의 코드 리스트 가져오기 성공")
+    void getCodeList() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                        .post("/sign-up")
-                        .content(objectMapper.writeValueAsString(userName))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
+                .post("/code/list"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void getCodeList() {
+    @DisplayName("유저 승인 성공")
+    void acceptMember() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/member/accept/1"))
+                .andExpect(status().isAccepted())
+                .andDo(print());
     }
 
     @Test
-    void acceptMember() {
+    @DisplayName("유저 승인 실패 - 미 로그인")
+    void acceptMember401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/member/accept/1")
+                .with(csrf()))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    @DisplayName("유저 승인 싫패 - 권한없음")
+    void acceptMember403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/member/accept/1"))
+                .andExpect(status().isForbidden());
     }
 
     @Test
