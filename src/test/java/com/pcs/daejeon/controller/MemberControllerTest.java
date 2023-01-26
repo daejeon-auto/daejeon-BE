@@ -122,8 +122,41 @@ class MemberControllerTest {
     }
 
     @Test
-    void rejectMember() {
+    @DisplayName("유저 거절 성공")
+    void rejectMember200() throws Exception {
+        Map<String, Object> member = createMember();
+
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/member/reject/"+member.get("data")))
+                .andExpect(status().isAccepted());
     }
+
+    @Test
+    @DisplayName("유저 거절 실패 - 유저 없음")
+    void rejectMember404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/member/reject/0"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("유저 거절 실패 - 미 로그인")
+    void rejectMember401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/member/reject/1"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("유저 거절 실패 - 권한 부족")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void rejectMember403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/member/reject/1"))
+                .andExpect(status().isForbidden());
+    }
+
 
     @Test
     void memberInfo() {
