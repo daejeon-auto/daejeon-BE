@@ -163,7 +163,7 @@ class MemberControllerTest {
     void memberInfo() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                 .post("/member/info"))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     @Test
