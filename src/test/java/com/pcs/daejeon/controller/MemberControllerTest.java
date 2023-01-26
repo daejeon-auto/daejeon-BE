@@ -159,6 +159,19 @@ class MemberControllerTest {
 
 
     @Test
-    void memberInfo() {
+    @DisplayName("자신의 정보 가져오기 성공")
+    void memberInfo() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/member/info"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("자신의 정보 가져오기 실패 - 미 로그인")
+    void memberInfo401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/member/info"))
+                .andExpect(status().isUnauthorized());
     }
 }
