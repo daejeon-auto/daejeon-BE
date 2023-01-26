@@ -42,7 +42,7 @@ public class PostController {
     public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
         Page<Tuple> posts = postService.findPagedPost(pageable);
 
-        Stream<PostDto> postDto = posts.getContent()
+        List<PostDto> postDto = posts.getContent()
                 .stream()
                 .map(o -> {
                     Post post = o.get(QPost.post);
@@ -66,7 +66,7 @@ public class PostController {
                             isLiked,
                             isReported
                     );
-                });
+                }).toList();
         Result<PostListDto> postResult = new Result<>(new PostListDto(
                 postDto,
                 posts.getTotalElements(),
