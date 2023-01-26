@@ -41,30 +41,7 @@ class MemberControllerTest {
     @Test
     @DisplayName("회원가입 성공")
     void signUp() throws Exception {
-        SignUpDto user = new SignUpDto(
-                "test1",
-                "200000101",
-                "01012341234",
-                AuthType.DIRECT,
-                "" + (int) (Math.random() * 100000),
-                "testPassword",
-                "testId" + (int) (Math.random() * 100),
-                "부산컴퓨터과학고등학교",
-                "부산",
-                "인스타아이디",
-                "인스타비밀번호"
-        );
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
-                        .post("/sign-up")
-                        .content(objectMapper.writeValueAsString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        // String result to object
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.readValue(mvcResult.getResponse().getContentAsString(), Map.class);
+        Map<String, Object> map = createMember();
 
         Assertions.assertThat(map.get("hasError")).isEqualTo(false);
     }
@@ -80,6 +57,15 @@ class MemberControllerTest {
     @Test
     @DisplayName("유저 승인 성공")
     void acceptMember() throws Exception {
+        Map<String, Object> map = createMember();
+
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/member/accept/"+map.get("data")))
+                .andExpect(status().isAccepted())
+                .andDo(print());
+    }
+
+    private Map<String, Object> createMember() throws Exception {
         SignUpDto user = new SignUpDto(
                 "test1",
                 "200000101",
@@ -103,11 +89,16 @@ class MemberControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.readValue(mvcResult.getResponse().getContentAsString(), Map.class);
+        return map;
+    }
 
+
+    @Test
+    @DisplayName("유저 승인 실패 - 유저 없음")
+    void acceptMember404() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                .post("/admin/member/accept/"+map.get("data")))
-                .andExpect(status().isAccepted())
-                .andDo(print());
+                        .post("/admin/member/accept/0"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
