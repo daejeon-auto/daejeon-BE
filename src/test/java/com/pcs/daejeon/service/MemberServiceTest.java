@@ -5,10 +5,12 @@ import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,25 +41,27 @@ class MemberServiceTest {
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
+    SchoolRepository schoolRepository;
+    @Autowired
     EntityManager em;
 
+
     private class CreateTestMember {
+        private final School school = schoolRepository.save(new School("테스트학교", "지역", "아이디", "비밀번호"));
         private Member saveMember;
         private SignUpDto signUpDto;
 
         public CreateTestMember() {
+
             SignUpDto signUpDto = new SignUpDto(
                     "test1",
                     "200000101",
                     "01012341234",
                     AuthType.DIRECT,
                     ""+(int) (Math.random()*100000),
+                    school.getId(),
                     "testPassword",
-                    "testId"+(int) (Math.random()*100),
-                    "부산컴퓨터과학고등학교",
-                    "부산",
-                    "인스타아이디",
-                    "인스타비밀번호"
+                    "testId"+(int) (Math.random()*100)
             );
 
             try {
@@ -100,12 +104,9 @@ class MemberServiceTest {
                 "01012341234",
                 AuthType.INDIRECT,
                 "20203",
+                new CreateTestMember().school.getId(),
                 "testPassword",
                 "testId3",
-                "부산컴퓨터과학고등학교",
-                "부산",
-                "인스타아이디",
-                "인스타비밀번호",
                 referCodeList.get(0).getCode()
         );
 
@@ -126,12 +127,9 @@ class MemberServiceTest {
                 "01012341234",
                 AuthType.INDIRECT,
                 "20786",
+                new CreateTestMember().school.getId(),
                 "testPassword",
                 "testId0921939",
-                "부산컴퓨터과학고등학교",
-                "부산",
-                "인스타아이디",
-                "인스타비밀번호",
                 referCodeList.get(0).getCode()
         );
         memberService.saveMember(signUpDto);
@@ -142,12 +140,9 @@ class MemberServiceTest {
                 "01012341234",
                 AuthType.INDIRECT,
                 "12323",
+                1L,
                 "testPassword",
                 "testId23212",
-                "부산컴퓨터과학고등학교",
-                "부산",
-                "인스타아이디",
-                "인스타비밀번호",
                 referCodeList.get(0).getCode()
         );
 
