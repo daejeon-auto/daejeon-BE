@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -30,7 +31,7 @@ public class MemberService {
     private final Util util;
 
 
-    public Member saveMember(SignUpDto signUpDto) {
+    public Member saveMember(SignUpDto signUpDto) throws MethodArgumentNotValidException {
         if (memberRepository.validStudentNum(signUpDto.getStudentNumber()) ||
                 memberRepository.validLoginId(signUpDto.getLoginId())) {
             throw new IllegalStateException("student already sign up");

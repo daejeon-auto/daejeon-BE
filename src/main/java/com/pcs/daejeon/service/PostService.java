@@ -6,7 +6,6 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
-import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.Tuple;
 import gui.ava.html.image.generator.HtmlImageGenerator;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -44,7 +44,7 @@ public class PostService {
     private final Util util;
     //    private final IGClient client;
 
-    public Long writePost(String description) {
+    public Long writePost(String description) throws MethodArgumentNotValidException {
         description = description.replace("\n", " ");
 
         boolean isBad = isBadDesc(description);

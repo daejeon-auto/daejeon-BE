@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -95,7 +96,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void 코드_있이_회원가입() {
+    public void 코드_있이_회원가입() throws MethodArgumentNotValidException {
         List<ReferCode> referCodeList = referCodeService.getReferCodeList();
 
         SignUpDto signUpDto = new SignUpDto(
@@ -118,7 +119,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void 중복코드_회원가입() {
+    public void 중복코드_회원가입() throws MethodArgumentNotValidException {
         List<ReferCode> referCodeList = referCodeService.getReferCodeList();
 
         SignUpDto signUpDto = new SignUpDto(

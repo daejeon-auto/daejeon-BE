@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -95,6 +96,8 @@ public class PostController {
         } catch (IllegalArgumentException e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
+        } catch (MethodArgumentNotValidException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_GATEWAY);
         }
     }
 
