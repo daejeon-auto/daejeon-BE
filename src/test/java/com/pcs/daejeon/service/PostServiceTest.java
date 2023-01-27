@@ -1,6 +1,7 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
@@ -46,6 +47,9 @@ class PostServiceTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    Util util;
 
     @Autowired
     EntityManager em;
@@ -170,7 +174,7 @@ class PostServiceTest {
     @Test
     @DisplayName("미신고 게시글 검색 성공")
     void searchPost200() {
-        Page<Post> posts = postService.searchPost(PageRequest.of(0, 15), memberRepository.getLoginMember().getId(), null);
+        Page<Post> posts = postService.searchPost(PageRequest.of(0, 15), util.getLoginMember().getId(), null);
 
         assertThat(posts.getSize()).isEqualTo(15);
     }

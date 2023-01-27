@@ -1,15 +1,14 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Like;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,11 +16,9 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.transaction.Transactional;
-
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @WithMockCustomUser
@@ -42,10 +39,13 @@ class LikeRepositoryImplTest {
     @Autowired
     SchoolRepository schoolRepository;
 
+    @Autowired
+    Util util;
+
     @Test
     public void 이미_좋야요를_눌렀을때() {
 
-        Member member = memberRepository.getLoginMember();
+        Member member = util.getLoginMember();
         schoolRepository.save(member.getSchool());
         Post helloWorld = new Post("hello world", member.getSchool());
         postRepository.save(helloWorld);
@@ -64,7 +64,7 @@ class LikeRepositoryImplTest {
     @Test
     public void 좋아요를_처음_등록할때() {
 
-        Member member = memberRepository.getLoginMember();
+        Member member = util.getLoginMember();
         schoolRepository.save(member.getSchool());
         Post helloWorld = new Post("hello world", member.getSchool());
         postRepository.save(helloWorld);

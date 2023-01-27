@@ -1,6 +1,7 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.type.AuthType;
@@ -24,6 +25,9 @@ class MemberRepositoryImplTest {
     @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    Util util;
+
     @Test
     public void 회원가입() {
         // TODO 학교 아이디로 식별
@@ -41,7 +45,7 @@ class MemberRepositoryImplTest {
                 "인스타비밀번호"
         );
 
-        Member member = memberRepository.createMember(signUpDto);
+        Member member = util.createMember(signUpDto);
 
         memberRepository.save(member);
 

@@ -1,6 +1,7 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.QPost;
@@ -42,6 +43,9 @@ class PostRepositoryImplTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    Util util;
 
     @Autowired
     EntityManager em;
@@ -104,14 +108,14 @@ class PostRepositoryImplTest {
 
     @Test
     public void 내가_쓴_글_리스트() {
-        Member member = memberRepository.getLoginMember();
+        Member member = util.getLoginMember();
         Post post = new Post("test글 작성", member.getSchool());
         Post save = postRepository.save(post);
 
         em.flush();
         em.clear();
 
-        Member loginMember = memberRepository.getLoginMember();
+        Member loginMember = util.getLoginMember();
         Page<Post> posts = postRepository.pagingPostByMemberId(pageable, loginMember);
 
         Post findPost = posts.getContent().get(0);

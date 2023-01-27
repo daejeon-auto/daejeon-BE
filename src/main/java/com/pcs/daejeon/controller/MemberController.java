@@ -1,13 +1,13 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.member.ReferCodeDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
-import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.ReferCodeService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,8 @@ import java.util.Objects;
 public class MemberController {
 
     private final MemberService memberService;
-    private final MemberRepository memberRepository;
     private final ReferCodeService referCodeService;
+    private final Util util;
 
     @PostMapping("/sign-up")
     public ResponseEntity<Result<Long>> signUp(@RequestBody @Valid SignUpDto signUpDto) {
@@ -121,7 +121,7 @@ public class MemberController {
     public ResponseEntity<Result<MemberInfoDto>> memberInfo() {
 
         try {
-            Member loginMember = memberRepository.getLoginMember();
+            Member loginMember = util.getLoginMember();
 
             MemberInfoDto memberInfoDto = new MemberInfoDto(
                     loginMember.getName(),

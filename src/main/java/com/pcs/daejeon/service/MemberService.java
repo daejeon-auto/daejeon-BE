@@ -1,5 +1,6 @@
 package com.pcs.daejeon.service;
 
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
@@ -11,7 +12,6 @@ import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.ReferCodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +26,8 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
     private final ReferCodeRepository referCodeRepository;
+    private final Util util;
 
 
     public Member saveMember(SignUpDto signUpDto) {
@@ -36,8 +36,7 @@ public class MemberService {
             throw new IllegalStateException("student already sign up");
         }
 
-
-        Member member = memberRepository.createMember(signUpDto); // password encode
+        Member member = util.createMember(signUpDto); // password encode
         if (member.getAuthType() == AuthType.INDIRECT) {
             ReferCode referCode = referCodeRepository.findUnusedReferCode(signUpDto.getReferCode());
             if (referCode == null) {
@@ -59,7 +58,7 @@ public class MemberService {
         Member member = byId.get();
         member.setMemberType(MemberType.ACCEPT);
 
-        log.info("[accept-member] accept member: id["+ member.getId() +"]"+ memberRepository.getLoginMember().getId());
+        log.info("[accept-member] accept member: id["+ member.getId() +"]"+ util.getLoginMember().getId());
     }
 
     public void rejectMember(Long memberId) {
@@ -70,7 +69,7 @@ public class MemberService {
         Member member = byId.get();
 
         member.setMemberType(MemberType.REJECT);
-        log.info("[reject-member] reject member: id["+ member.getId() +"]"+ memberRepository.getLoginMember().getId());
+        log.info("[reject-member] reject member: id["+ member.getId() +"]"+ util.getLoginMember().getId());
     }
 
     public List<Member> getMembers(Long memberId, boolean onlyAdmin) {
