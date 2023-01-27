@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -80,7 +81,60 @@ class PostControllerTest {
     }
 
     @Test
-    void writePost() {
+    @DisplayName("포스트 작성 성공")
+    void writePost() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/write")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"description\": \"test글 작성\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("포스트 작성 실패 - 미로그인")
+    void writePost401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/write")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"description\": \"test글 작성\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("포스트 작성 실패 - 욕설")
+    void writePost400() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/write")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"description\": \"시발 좆같네 ----------------------------\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("포스트 작성 실패 - 글자수 초과101")
+    void writePost400_over() throws Exception {
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                        .post("/post/write")
+                        .content("{\"description\": \"-----------------------------------------------------------------------------------------------------\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+//        String contentAsString = mapper.writeValueAsString(mvcResult.getResponse().getContentAsString());
+//        Result result = mapper.readValue(contentAsString, Result.class);
+//
+//        System.out.println(result.getData());
+    }
+
+    @Test
+    @DisplayName("포스트 작성 실패 - 글자수 부족")
+    void writePost400_under() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/write")
+                .content("{\"description\": \"\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
