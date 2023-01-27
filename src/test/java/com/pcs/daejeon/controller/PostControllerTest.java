@@ -6,10 +6,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.common.Result;
+import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.dto.post.PostDto;
 import com.pcs.daejeon.dto.post.PostListDto;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,22 +46,26 @@ class PostControllerTest {
     PostRepository postRepository;
 
     ObjectMapper mapper = new ObjectMapper();
+    boolean isSetUp = false;
 
     @BeforeEach
     void setUp() {
+        isSetUp = true;
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         for (int i = 0; i < 100; i++) {
             postRepository.save(
-                    new Post("testPost"+i,
-                            new School("부컴과",
-                                    "부산",
-                                    "인스타아이디",
-                                    "인스타pwd")));
+                    new Post("testPost"+i, getLoginMember().getSchool()));
         }
     }
-
+    private Member getLoginMember() {
+        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return member.getMember();
+    }
     @Test
     @DisplayName("포스트 가져오기 성공")
     void getPostPage() throws Exception {
@@ -76,7 +82,7 @@ class PostControllerTest {
 
         int i = 0;
         for (PostDto postDto : map.getData().getPostList()) {
-            assertThat(postDto.getPostId()).isEqualTo(100-i++);
+            assertThat(postDto.getPostId()).isEqualTo(400-i++);
         }
     }
 
