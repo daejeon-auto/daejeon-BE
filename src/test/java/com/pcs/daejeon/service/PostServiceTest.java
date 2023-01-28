@@ -1,6 +1,7 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolationException;
@@ -48,6 +50,9 @@ class PostServiceTest {
     MemberRepository memberRepository;
 
     @Autowired
+    Util util;
+
+    @Autowired
     EntityManager em;
 
     @BeforeEach
@@ -66,7 +71,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 작성 성공")
-    void writePost200() {
+    void writePost200() throws MethodArgumentNotValidException {
         Long postId = postService.writePost("test글 작성");
 
         Optional<Post> post = postRepository.findById(postId);
@@ -91,7 +96,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 삭제 성공")
-    void deletePost200() {
+    void deletePost200() throws MethodArgumentNotValidException {
         Long postId = postService.writePost("test post 1");
 
         em.flush();
@@ -110,7 +115,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("글 승인 성공")
-    void acceptPost200() {
+    void acceptPost200() throws MethodArgumentNotValidException {
         Long postId = postService.writePost("write post 1");
 
         postService.deletePost(postId);
@@ -170,7 +175,7 @@ class PostServiceTest {
     @Test
     @DisplayName("미신고 게시글 검색 성공")
     void searchPost200() {
-        Page<Post> posts = postService.searchPost(PageRequest.of(0, 15), memberRepository.getLoginMember().getId(), null);
+        Page<Post> posts = postService.searchPost(PageRequest.of(0, 15), util.getLoginMember().getId(), null);
 
         assertThat(posts.getSize()).isEqualTo(15);
     }

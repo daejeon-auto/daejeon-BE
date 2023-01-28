@@ -1,6 +1,5 @@
 package com.pcs.daejeon.dto.member;
 
-import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +27,7 @@ public class SignUpDto {
     private String studentNumber;
 
     @NotNull
-    private School school;
+    private Long schoolId;
 
     @NotEmpty
     private String password;
@@ -38,47 +37,26 @@ public class SignUpDto {
 
     private String referCode = null;
 
-    public SignUpDto(String name,
-                     String birthDay,
-                     String phoneNumber,
-                     AuthType authType,
-                     String studentNumber,
-                     String password,
-                     String loginId,
-                     String schoolName,
-                     String locate,
-                     String instaId,
-                     String instaPwd,
-                     String referCode) {
+    public SignUpDto(String name, String birthDay, String phoneNumber, AuthType authType, String studentNumber, Long schoolId, String password, String loginId, String referCode) {
         this.name = name;
         this.birthDay = birthDay;
         this.phoneNumber = phoneNumber;
         this.authType = authType;
         this.studentNumber = studentNumber;
+        this.schoolId = schoolId;
         this.password = password;
         this.loginId = loginId;
         this.referCode = referCode;
-        this.school = new School(schoolName, locate, instaId, instaPwd);
     }
 
-    public SignUpDto(String name,
-                     String birthDay,
-                     String phoneNumber,
-                     AuthType authType,
-                     String studentNumber,
-                     String pwd,
-                     String loginId,
-                     String schoolName,
-                     String locate,
-                     String instaId,
-                     String instaPwd) {
+    public SignUpDto(String name, String birthDay, String phoneNumber, AuthType authType, String studentNumber, Long schoolId, String password, String loginId) {
         this.name = name;
         this.birthDay = birthDay;
         this.phoneNumber = phoneNumber;
         this.authType = authType;
         this.studentNumber = studentNumber;
-        this.password = pwd;
+        this.schoolId = schoolId;
+        this.password = password;
         this.loginId = loginId;
-        this.school = new School(schoolName, locate, instaId, instaPwd);
     }
 }

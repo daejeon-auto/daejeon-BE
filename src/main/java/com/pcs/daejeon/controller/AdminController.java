@@ -1,6 +1,7 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.MemberListDto;
 import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.PersonalInfo;
@@ -10,7 +11,6 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.Report;
 import com.pcs.daejeon.entity.type.RoleTier;
-import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
@@ -35,8 +35,7 @@ public class AdminController {
     private final ReportService reportService;
     private final MemberService memberService;
     private final PostService postService;
-
-    private final MemberRepository memberRepository;
+    private final Util util;
 
     @PostMapping("/admin/reports/{id}")
     public ResponseEntity<Result<Stream<ReportListDto>>> getReportList(@PathVariable("id") Long postId) {
@@ -101,7 +100,7 @@ public class AdminController {
             memberService.acceptPendingMember(pendingMemberDto);
 
             log.info("[accept-pending-member] accept userName = "+pendingMemberDto.getName()+" | student number = "
-                    +pendingMemberDto.getStd_number()+" || by adminId = "+memberRepository.getLoginMember().getId());
+                    +pendingMemberDto.getStd_number()+" || by adminId = "+util.getLoginMember().getId());
             return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.NOT_FOUND);
@@ -117,7 +116,7 @@ public class AdminController {
             memberService.rejectPendingMember(pendingMemberDto);
 
             log.info("[reject-pending-member] reject userName = "+pendingMemberDto.getName()+" | student number = "
-                    +pendingMemberDto.getStd_number()+" || by adminId = "+memberRepository.getLoginMember().getId());
+                    +pendingMemberDto.getStd_number()+" || by adminId = "+util.getLoginMember().getId());
             return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
@@ -144,7 +143,7 @@ public class AdminController {
                     member.getUsedCode() != null ? member.getUsedCode().getCode() : ""
             );
 
-            log.info("[call-personal-info] call by adminId = "+memberRepository.getLoginMember().getId());
+            log.info("[call-personal-info] call by adminId = "+util.getLoginMember().getId());
             return new ResponseEntity<>(new Result<>(personalInfo, false), HttpStatus.OK);
         } catch (Exception e) {
             log.error("e = " + e);
@@ -158,7 +157,7 @@ public class AdminController {
         try {
             Member member = memberService.setMemberRole(memberId, tier);
 
-            log.info("[set-role] set role memberId = "+member.getId()+" changed role = "+member.getRole().toString()+" by adminId = "+memberRepository.getLoginMember().getId());
+            log.info("[set-role] set role memberId = "+member.getId()+" changed role = "+member.getRole().toString()+" by adminId = "+util.getLoginMember().getId());
             return new ResponseEntity<>(new Result<>("success", false), HttpStatus.OK);
         } catch (Exception e) {
             log.error("e = " + e);

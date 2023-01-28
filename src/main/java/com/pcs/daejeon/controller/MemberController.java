@@ -1,19 +1,20 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.member.ReferCodeDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
-import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.ReferCodeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,11 +30,11 @@ import java.util.Objects;
 public class MemberController {
 
     private final MemberService memberService;
-    private final MemberRepository memberRepository;
     private final ReferCodeService referCodeService;
+    private final Util util;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Result<Long>> signUp(@RequestBody @Valid SignUpDto signUpDto) {
+    public ResponseEntity<Result<String>> signUp(@RequestBody @Valid SignUpDto signUpDto) {
 
         try {
             Member save = memberService.saveMember(signUpDto);
@@ -44,18 +45,20 @@ public class MemberController {
                 }
             }
 
-            return new ResponseEntity<>(new Result<>(save.getId(), false), HttpStatus.CREATED);
+            return new ResponseEntity<>(new Result<>(save.getId().toString(), false), HttpStatus.CREATED);
         } catch (IllegalStateException e) {
             if (Objects.equals(e.getMessage(), "student already sign up")) {
-                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.CONFLICT);
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.CONFLICT);
             }
 
             if (Objects.equals(e.getMessage(), "unused refer code not found")) {
-                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
             }
 
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
+        } catch (MethodArgumentNotValidException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
@@ -121,7 +124,7 @@ public class MemberController {
     public ResponseEntity<Result<MemberInfoDto>> memberInfo() {
 
         try {
-            Member loginMember = memberRepository.getLoginMember();
+            Member loginMember = util.getLoginMember();
 
             MemberInfoDto memberInfoDto = new MemberInfoDto(
                     loginMember.getName(),

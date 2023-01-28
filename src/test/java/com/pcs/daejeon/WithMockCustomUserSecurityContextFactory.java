@@ -7,6 +7,7 @@ import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
 import com.pcs.daejeon.service.ReferCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,12 +26,18 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
     MemberRepository memberRepository;
 
     @Autowired
+    SchoolRepository schoolRepository;
+
+    @Autowired
     ReferCodeService referCodeService;
 
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser annotation) {
 
         final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        School school = new School("부산컴퓨터과학고등학교", "부산 중구", "인스타아이디", "패스워드");
+        schoolRepository.save(school);
 
         Member member = new Member(
                 "test",
@@ -40,7 +47,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 "password",
                 "loginId",
                 AuthType.DIRECT,
-                new School("부산컴퓨터과학고등학교", "부산 중구", "인스타아이디", "패스워드")
+                school
         );
         member.setRole(RoleTier.ROLE_TIER2);
         member.setMemberType(MemberType.ACCEPT);

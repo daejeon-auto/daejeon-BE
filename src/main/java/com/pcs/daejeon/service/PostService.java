@@ -1,11 +1,11 @@
 package com.pcs.daejeon.service;
 
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Like;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
-import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.Tuple;
 import gui.ava.html.image.generator.HtmlImageGenerator;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -39,11 +40,11 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
-//    private final IGClient client;
+    private final Util util;
+    //    private final IGClient client;
 
-    public Long writePost(String description) {
+    public Long writePost(String description) throws MethodArgumentNotValidException {
         description = description.replace("\n", " ");
 
         boolean isBad = isBadDesc(description);
@@ -51,7 +52,7 @@ public class PostService {
             throw new IllegalArgumentException("bad words");
         }
 
-        Member loginMember = memberRepository.getLoginMember();
+        Member loginMember = util.getLoginMember();
         Post save = postRepository.save(new Post(description, loginMember.getSchool()));
         return save.getId();
     }
@@ -100,7 +101,7 @@ public class PostService {
         Post post = findPostById(postId);
 
         post.setPostType(PostType.DELETE);
-        log.info("[delete-post] delete post: id["+ post.getId() +"]"+ memberRepository.getLoginMember().getId());
+        log.info("[delete-post] delete post: id["+ post.getId() +"]"+ util.getLoginMember().getId());
     }
 
     public void acceptPost(Long postId) {
@@ -108,7 +109,7 @@ public class PostService {
 
         post.setPostType(PostType.ACCEPTED);
 
-        Member loginMember = memberRepository.getLoginMember();
+        Member loginMember = util.getLoginMember();
         log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"] --- ");
     }
 
@@ -117,7 +118,7 @@ public class PostService {
     }
 
     public Page<Post> findPagedPostByMemberId(Pageable pageable) {
-        Member loginMember = memberRepository.getLoginMember();
+        Member loginMember = util.getLoginMember();
         return postRepository.pagingPostByMemberId(pageable, loginMember);
     }
     /**
@@ -150,14 +151,14 @@ public class PostService {
             throw new IllegalStateException("post not found");
         }
 
-        if (likeRepository.validLike(memberRepository.getLoginMember(), postId)) {
-            Member loginMember = memberRepository.getLoginMember();
+        if (likeRepository.validLike(util.getLoginMember(), postId)) {
+            Member loginMember = util.getLoginMember();
             Like like = likeRepository.findByPostAndLikedBy(post.get(), loginMember);
             likeRepository.delete(like);
             return;
         }
 
-        Like like = new Like(memberRepository.getLoginMember(), post.get());
+        Like like = new Like(util.getLoginMember(), post.get());
         likeRepository.save(like);
 
         Long likedCount = likeRepository.countByPost(post.get());
