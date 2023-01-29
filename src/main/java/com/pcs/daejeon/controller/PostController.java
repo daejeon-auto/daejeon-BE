@@ -124,6 +124,8 @@ public class PostController {
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
             log.error("e = " + e);
+            if (e.getMessage().equals("not found post"))
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
             return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -135,6 +137,9 @@ public class PostController {
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
             log.error("e = " + e);
+            if (e.getMessage().equals("not found post"))
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
+
             return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
