@@ -84,7 +84,7 @@ class PostControllerTest {
 
         int i = 0;
         for (PostDto postDto : map.getData().getPostList()) {
-            assertThat(postDto.getPostId()).isEqualTo(400-i++);
+            assertThat(postDto.getPostId()).isEqualTo(examplePostId-i++);
         }
     }
 
@@ -187,7 +187,34 @@ class PostControllerTest {
     }
 
     @Test
-    void acceptPost() {
+    @DisplayName("포스트 승인 성공")
+    void acceptPost() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/accept/"+examplePostId))
+                .andExpect(status().isOk());
+    }
+    @Test
+    @DisplayName("포스트 승인 실패 - 포스트 없음")
+    void acceptPost404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/accept/"+0))
+                .andExpect(status().isNotFound());
+    }
+    @Test
+    @DisplayName("포스트 승인 실패 - 미로그인")
+    void acceptPost401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/accept/"+examplePostId))
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("포스트 승인 실패 - 권한 없음")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void acceptPost403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/accept/"+examplePostId))
+                .andExpect(status().isForbidden());
     }
 
     @Test
