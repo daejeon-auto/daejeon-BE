@@ -47,6 +47,7 @@ class PostControllerTest {
 
     ObjectMapper mapper = new ObjectMapper();
     boolean isSetUp = false;
+    long examplePostId = 0;
 
     @BeforeEach
     void setUp() {
@@ -55,8 +56,9 @@ class PostControllerTest {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         for (int i = 0; i < 100; i++) {
-            postRepository.save(
-                    new Post("testPost"+i, getLoginMember().getSchool()));
+            Post save = postRepository.save(
+                    new Post("testPost" + i, getLoginMember().getSchool()));
+            examplePostId = save.getId();
         }
     }
     private Member getLoginMember() {
@@ -144,7 +146,44 @@ class PostControllerTest {
     }
 
     @Test
-    void reportPost() {
+    @DisplayName("신고 성공")
+    void reportPost() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/report/"+examplePostId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reason\": \"이거 문제 있습니다\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("신고 실패 - 401 미로그인")
+    void reportPost401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/report/"+examplePostId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reason\": \"이거 문제 있습니다\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("신고 실패 - 404 포스트 없음")
+    void reportPost404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/report/"+0L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reason\": \"이거 문제 있습니다\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("신고 실패 - 400 이유 없음")
+    void reportPost400() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/report/"+0L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reason\": \"\"}"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
