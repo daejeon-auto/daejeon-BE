@@ -218,7 +218,34 @@ class PostControllerTest {
     }
 
     @Test
-    void rejectedPost() {
+    @DisplayName("포스트 차단 성공")
+    void rejectedPost() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/reject/"+examplePostId))
+                .andExpect(status().isOk());
+    }
+    @Test
+    @DisplayName("포스트 차단 실패 - 미로그인")
+    void rejectedPost401() throws Exception {
+        mvc.perform(logout());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/reject/"+examplePostId))
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("포스트 차단 실패 - 권한 없음")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void rejectedPost403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/reject/"+examplePostId))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    @DisplayName("포스트 차단 실패 - 포스트 없음")
+    void rejectedPost404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/reject/"+0))
+                .andExpect(status().isNotFound());
     }
 
     @Test
