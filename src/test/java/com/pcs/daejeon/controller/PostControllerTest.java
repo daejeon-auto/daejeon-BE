@@ -300,6 +300,20 @@ class PostControllerTest {
     }
 
     @Test
-    void getWrotePosts() {
+    @DisplayName("작성한 포스트 가져오기")
+    void getWrotePosts() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/member/posts"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("작성한 포스트 가져오기 실패 - 미로그인")
+    void getWrotePosts401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+
+        mvc.perform(MockMvcRequestBuilders
+                .post("/member/posts"))
+                .andExpect(status().isUnauthorized());
     }
 }
