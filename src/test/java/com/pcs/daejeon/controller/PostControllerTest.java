@@ -249,11 +249,54 @@ class PostControllerTest {
     }
 
     @Test
-    void addLiked() {
+    @DisplayName("좋아요 추가 성공")
+    void addLiked() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/like/add/"+examplePostId))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void rejectPostList() {
+    @DisplayName("좋아요 추가 실패 - 미로그인")
+    void addLiked401() throws Exception {
+        mvc.perform(logout());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/like/add/"+examplePostId))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("좋아요 추가 실패 - 포스트 없음")
+    void addLiked404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/like/add/0"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("신고된 포스트 가져오기")
+    void rejectPostList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/posts/reject"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("신고된 포스트 가져오기 - 미로그인")
+    void rejectPostList401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/posts/reject"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("신고된 포스트 가져오기 - 권한 부족")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void rejectPostList403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/posts/reject"))
+                .andExpect(status().isForbidden());
     }
 
     @Test
