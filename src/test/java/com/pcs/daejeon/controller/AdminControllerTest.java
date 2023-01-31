@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,7 +121,28 @@ class AdminControllerTest {
     }
 
     @Test
-    void getPendingMembers() {
+    @DisplayName("대기 유저 가져오기 성공")
+    void getPendingMembers() throws Exception {
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/members/pending"))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+    @Test
+    @DisplayName("대기 유저 가져오기 실패 - 권한 부족")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void getPendingMembers403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/members/pending"))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    @DisplayName("대기 유저 가져오기 실패 - 미 로그인")
+    void getPendingMembers401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/members/pending"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
