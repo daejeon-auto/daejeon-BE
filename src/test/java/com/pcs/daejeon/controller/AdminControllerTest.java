@@ -95,7 +95,28 @@ class AdminControllerTest {
     }
 
     @Test
-    void getMembers() {
+    @DisplayName("유저 리스트 가져오기 성공")
+    void getMembers() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/members"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("유저 리스트 가져오기 실패 - 권한 부족")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void getMembers403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/members"))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    @DisplayName("유저 리스트 가져오기 실패 - 미로그인")
+    void getMembers401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/members"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
