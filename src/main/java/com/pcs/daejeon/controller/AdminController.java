@@ -86,7 +86,7 @@ public class AdminController {
 
             List<PendingMemberDto> pendingMemberDtos = pendingMembers.stream()
                     .map(o -> new PendingMemberDto(
-                            o.getSchool(),
+                            o.getSchool().getId(),
                             o.getBirthDay(),
                             o.getName(),
                             o.getStudentNumber()))

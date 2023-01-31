@@ -1,6 +1,5 @@
 package com.pcs.daejeon.dto.member;
 
-import com.pcs.daejeon.entity.School;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +13,7 @@ import javax.validation.constraints.NotNull;
 public class PendingMemberDto {
 
     @NotNull
-    private School school;
+    private Long schoolId;
     @NotNull
     private String birthday;
     @NotNull
