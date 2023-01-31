@@ -49,6 +49,11 @@ public class AdminController {
                     ));
 
             return new ResponseEntity<>(new Result<>(reportListDto, false), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found post")) status = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
