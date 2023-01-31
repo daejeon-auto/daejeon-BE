@@ -5,15 +5,22 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.entity.type.AuthType;
+import com.pcs.daejeon.entity.type.MemberType;
+import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,6 +29,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,9 +47,17 @@ class AdminControllerTest {
     @Autowired
     PostRepository postRepository;
 
+    @Autowired
+    SchoolRepository schoolRepository;
+
+    @Autowired
+    MemberRepository memberRepository;
+
     ObjectMapper mapper = new ObjectMapper();
 
     long examplePostId = 0;
+    long exampleSchoolId = 0;
+    Member exampleMember = null;
 
     private Member getLoginMember() {
         PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
@@ -61,6 +77,27 @@ class AdminControllerTest {
                     new Post("testPost" + i, getLoginMember().getSchool()));
             examplePostId = save.getId();
         }
+
+        School school = schoolRepository.save(new School(
+                "부산컴퓨터과학고",
+                "부산",
+                "인스타아이디",
+                "인스타패스워드"
+        ));
+
+        exampleSchoolId = school.getId();
+
+        Member member = memberRepository.save(new Member(
+                "testMember",
+                "000000",
+                "01012341234",
+                "00000",
+                "password",
+                "loginId",
+                AuthType.DIRECT,
+                school
+        ));
+        exampleMember = member;
     }
 
     @Test
@@ -146,7 +183,76 @@ class AdminControllerTest {
     }
 
     @Test
-    void acceptPendingMember() {
+    @DisplayName("대기 유저 승인 성공")
+    void acceptPendingMember() throws Exception {
+
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/pending-member/accept")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        mapper.writeValueAsString(new PendingMemberDto(
+                            exampleSchoolId,
+                            exampleMember.getBirthDay(),
+                            exampleMember.getName(),
+                            exampleMember.getStudentNumber()
+                        ))
+                ))
+                .andExpect(status().isAccepted());
+
+        MemberType memberType = exampleMember.getMemberType();
+        assertThat(memberType).isEqualTo(MemberType.ACCEPT);
+    }
+    @Test
+    @DisplayName("대기 유저 승인 실패 - 권한 부족")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void acceptPendingMember403() throws Exception {
+
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/pending-member/accept")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        mapper.writeValueAsString(new PendingMemberDto(
+                            exampleSchoolId,
+                            exampleMember.getBirthDay(),
+                            exampleMember.getName(),
+                            exampleMember.getStudentNumber()
+                        ))
+                ))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    @DisplayName("대기 유저 승인 실패 - 미로그인")
+    void acceptPendingMember401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/pending-member/accept")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        mapper.writeValueAsString(new PendingMemberDto(
+                            exampleSchoolId,
+                            exampleMember.getBirthDay(),
+                            exampleMember.getName(),
+                            exampleMember.getStudentNumber()
+                        ))
+                ))
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("대기 유저 승인 실패 - 유저 없음")
+    void acceptPendingMember404() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/pending-member/accept")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        mapper.writeValueAsString(new PendingMemberDto(
+                            exampleSchoolId,
+                            "123123",
+                            exampleMember.getName(),
+                            exampleMember.getStudentNumber()
+                        ))
+                ))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
