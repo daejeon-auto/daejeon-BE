@@ -255,7 +255,70 @@ class AdminControllerTest {
     }
 
     @Test
-    void rejectPendingMember() {
+    @DisplayName("대기 유저 거절 성공")
+    void rejectPendingMember() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/pending-member/reject")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        mapper.writeValueAsString(new PendingMemberDto(
+                                exampleSchoolId,
+                                exampleMember.getBirthDay(),
+                                exampleMember.getName(),
+                                exampleMember.getStudentNumber()
+                        ))
+                ))
+                .andExpect(status().isAccepted());
+    }
+    @Test
+    @DisplayName("대기 유저 거절 실패 - 미로그인")
+    void rejectPendingMember401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/pending-member/reject")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        mapper.writeValueAsString(new PendingMemberDto(
+                                exampleSchoolId,
+                                exampleMember.getBirthDay(),
+                                exampleMember.getName(),
+                                exampleMember.getStudentNumber()
+                        ))
+                ))
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("대기 유저 거절 실패 - 권한 부족")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void rejectPendingMember403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/pending-member/reject")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        mapper.writeValueAsString(new PendingMemberDto(
+                                exampleSchoolId,
+                                exampleMember.getBirthDay(),
+                                exampleMember.getName(),
+                                exampleMember.getStudentNumber()
+                        ))
+                ))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    @DisplayName("대기 유저 거절 실패 - 유저 없음")
+    void rejectPendingMember404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/pending-member/reject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                mapper.writeValueAsString(new PendingMemberDto(
+                                        exampleSchoolId,
+                                        "123123",
+                                        exampleMember.getName(),
+                                        exampleMember.getStudentNumber()
+                                ))
+                        ))
+                .andExpect(status().isNotFound());
     }
 
     @Test
