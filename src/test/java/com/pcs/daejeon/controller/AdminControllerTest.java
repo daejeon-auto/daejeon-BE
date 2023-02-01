@@ -246,13 +246,13 @@ class AdminControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                         mapper.writeValueAsString(new PendingMemberDto(
-                            exampleSchoolId,
+                            0L,
                             "123123",
                             exampleMember.getName(),
                             exampleMember.getStudentNumber()
                         ))
                 ))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isNotFound());
     }
 
     @Test
