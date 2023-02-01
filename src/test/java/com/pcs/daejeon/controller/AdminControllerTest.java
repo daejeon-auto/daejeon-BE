@@ -370,10 +370,47 @@ class AdminControllerTest {
     }
 
     @Test
-    void setRole() {
+    @DisplayName("권한 수정 성공")
+    void setRole() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/member/set-role/" + exampleMember.getId() + "/ROLE_TIER1"))
+                .andExpect(status().isOk());
+
+        assertThat(exampleMember.getRole()).isEqualTo(RoleTier.ROLE_TIER1);
+    }
+    @Test
+    @DisplayName("권한 수정 실패 - 권한 없음 1")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void setRole403_1() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/member/set-role/" + exampleMember.getId() + "/ROLE_TIER1"))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    @DisplayName("권한 수정 실패 - 권한 없음 2")
+    @WithMockCustomUser(role = "ROLE_TIER1")
+    void setRole403_2() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/member/set-role/" + exampleMember.getId() + "/ROLE_TIER1"))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    @DisplayName("권한 수정 실패 - 미로그인")
+    void setRole401() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/member/set-role/" + exampleMember.getId() + "/ROLE_TIER1"))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    @DisplayName("권한 수정 실패 - 유저 없음")
+    void setRole404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/member/set-role/0/ROLE_TIER1"))
+                .andExpect(status().isNotFound());
     }
 
-    @Test
-    void rejectPostList() {
-    }
+//    @Test
+//    @DisplayName("")
+//    void rejectPostList() {
+//    }
 }
