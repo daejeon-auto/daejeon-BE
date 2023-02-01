@@ -240,13 +240,12 @@ class AdminControllerTest {
     @Test
     @DisplayName("대기 유저 승인 실패 - 유저 없음")
     void acceptPendingMember404() throws Exception {
-        mvc.perform(logout()).andExpect(status().isOk());
         mvc.perform(MockMvcRequestBuilders
                 .post("/admin/pending-member/accept")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                         mapper.writeValueAsString(new PendingMemberDto(
-                            0L,
+                            exampleSchoolId,
                             "123123",
                             exampleMember.getName(),
                             exampleMember.getStudentNumber()
