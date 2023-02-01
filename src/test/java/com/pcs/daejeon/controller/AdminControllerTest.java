@@ -322,7 +322,51 @@ class AdminControllerTest {
     }
 
     @Test
-    void callPersonalInfo() {
+    @DisplayName("개인 정보 가져오기 성공")
+    void callPersonalInfo() throws Exception {
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/personal-info/" + exampleMember.getId()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Result<PersonalInfo> result = mapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<Result<PersonalInfo>>() {});
+
+        assertThat(result.getData().getName()).isEqualTo(exampleMember.getName());
+    }
+    @Test
+    @DisplayName("개인 정보 가져오기 실패 - 미로그인")
+    void callPersonalInfo401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/personal-info/" + exampleMember.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("개인 정보 가져오기 실패 - 권한 부족 1")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void callPersonalInfo403_1() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/personal-info/" + exampleMember.getId()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("개인 정보 가져오기 실패 - 권한 부족 2")
+    @WithMockCustomUser(role = "ROLE_TIER1")
+    void callPersonalInfo403_2() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/personal-info/" + exampleMember.getId()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("개인 정보 가져오기 실패 - 유저 없음")
+    void callPersonalInfo404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/personal-info/0"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
