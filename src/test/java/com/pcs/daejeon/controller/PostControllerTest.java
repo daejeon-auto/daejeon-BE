@@ -47,6 +47,7 @@ class PostControllerTest {
 
     ObjectMapper mapper = new ObjectMapper();
     boolean isSetUp = false;
+    long examplePostId = 0;
 
     @BeforeEach
     void setUp() {
@@ -55,8 +56,9 @@ class PostControllerTest {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         for (int i = 0; i < 100; i++) {
-            postRepository.save(
-                    new Post("testPost"+i, getLoginMember().getSchool()));
+            Post save = postRepository.save(
+                    new Post("testPost" + i, getLoginMember().getSchool()));
+            examplePostId = save.getId();
         }
     }
     private Member getLoginMember() {
@@ -82,7 +84,7 @@ class PostControllerTest {
 
         int i = 0;
         for (PostDto postDto : map.getData().getPostList()) {
-            assertThat(postDto.getPostId()).isEqualTo(400-i++);
+            assertThat(postDto.getPostId()).isEqualTo(examplePostId-i++);
         }
     }
 
@@ -144,26 +146,174 @@ class PostControllerTest {
     }
 
     @Test
-    void reportPost() {
+    @DisplayName("신고 성공")
+    void reportPost() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/report/"+examplePostId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reason\": \"이거 문제 있습니다\"}"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void acceptPost() {
+    @DisplayName("신고 실패 - 401 미로그인")
+    void reportPost401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/report/"+examplePostId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reason\": \"이거 문제 있습니다\"}"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void rejectedPost() {
+    @DisplayName("신고 실패 - 404 포스트 없음")
+    void reportPost404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/report/"+0L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reason\": \"이거 문제 있습니다\"}"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void addLiked() {
+    @DisplayName("신고 실패 - 400 이유 없음")
+    void reportPost400() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/report/"+0L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"reason\": \"\"}"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void rejectPostList() {
+    @DisplayName("포스트 승인 성공")
+    void acceptPost() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/accept/"+examplePostId))
+                .andExpect(status().isOk());
+    }
+    @Test
+    @DisplayName("포스트 승인 실패 - 포스트 없음")
+    void acceptPost404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/accept/"+0))
+                .andExpect(status().isNotFound());
+    }
+    @Test
+    @DisplayName("포스트 승인 실패 - 미로그인")
+    void acceptPost401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/accept/"+examplePostId))
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("포스트 승인 실패 - 권한 없음")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void acceptPost403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/accept/"+examplePostId))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void getWrotePosts() {
+    @DisplayName("포스트 차단 성공")
+    void rejectedPost() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/reject/"+examplePostId))
+                .andExpect(status().isOk());
+    }
+    @Test
+    @DisplayName("포스트 차단 실패 - 미로그인")
+    void rejectedPost401() throws Exception {
+        mvc.perform(logout());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/reject/"+examplePostId))
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("포스트 차단 실패 - 권한 없음")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void rejectedPost403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/reject/"+examplePostId))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    @DisplayName("포스트 차단 실패 - 포스트 없음")
+    void rejectedPost404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/post/reject/"+0))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("좋아요 추가 성공")
+    void addLiked() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/like/add/"+examplePostId))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("좋아요 추가 실패 - 미로그인")
+    void addLiked401() throws Exception {
+        mvc.perform(logout());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/like/add/"+examplePostId))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("좋아요 추가 실패 - 포스트 없음")
+    void addLiked404() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/post/like/add/0"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("신고된 포스트 가져오기")
+    void rejectPostList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/posts/reject"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("신고된 포스트 가져오기 - 미로그인")
+    void rejectPostList401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/posts/reject"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("신고된 포스트 가져오기 - 권한 부족")
+    @WithMockCustomUser(role = "ROLE_TIER0")
+    void rejectPostList403() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/admin/posts/reject"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("작성한 포스트 가져오기")
+    void getWrotePosts() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/member/posts"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("작성한 포스트 가져오기 실패 - 미로그인")
+    void getWrotePosts401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
+
+        mvc.perform(MockMvcRequestBuilders
+                .post("/member/posts"))
+                .andExpect(status().isUnauthorized());
     }
 }

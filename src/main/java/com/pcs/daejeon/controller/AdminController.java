@@ -49,6 +49,11 @@ public class AdminController {
                     ));
 
             return new ResponseEntity<>(new Result<>(reportListDto, false), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found post")) status = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
@@ -81,7 +86,7 @@ public class AdminController {
 
             List<PendingMemberDto> pendingMemberDtos = pendingMembers.stream()
                     .map(o -> new PendingMemberDto(
-                            o.getSchool(),
+                            o.getSchool().getId(),
                             o.getBirthDay(),
                             o.getName(),
                             o.getStudentNumber()))
@@ -145,6 +150,8 @@ public class AdminController {
 
             log.info("[call-personal-info] call by adminId = "+util.getLoginMember().getId());
             return new ResponseEntity<>(new Result<>(personalInfo, false), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
@@ -159,6 +166,8 @@ public class AdminController {
 
             log.info("[set-role] set role memberId = "+member.getId()+" changed role = "+member.getRole().toString()+" by adminId = "+util.getLoginMember().getId());
             return new ResponseEntity<>(new Result<>("success", false), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("server error", true), HttpStatus.BAD_REQUEST);

@@ -1,12 +1,17 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.Report;
 import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.entity.type.AuthType;
+import com.pcs.daejeon.entity.type.PostType;
+import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.repository.ReportRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +41,8 @@ class ReportServiceTest {
     SchoolRepository schoolRepository;
     @Autowired
     ReportRepository reportRepository;
+    @Autowired
+    MemberRepository memberRepository;
 
     @Test
     @DisplayName("신고 성공")
@@ -73,6 +80,43 @@ class ReportServiceTest {
         assertThrows(IllegalStateException.class,
                 () -> reportService.report("reason", 0L),
                 "not found post");
+    }
+
+    @Test
+    @DisplayName("신고 5회로 인한 차단")
+    @WithMockCustomUser
+    void rejectPost() {
+        School school = schoolRepository.save(new School(
+                "부산컴과고",
+                "부산",
+                "인스타아이디",
+                "인스타패스워드"
+        ));
+        Post helloWorld = postRepository.save(new Post("hello world", school));
+        Assertions.assertThat(helloWorld.getPostType()).isEqualTo(PostType.ACCEPTED);
+
+        for (int i = 0; i < 4; i++) {
+            Member testMember = new Member(
+                    "testMember",
+                    "20202" + i,
+                    "01012341234",
+                    "00000" + i,
+                    "password" + i,
+                    "loginId" + i,
+                    AuthType.DIRECT,
+                    school
+            );
+            memberRepository.save(testMember);
+            reportRepository.save(new Report(
+                    "reason",
+                    testMember,
+                    helloWorld
+            ));
+        }
+
+        reportService.report("reason", helloWorld.getId());
+
+        Assertions.assertThat(helloWorld.getPostType()).isEqualTo(PostType.REJECTED);
     }
 
     @Test

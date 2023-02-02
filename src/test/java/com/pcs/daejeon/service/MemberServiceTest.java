@@ -187,7 +187,7 @@ class MemberServiceTest {
 
         Member member = createTestMember.saveMember;
         memberService.acceptPendingMember(new PendingMemberDto(
-                member.getSchool(),
+                member.getSchool().getId(),
                 member.getBirthDay(),
                 member.getName(),
                 member.getStudentNumber()
@@ -203,7 +203,7 @@ class MemberServiceTest {
         Member member = createTestMember.saveMember;
         Assertions.assertThrows(IllegalStateException.class, () -> {
             memberService.acceptPendingMember(new PendingMemberDto(
-                    member.getSchool(),
+                    member.getSchool().getId(),
                     member.getBirthDay(),
                     "",
                     member.getStudentNumber()
@@ -218,7 +218,7 @@ class MemberServiceTest {
         Long memberId = member.getId();
 
         memberService.rejectPendingMember(new PendingMemberDto(
-                member.getSchool(),
+                member.getSchool().getId(),
                 member.getBirthDay(),
                 member.getName(),
                 member.getStudentNumber()
@@ -234,7 +234,7 @@ class MemberServiceTest {
         Member member = createTestMember.saveMember;
         Assertions.assertThrows(IllegalStateException.class, () -> {
             memberService.rejectPendingMember(new PendingMemberDto(
-                    member.getSchool(),
+                    member.getSchool().getId(),
                     member.getBirthDay(),
                     "",
                     member.getStudentNumber()

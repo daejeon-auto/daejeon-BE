@@ -5,13 +5,16 @@ import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.ReferCodeRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +31,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final ReferCodeRepository referCodeRepository;
+    private final SchoolRepository schoolRepository;
     private final Util util;
 
 
@@ -52,11 +56,16 @@ public class MemberService {
     }
 
     public void acceptMember(Long memberId) {
-        Optional<Member> byId = memberRepository.findById(memberId);
-        if (byId.isEmpty()) {
+        Optional<Member> acceptMember = memberRepository.findById(memberId);
+        if (acceptMember.isEmpty()) {
             throw new IllegalStateException("member not found");
         }
-        Member member = byId.get();
+
+        if (isNotSameSchool(acceptMember.get())) {
+            throw new IllegalStateException("school is different");
+        }
+
+        Member member = acceptMember.get();
         member.setMemberType(MemberType.ACCEPT);
 
         log.info("[accept-member] accept member: id["+ member.getId() +"]"+ util.getLoginMember().getId());
@@ -68,6 +77,10 @@ public class MemberService {
             throw new IllegalStateException("member not found");
         }
         Member member = byId.get();
+
+        if (isNotSameSchool(member)) {
+            throw new IllegalStateException("school is different");
+        }
 
         member.setMemberType(MemberType.REJECT);
         log.info("[reject-member] reject member: id["+ member.getId() +"]"+ util.getLoginMember().getId());
@@ -82,11 +95,12 @@ public class MemberService {
     }
 
     public void acceptPendingMember(@Valid PendingMemberDto pendingMemberDto) {
+        Optional<School> school = getSchool(pendingMemberDto);
         Member member = memberRepository.findByNameAndBirthDayAndStudentNumberAndSchool(
                 pendingMemberDto.getName(),
                 pendingMemberDto.getBirthday(),
                 pendingMemberDto.getStd_number(),
-                pendingMemberDto.getSchool()
+                school.get()
         );
 
         if (member == null) {
@@ -96,12 +110,22 @@ public class MemberService {
         member.setMemberType(MemberType.ACCEPT);
     }
 
+    @NotNull
+    private Optional<School> getSchool(PendingMemberDto pendingMemberDto) {
+        Optional<School> school = schoolRepository.findById(pendingMemberDto.getSchoolId());
+
+        if (school.isEmpty()) throw new IllegalArgumentException("not found school");
+        return school;
+    }
+
     public void rejectPendingMember(PendingMemberDto pendingMemberDto) {
+        Optional<School> school = getSchool(pendingMemberDto);
+
         Member member = memberRepository.findByNameAndBirthDayAndStudentNumberAndSchool(
                 pendingMemberDto.getName(),
                 pendingMemberDto.getBirthday(),
                 pendingMemberDto.getStd_number(),
-                pendingMemberDto.getSchool()
+                school.get()
         );
 
         if (member == null) {
@@ -131,5 +155,10 @@ public class MemberService {
         member.get().setRole(tier);
 
         return member.get();
+    }
+
+    private boolean isNotSameSchool(Member acceptMember) {
+        Member admin = util.getLoginMember();
+        return admin.getSchool() != acceptMember.getSchool();
     }
 }

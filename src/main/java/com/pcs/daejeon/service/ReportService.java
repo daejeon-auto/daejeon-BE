@@ -69,6 +69,11 @@ public class ReportService {
     }
 
     public List<Report> getReportList(Long postId) {
+        Optional<Post> post = postRepository.findById(postId);
+        if (post.isEmpty()) {
+            throw new IllegalArgumentException("not found post");
+        }
+
         return reportRepository.findAllByReportedPostId(postId);
     }
 }

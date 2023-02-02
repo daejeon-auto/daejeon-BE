@@ -12,5 +12,7 @@ public class MemberInfoDto {
     private String std_num;
     private String birthDay;
     private String phoneNumber;
+    private String schoolName;
+    private String schoolLocate;
     private AuthType auth_type;
 }
