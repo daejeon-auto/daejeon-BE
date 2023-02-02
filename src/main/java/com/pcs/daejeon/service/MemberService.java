@@ -56,11 +56,17 @@ public class MemberService {
     }
 
     public void acceptMember(Long memberId) {
-        Optional<Member> byId = memberRepository.findById(memberId);
-        if (byId.isEmpty()) {
+        Optional<Member> acceptMember = memberRepository.findById(memberId);
+        if (acceptMember.isEmpty()) {
             throw new IllegalStateException("member not found");
         }
-        Member member = byId.get();
+
+        Member admin = util.getLoginMember();
+        if (admin.getSchool() != acceptMember.get().getSchool()) {
+            throw new IllegalStateException("school is different");
+        }
+
+        Member member = acceptMember.get();
         member.setMemberType(MemberType.ACCEPT);
 
         log.info("[accept-member] accept member: id["+ member.getId() +"]"+ util.getLoginMember().getId());

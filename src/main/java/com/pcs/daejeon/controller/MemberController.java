@@ -65,6 +65,8 @@ public class MemberController {
         }
     }
 
+    // TODO 학교 및 관리자 계정 등록 만들기
+
     @PostMapping("/code/list")
     public ResponseEntity<Result<List<ReferCodeDto>>> getCodeList() {
         try {
@@ -92,12 +94,17 @@ public class MemberController {
 
             return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
         } catch (IllegalStateException e ) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
             if (Objects.equals(e.getMessage(), "member not found")) {
-                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
+                status = HttpStatus.NOT_FOUND;
+            }
+
+            if (Objects.equals(e.getMessage(), "school is different")) {
+                status = HttpStatus.FORBIDDEN;
             }
 
             log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>( null, true), status);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
