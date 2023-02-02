@@ -146,6 +146,8 @@ public class MemberController {
                     loginMember.getStudentNumber(),
                     loginMember.getBirthDay(),
                     loginMember.getPhoneNumber(),
+                    loginMember.getSchool().getName(),
+                    loginMember.getSchool().getLocate(),
                     loginMember.getAuthType()
             );
 
