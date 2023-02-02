@@ -61,8 +61,7 @@ public class MemberService {
             throw new IllegalStateException("member not found");
         }
 
-        Member admin = util.getLoginMember();
-        if (admin.getSchool() != acceptMember.get().getSchool()) {
+        if (isNotSameSchool(acceptMember.get())) {
             throw new IllegalStateException("school is different");
         }
 
@@ -78,6 +77,10 @@ public class MemberService {
             throw new IllegalStateException("member not found");
         }
         Member member = byId.get();
+
+        if (isNotSameSchool(member)) {
+            throw new IllegalStateException("school is different");
+        }
 
         member.setMemberType(MemberType.REJECT);
         log.info("[reject-member] reject member: id["+ member.getId() +"]"+ util.getLoginMember().getId());
@@ -152,5 +155,10 @@ public class MemberService {
         member.get().setRole(tier);
 
         return member.get();
+    }
+
+    private boolean isNotSameSchool(Member acceptMember) {
+        Member admin = util.getLoginMember();
+        return admin.getSchool() != acceptMember.getSchool();
     }
 }

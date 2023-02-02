@@ -190,9 +190,37 @@ class MemberControllerTest {
     @Test
     @DisplayName("유저 거절 실패 - 권한 부족")
     @WithMockCustomUser(role = "ROLE_TIER0")
-    void rejectMember403() throws Exception {
+    void rejectMember403_1() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                 .post("/admin/member/reject/1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("유저 거절 싫패 - 권한없음")
+    void rejectMember403_2() throws Exception {
+        School school = new School(
+                "테스트학교",
+                "테스트지역",
+                "인스타아이디",
+                "인스타패스워드"
+        );
+
+        Member user = new Member(
+                "test1",
+                "200000101",
+                "01012341234",
+                "" + (int) (Math.random() * 100000),
+                "testPassword",
+                "testId" + (int) (Math.random() * 100),
+                AuthType.DIRECT,
+                school
+        );
+
+        Member save = memberRepository.save(user);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/admin/member/reject/"+save.getId()))
                 .andExpect(status().isForbidden());
     }
 
