@@ -199,4 +199,32 @@ public class AdminController {
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("/admin/post/accept/{id}")
+    public ResponseEntity<Result<String>> acceptPost(@PathVariable("id") Long id) {
+        try {
+            postService.acceptPost(id);
+
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            log.error("e = " + e);
+            if (e.getMessage().equals("not found post"))
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/admin/post/reject/{id}")
+    public ResponseEntity<Result<String>> rejectedPost(@PathVariable("id") Long id) {
+        try {
+            postService.deletePost(id);
+
+            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            log.error("e = " + e);
+            if (e.getMessage().equals("not found post"))
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
+
+            return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
