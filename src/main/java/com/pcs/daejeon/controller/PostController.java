@@ -85,10 +85,12 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
         } catch (MethodArgumentNotValidException e) {
-            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_GATEWAY);
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
