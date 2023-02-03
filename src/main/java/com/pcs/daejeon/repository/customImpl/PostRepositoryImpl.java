@@ -1,10 +1,7 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
-import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.QMember;
-import com.pcs.daejeon.entity.QPost;
+import com.pcs.daejeon.entity.*;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
 import com.querydsl.core.Tuple;
@@ -19,10 +16,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.pcs.daejeon.entity.QLike.like;
 import static com.pcs.daejeon.entity.QPost.post;
 import static com.pcs.daejeon.entity.QReport.report;
+import static com.pcs.daejeon.entity.QSchool.*;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
@@ -51,25 +50,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .select(post, like, report)
                 .from(post)
                 .leftJoin(post.like, like);
-        if (member != null) {
-            tupleJPAQuery
-                    .leftJoin(like.post, likePost)
-                    .leftJoin(like.likedBy, likedBy)
-                    .on(likePost.id.eq(post.id), likedBy.id.eq(member.getMember().getId()))
-                    .leftJoin(post.reports, report)
-                    .leftJoin(report.reportedPost, reportedPost)
-                    .leftJoin(report.reportedBy, reportedBy)
-                    .on(reportedPost.id.eq(post.id), reportedBy.id.eq(member.getMember().getId()));
-        } else {
-            tupleJPAQuery
-                .on(like.post.id.eq(0L))
-                .leftJoin(post.reports, report)
-                .leftJoin(report.reportedPost, reportedPost)
-                .on(reportedPost.id.eq(0L));
+        if (member == null) {
+            throw new IllegalStateException("need login");
         }
 
+        tupleJPAQuery
+                .leftJoin(like.post, likePost)
+                .leftJoin(like.likedBy, likedBy)
+                .on(likePost.id.eq(post.id), likedBy.id.eq(member.getMember().getId()))
+                .leftJoin(post.reports, report)
+                .leftJoin(report.reportedPost, reportedPost)
+                .leftJoin(report.reportedBy, reportedBy)
+                .on(reportedPost.id.eq(post.id), reportedBy.id.eq(member.getMember().getId()));
+
         List<Tuple> result = tupleJPAQuery
-                .where(post.postType.eq(PostType.ACCEPTED))
+                .where(post.postType.eq(PostType.ACCEPTED),
+                        post.school.id.eq(Objects.requireNonNull(member).getMember().getSchool().getId()))
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
                 .limit(page.getPageSize())

@@ -18,8 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,48 +41,41 @@ public class PostController {
     public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
         Page<Tuple> posts = postService.findPagedPost(pageable);
 
-        List<PostDto> postDto = posts.getContent()
-                .stream()
-                .map(o -> {
-                    Post post = o.get(QPost.post);
+        try {
 
-                    boolean isLiked = false;
-                    boolean isReported = false;
+            List<PostDto> postDto = posts.getContent()
+                    .stream()
+                    .map(o -> {
+                        Post post = o.get(QPost.post);
 
-                    if (o.get(QLike.like) != null) {
-                        isLiked = true;
-                    }
-                    if (o.get(QReport.report) != null) {
-                        isReported = true;
-                    }
+                        boolean isLiked = o.get(QLike.like) != null;
+                        boolean isReported = o.get(QReport.report) != null;
 
+                        return new PostDto(
+                                Objects.requireNonNull(post).getId(),
+                                post.getDescription(),
+                                post.getCreatedDate(),
+                                postRepository.getLikedCount(post),
+                                isLiked,
+                                isReported
+                        );
+                    }).toList();
+            Result<PostListDto> postResult = new Result<>(new PostListDto(
+                    postDto,
+                    posts.getTotalElements(),
+                    posts.getTotalPages()
+            ));
 
-                    return new PostDto(
-                            Objects.requireNonNull(post).getId(),
-                            post.getDescription(),
-                            post.getCreatedDate(),
-                            postRepository.getLikedCount(post),
-                            isLiked,
-                            isReported
-                    );
-                }).toList();
-        Result<PostListDto> postResult = new Result<>(new PostListDto(
-                postDto,
-                posts.getTotalElements(),
-                posts.getTotalPages()
-        ));
+            return ResponseEntity.ok().body(postResult);
+        } catch (IllegalStateException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("need login")) status = HttpStatus.UNAUTHORIZED;
 
-        boolean isLogin = false;
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (principal instanceof UserDetails) {
-                isLogin = true;
-            }
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return ResponseEntity
-                .ok().header("isLogin", Boolean.toString(isLogin))
-                .body(postResult);
     }
 
     @PostMapping("/post/write")
