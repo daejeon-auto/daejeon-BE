@@ -159,9 +159,12 @@ public class PostService {
         if (post.isEmpty()) {
             throw new IllegalStateException("post not found");
         }
+        Member loginMember = util.getLoginMember();
+        if (post.get().getSchool().getId() != loginMember.getSchool().getId()) {
+            throw new IllegalStateException("school is different");
+        }
 
-        if (likeRepository.validLike(util.getLoginMember(), postId)) {
-            Member loginMember = util.getLoginMember();
+        if (likeRepository.validLike(loginMember, postId)) {
             Like like = likeRepository.findByPostAndLikedBy(post.get(), loginMember);
             likeRepository.delete(like);
             return;

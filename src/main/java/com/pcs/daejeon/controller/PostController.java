@@ -117,17 +117,18 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            if (Objects.equals(e.getMessage(), "member already liked this post")) {
-                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.CONFLICT);
-            } else if (Objects.equals(e.getMessage(), "post not found")) {
-                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
-            }
+                HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (Objects.equals(e.getMessage(), "member already liked this post")) status = HttpStatus.CONFLICT;
+            if (Objects.equals(e.getMessage(), "post not found")) status = HttpStatus.NOT_FOUND;
+            if (e.getMessage().equals("school is different")) status = HttpStatus.FORBIDDEN;
 
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (IOException | URISyntaxException e) {
             log.error("e = " + e);
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
