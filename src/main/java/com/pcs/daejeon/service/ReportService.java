@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -31,7 +32,7 @@ public class ReportService {
             return;
         }
 
-        removeReport(postId);
+//        removeReport(postId);
     }
 
     private void addReport(String reason, Long postId) {
@@ -39,6 +40,10 @@ public class ReportService {
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
             throw new IllegalStateException("not found post");
+        }
+        if (!Objects.equals(loginMember.getSchool().getId(),
+                post.get().getSchool().getId())) {
+            throw new IllegalStateException("school is different");
         }
 
         Report report = new Report(reason, loginMember, post.get());
