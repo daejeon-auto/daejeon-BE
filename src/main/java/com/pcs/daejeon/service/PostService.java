@@ -1,9 +1,17 @@
 package com.pcs.daejeon.service;
 
+import com.github.instagram4j.instagram4j.IGClient;
+import com.github.instagram4j.instagram4j.exceptions.IGLoginException;
+import com.github.instagram4j.instagram4j.requests.IGRequest;
+import com.github.instagram4j.instagram4j.requests.media.MediaConfigureTimelineRequest;
+import com.github.instagram4j.instagram4j.requests.upload.RuploadPhotoRequest;
+import com.github.instagram4j.instagram4j.responses.media.MediaResponse;
+import com.github.instagram4j.instagram4j.responses.media.RuploadPhotoResponse;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Like;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.PostRepository;
@@ -26,8 +34,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -176,7 +186,8 @@ public class PostService {
         Long likedCount = likeRepository.countByPost(post.get());
         if (likedCount == 15) {
             drawImage(post.get().getDescription());
-//            uploadToInstagram();
+            School school = loginMember.getSchool();
+            uploadToInstagram(school.getInstaId(), school.getInstaPwd());
         }
     }
 
@@ -204,15 +215,26 @@ public class PostService {
         }
     }
 
-//    private void uploadToInstagram() throws IOException {
-//        File file = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
-//        byte[] imgData = Files.readAllBytes(file.toPath());
-//        IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
-//        String id = client.sendRequest(uploadReq).join().getUpload_id();
-//        IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
-//                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption("👍👍"));
-//        MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
-//    }
+
+    public IGClient igClient(String instaId, String instaPwd) throws IGLoginException {
+    IGClient client = IGClient.builder()
+                .username(instaId)
+                .password(instaPwd)
+                .login();
+
+        return client;
+    }
+
+    private void uploadToInstagram(String instaId, String instaPwd) throws IOException {
+        IGClient client = igClient(instaId, instaPwd);
+        File file = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
+        byte[] imgData = Files.readAllBytes(file.toPath());
+        IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
+        String id = client.sendRequest(uploadReq).join().getUpload_id();
+        IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
+                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption("👍👍"));
+        MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
+    }
 
     private void convertPngToJpg() throws IOException {
         Path source = Paths.get(System.getProperty("user.dir")+"/src/textImage.png");
