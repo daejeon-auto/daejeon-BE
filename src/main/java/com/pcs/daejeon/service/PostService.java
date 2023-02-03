@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -100,12 +101,20 @@ public class PostService {
     public void deletePost(Long postId) {
         Post post = findPostById(postId);
 
+        if (!Objects.equals(util.getLoginMember().getSchool().getId(), post.getSchool().getId())) {
+            throw new IllegalStateException("school is different");
+        }
+
         post.setPostType(PostType.DELETE);
         log.info("[delete-post] delete post: id["+ post.getId() +"]"+ util.getLoginMember().getId());
     }
 
     public void acceptPost(Long postId) {
         Post post = findPostById(postId);
+
+        if (!Objects.equals(util.getLoginMember().getSchool().getId(), post.getSchool().getId())) {
+            throw new IllegalStateException("school is different");
+        }
 
         post.setPostType(PostType.ACCEPTED);
 

@@ -207,9 +207,13 @@ public class AdminController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            log.error("e = " + e);
-            if (e.getMessage().equals("not found post"))
-                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found post")) status = HttpStatus.NOT_FOUND;
+            if (e.getMessage().equals("school is different")) status = HttpStatus.FORBIDDEN;
+
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), status);
+        } catch (Exception e) {
+            log.error(e.getMessage());
             return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -220,10 +224,13 @@ public class AdminController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            log.error("e = " + e);
-            if (e.getMessage().equals("not found post"))
-                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found post")) status = HttpStatus.NOT_FOUND;
+            if (e.getMessage().equals("school is different")) status = HttpStatus.FORBIDDEN;
 
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), status);
+        } catch (Exception e) {
+            log.error(e.getMessage());
             return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
