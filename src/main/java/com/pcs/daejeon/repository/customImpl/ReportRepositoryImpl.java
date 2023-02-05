@@ -33,14 +33,14 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
                 .fetchOne();
 
         // 해당 학교와 같은 학교인지 확인
-        School school = query
-                .selectFrom(QPost.post.school)
+        Post post = query
+                .selectFrom(QPost.post)
                 .where(QPost.post.id.eq(postId))
                 .fetchOne();
 
-        return result == null &&
-                Objects.equals(
-                        util.getLoginMember().getSchool().getId(),
-                        Objects.requireNonNull(school).getId());
+        return result != null ||
+                post == null ||
+                Objects.equals(util.getLoginMember().getSchool().getId(),
+                    post.getSchool().getId());
     }
 }
