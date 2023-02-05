@@ -47,6 +47,10 @@ public class MemberService {
             if (referCode == null) {
                 throw new IllegalStateException("unused refer code not found");
             }
+            if (!member.getSchool().getId().equals(
+                    referCode.getCreatedBy().getSchool().getId())) {
+                throw new IllegalStateException("school is different");
+            }
 
             member.setMemberType(MemberType.ACCEPT);
             member.useCode(referCode);

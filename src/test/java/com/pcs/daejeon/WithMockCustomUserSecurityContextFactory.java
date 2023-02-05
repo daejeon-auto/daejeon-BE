@@ -52,7 +52,9 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
         member.setRole(RoleTier.ROLE_TIER2);
         member.setMemberType(MemberType.ACCEPT);
         memberRepository.save(member);
-        referCodeService.generateCode(member);
+        for (int i = 0; i < 3; i++) {
+            referCodeService.generateCode(member);
+        }
 
         final UsernamePasswordAuthenticationToken authenticationToken
                 = new UsernamePasswordAuthenticationToken(new PrincipalDetails(

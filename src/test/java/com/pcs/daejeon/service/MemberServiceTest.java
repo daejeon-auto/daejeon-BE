@@ -1,17 +1,18 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
-import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,11 +45,12 @@ class MemberServiceTest {
     @Autowired
     SchoolRepository schoolRepository;
     @Autowired
+    Util util;
+    @Autowired
     EntityManager em;
 
 
     private class CreateTestMember {
-        private final School school = schoolRepository.save(new School("테스트학교", "지역", "아이디", "비밀번호"));
         private Member saveMember;
         private SignUpDto signUpDto;
 
@@ -60,7 +62,7 @@ class MemberServiceTest {
                     "01012341234",
                     AuthType.DIRECT,
                     ""+(int) (Math.random()*100000),
-                    school.getId(),
+                    util.getLoginMember().getSchool().getId(),
                     "testPassword",
                     "testId"+(int) (Math.random()*100)
             );
@@ -105,7 +107,7 @@ class MemberServiceTest {
                 "01012341234",
                 AuthType.INDIRECT,
                 "20203",
-                new CreateTestMember().school.getId(),
+                util.getLoginMember().getSchool().getId(),
                 "testPassword",
                 "testId3",
                 referCodeList.get(0).getCode()
@@ -122,13 +124,14 @@ class MemberServiceTest {
     public void 중복코드_회원가입() throws MethodArgumentNotValidException {
         List<ReferCode> referCodeList = referCodeService.getReferCodeList();
 
+        Long schoolId = util.getLoginMember().getSchool().getId();
         SignUpDto signUpDto = new SignUpDto(
                 "test1",
                 "200000101",
                 "01012341234",
                 AuthType.INDIRECT,
                 "20786",
-                new CreateTestMember().school.getId(),
+                schoolId,
                 "testPassword",
                 "testId0921939",
                 referCodeList.get(0).getCode()
@@ -141,13 +144,34 @@ class MemberServiceTest {
                 "01012341234",
                 AuthType.INDIRECT,
                 "12323",
-                1L,
+                schoolId,
                 "testPassword",
                 "testId23212",
                 referCodeList.get(0).getCode()
         );
 
         Assertions.assertThrows(IllegalStateException.class, () -> memberService.saveMember(signUpDto2));
+    }
+
+    @Test
+    @DisplayName("다른 학교 코드 가입")
+    void otherSchoolCode() {
+        Member loginMember = util.getLoginMember();
+        List<ReferCode> referCodeList = referCodeService.getReferCodeList();
+
+        Long schoolId = util.getLoginMember().getSchool().getId();
+        SignUpDto signUpDto = new SignUpDto(
+                "test1",
+                "200000101",
+                "01012341234",
+                AuthType.INDIRECT,
+                "20786",
+                loginMember.getSchool().getId() + 1,
+                "testPassword",
+                "testId0921939",
+                referCodeList.get(1).getCode()
+        );
+        Assertions.assertThrows(Exception.class, () -> memberService.saveMember(signUpDto));
     }
     // === 회원가입 ===
 
