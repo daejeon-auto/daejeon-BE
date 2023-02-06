@@ -13,6 +13,7 @@ import com.pcs.daejeon.service.ReportService;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -101,6 +102,8 @@ public class PostController {
             reportService.report(reason.getReason(), postId);
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
+        } catch (InvalidDataAccessApiUsageException e) {
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
             if (e.getMessage().equals("not found post")) status = HttpStatus.NOT_FOUND;
