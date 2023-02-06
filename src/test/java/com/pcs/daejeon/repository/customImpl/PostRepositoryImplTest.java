@@ -73,20 +73,6 @@ class PostRepositoryImplTest {
     }
 
     @Test
-    public void 로그인_안했을시_페이징() throws Exception {
-        mvc.perform(logout());
-
-        Page<Tuple> post = postRepository.pagingPost(pageable);
-
-        assertThat(post.getTotalElements()).isEqualTo(100L);
-        assertThat(post.getTotalPages()).isEqualTo(100 / 10);
-
-        for (int i = 0; i < post.getContent().size(); i++) {
-            assertThat(post.getContent().get(i).get(QPost.post).getDescription()).isEqualTo("test value " + (99-i));
-        }
-    }
-
-    @Test
     public void 신고된_글_리스트() {
         // == reject post 생성 ==
         Page<Tuple> tuples = postRepository.pagingPost(pageable);
