@@ -38,9 +38,9 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
                 .where(QPost.post.id.eq(postId))
                 .fetchOne();
 
-        return result != null ||
-                post == null ||
-                Objects.equals(util.getLoginMember().getSchool().getId(),
-                    post.getSchool().getId());
+        return result == null ||
+                post != null ?
+                !Objects.equals(util.getLoginMember().getSchool().getId(),
+                    post.getSchool().getId()) : true;
     }
 }

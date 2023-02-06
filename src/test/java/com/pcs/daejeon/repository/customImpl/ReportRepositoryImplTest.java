@@ -55,7 +55,7 @@ class ReportRepositoryImplTest {
         Post post = new Post("test글 작성", member.getSchool());
         Post save = postRepository.save(post);
 
-        Report report = new Report("test", util.getLoginMember(), post);
+        Report report = new Report("test reason", member, save);
         reportRepository.save(report);
 
         boolean valid = reportRepository.validReport(save.getId());
