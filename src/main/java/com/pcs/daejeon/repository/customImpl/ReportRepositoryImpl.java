@@ -25,10 +25,10 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
         QMember reportedBy = new QMember("reportedBy");
         QPost reportedPost = new QPost("reportedPost");
 
-        Report result = query
-                .selectFrom(report)
-                .innerJoin(report.reportedBy, reportedBy)
-                .innerJoin(report.reportedPost, reportedPost)
+        Report report = query
+                .selectFrom(QReport.report)
+                .innerJoin(QReport.report.reportedBy, reportedBy)
+                .innerJoin(QReport.report.reportedPost, reportedPost)
                 .where(reportedBy.id.eq(member.getId()), reportedPost.id.eq(postId))
                 .fetchOne();
 
@@ -38,9 +38,10 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
                 .where(QPost.post.id.eq(postId))
                 .fetchOne();
 
-        return result == null ||
-                post != null ?
-                !Objects.equals(util.getLoginMember().getSchool().getId(),
-                    post.getSchool().getId()) : true;
+        if (post == null) throw new IllegalStateException("not found post");
+        if (!Objects.equals(util.getLoginMember().getSchool().getId(),
+                post.getSchool().getId())) throw new IllegalStateException("school is different");
+
+        return report == null;
     }
 }
