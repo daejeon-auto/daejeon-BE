@@ -9,8 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Objects;
 
-import static com.pcs.daejeon.entity.QReport.report;
-
 @Repository
 @RequiredArgsConstructor
 public class ReportRepositoryImpl implements ReportRepositoryCustom {
@@ -42,6 +40,6 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
         if (!Objects.equals(util.getLoginMember().getSchool().getId(),
                 post.getSchool().getId())) throw new IllegalStateException("school is different");
 
-        return report == null;
+        return report != null;
     }
 }

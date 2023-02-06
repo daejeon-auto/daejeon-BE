@@ -46,7 +46,7 @@ class ReportRepositoryImplTest {
 
         boolean valid = reportRepository.validReport(save.getId());
 
-        assertThat(valid).isTrue();
+        assertThat(valid).isFalse();
     }
 
     @Test
@@ -60,6 +60,6 @@ class ReportRepositoryImplTest {
 
         boolean valid = reportRepository.validReport(save.getId());
 
-        assertThat(valid).isFalse();
+        assertThat(valid).isTrue();
     }
 }
