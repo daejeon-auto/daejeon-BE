@@ -216,7 +216,7 @@ public class PostService {
     }
 
 
-    public IGClient igClient(String instaId, String instaPwd) throws IGLoginException {
+    private IGClient igClient(String instaId, String instaPwd) throws IGLoginException {
     IGClient client = IGClient.builder()
                 .username(instaId)
                 .password(instaPwd)
