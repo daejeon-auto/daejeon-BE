@@ -7,11 +7,12 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Getter
 @NoArgsConstructor
 public class ReportReasonDto {
-    @NotEmpty @Min(10) @Max(500)
+    @NotEmpty @Size(min = 10, max = 500)
     private String reason;
 
     public ReportReasonDto(String reason) {

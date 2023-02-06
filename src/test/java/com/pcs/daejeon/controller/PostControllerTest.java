@@ -183,7 +183,7 @@ class PostControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .post("/post/report/"+0L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"reason\": \"이거 문제 있습니다\"}"))
+                .content("{\"reason\": \"이거 문제 있습니다---\"}"))
                 .andExpect(status().isNotFound());
     }
 
