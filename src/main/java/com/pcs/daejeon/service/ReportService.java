@@ -28,23 +28,10 @@ public class ReportService {
 
     public void report(String reason, Long postId) {
         if (reportRepository.validReport(postId)) {
-            addReport(reason, postId);
             return;
         }
-
-//        removeReport(postId);
-    }
-
-    private void addReport(String reason, Long postId) {
         Member loginMember = util.getLoginMember();
         Optional<Post> post = postRepository.findById(postId);
-        if (post.isEmpty()) {
-            throw new IllegalStateException("not found post");
-        }
-        if (!Objects.equals(loginMember.getSchool().getId(),
-                post.get().getSchool().getId())) {
-            throw new IllegalStateException("school is different");
-        }
 
         Report report = new Report(reason, loginMember, post.get());
         reportRepository.save(report);
