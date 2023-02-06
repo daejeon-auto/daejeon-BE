@@ -1,6 +1,7 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.Report;
@@ -44,15 +45,13 @@ class ReportServiceTest {
     @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    Util util;
+
     @Test
     @DisplayName("신고 성공")
     void addReport200() {
-        School school = schoolRepository.save(new School(
-                "부산컴과고",
-                "부산",
-                "인스타아이디",
-                "인스타패스워드"
-        ));
+        School school = util.getLoginMember().getSchool();
         Post post = postRepository.save(new Post("hello world", school));
 
         reportService.report("reason", post.getId());
@@ -63,12 +62,7 @@ class ReportServiceTest {
     @Test
     @DisplayName("신고 실패 - reason부족")
     void addReport400() {
-        School school = schoolRepository.save(new School(
-                "부산컴과고",
-                "부산",
-                "인스타아이디",
-                "인스타패스워드"
-        ));
+        School school = util.getLoginMember().getSchool();
         Post post = postRepository.save(new Post("hello world", school));
 
         reportService.report("reason", post.getId());
@@ -86,12 +80,7 @@ class ReportServiceTest {
     @DisplayName("신고 5회로 인한 차단")
     @WithMockCustomUser
     void rejectPost() {
-        School school = schoolRepository.save(new School(
-                "부산컴과고",
-                "부산",
-                "인스타아이디",
-                "인스타패스워드"
-        ));
+        School school = util.getLoginMember().getSchool();
         Post helloWorld = postRepository.save(new Post("hello world", school));
         Assertions.assertThat(helloWorld.getPostType()).isEqualTo(PostType.ACCEPTED);
 
