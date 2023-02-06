@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,8 +72,8 @@ class ReportServiceTest {
     @Test
     @DisplayName("신고 실패 - post 없음")
     void addReport404() {
-        assertThrows(IllegalStateException.class,
-                () -> reportService.report("reason", 0L),
+        assertThrows(InvalidDataAccessApiUsageException.class,
+                () -> reportService.report("reason-----", 0L),
                 "not found post");
     }
 
