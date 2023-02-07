@@ -3,7 +3,9 @@ package com.pcs.daejeon.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
+import com.pcs.daejeon.dto.school.SchoolRegistDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
@@ -59,6 +61,36 @@ class MemberControllerTest {
         Map<String, Object> map = createMember();
 
         Assertions.assertThat(map.get("hasError")).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("관리자 회원가입 성공")
+    void signUpAdmin() throws Exception {
+        SignUpDto user = new SignUpDto(
+                "test1",
+                "200000101",
+                "01012341234",
+                AuthType.DIRECT,
+                "" + (int) (Math.random() * 100000),
+                getLoginMember().getSchool().getId(),
+                "testPassword",
+                "testId" + (int) (Math.random() * 100)
+        );
+
+        SchoolRegistDto schoolRegistDto = new SchoolRegistDto(
+                "컴퓨터과학고등학교",
+                "부산",
+                "인스타아이디",
+                "인스타패스워드"
+        );
+
+        mvc.perform(MockMvcRequestBuilders
+                .post("/signup-admin")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new SignUpAdminDto(
+                        user, schoolRegistDto
+                ))))
+                .andExpect(status().isCreated());
     }
 
     @Test
