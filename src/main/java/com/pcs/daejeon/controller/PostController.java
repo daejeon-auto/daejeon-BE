@@ -102,11 +102,16 @@ public class PostController {
             reportService.report(reason.getReason(), postId);
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
+        } catch (InvalidDataAccessApiUsageException e) {
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found post")) status = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
             log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

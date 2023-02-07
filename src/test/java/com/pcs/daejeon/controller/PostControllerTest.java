@@ -183,7 +183,7 @@ class PostControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .post("/post/report/"+0L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"reason\": \"이거 문제 있습니다\"}"))
+                .content("{\"reason\": \"이거 문제 있습니다---\"}"))
                 .andExpect(status().isNotFound());
     }
 
@@ -191,10 +191,10 @@ class PostControllerTest {
     @DisplayName("신고 실패 - 400 이유 없음")
     void reportPost400() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                .post("/post/report/"+0L)
+                .post("/post/report/"+examplePost.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"reason\": \"\"}"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

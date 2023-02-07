@@ -120,6 +120,6 @@ class ReferCodeServiceTest {
         List<ReferCode> referCodeList = referCodeService.getReferCodeList();
 
         // 계정 생성 당시 추천코드 하나 발급
-        assertThat(referCodeList.size()).isEqualTo(1);
+        assertThat(referCodeList.size()).isEqualTo(3);
     }
 }

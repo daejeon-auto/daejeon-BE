@@ -1,16 +1,20 @@
 package com.pcs.daejeon.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.dto.member.PendingMemberDto;
+import com.pcs.daejeon.dto.member.PersonalInfo;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
+import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
@@ -397,9 +401,10 @@ class AdminControllerTest {
     @Test
     @DisplayName("권한 수정 실패 - 미로그인")
     void setRole401() throws Exception {
+        mvc.perform(logout()).andExpect(status().isOk());
         mvc.perform(MockMvcRequestBuilders
                         .post("/admin/member/set-role/" + exampleMember.getId() + "/ROLE_TIER1"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
     @Test
     @DisplayName("권한 수정 실패 - 유저 없음")

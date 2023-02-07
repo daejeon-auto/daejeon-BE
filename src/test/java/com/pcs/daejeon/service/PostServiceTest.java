@@ -57,13 +57,7 @@ class PostServiceTest {
 
     @BeforeEach
     public void initData() {
-        School school = new School(
-                "테스트학교",
-                "지역",
-                "인스타아이디",
-                "인스타비밀번호"
-        );
-        schoolRepository.save(school);
+        School school = util.getLoginMember().getSchool();
         for (int i = 0; i < 100; i++) {
             postRepository.save(new Post("test value " + i, school));
         }
@@ -135,10 +129,10 @@ class PostServiceTest {
     @Test
     @DisplayName("글 가져오기 성공")
     void findPagedPost() {
-        List<Tuple> post = postService.findPagedPost(PageRequest.of(0, 15)).getContent();
+        Page<Tuple> pagedPost = postService.findPagedPost(PageRequest.of(0, 15));
 
-        Assertions.assertFalse(post.isEmpty());
-        assertThat(post.size()).isEqualTo(15);
+        Assertions.assertTrue(pagedPost.hasContent());
+        assertThat(pagedPost.getContent().size()).isEqualTo(15);
     }
 
     @Test
