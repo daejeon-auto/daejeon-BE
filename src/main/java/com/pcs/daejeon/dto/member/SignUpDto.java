@@ -59,4 +59,8 @@ public class SignUpDto {
         this.password = password;
         this.loginId = loginId;
     }
+
+    public void setSchoolId(Long schoolId) {
+        this.schoolId = schoolId;
+    }
 }

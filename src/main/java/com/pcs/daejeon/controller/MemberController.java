@@ -4,12 +4,15 @@ import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.member.ReferCodeDto;
+import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.ReferCodeService;
+import com.pcs.daejeon.service.SchoolService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final ReferCodeService referCodeService;
+    private final SchoolService schoolService;
     private final Util util;
 
     @PostMapping("/sign-up")
@@ -62,6 +66,41 @@ public class MemberController {
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/signup-admin")
+    public ResponseEntity<Result> signUpAdmin(@RequestBody @Valid SignUpAdminDto signUpAdminDto) {
+
+        try {
+            School regist = schoolService.regist(signUpAdminDto.getSchool());
+            signUpAdminDto.getMember().setSchoolId(regist.getId());
+            Member member = memberService.saveMember(signUpAdminDto.getMember());
+
+            MemberInfoDto memberInfo = new MemberInfoDto(member.getName(),
+                    member.getStudentNumber(),
+                    member.getBirthDay(),
+                    member.getPhoneNumber(),
+                    member.getSchool().getName(),
+                    member.getSchool().getLocate(),
+                    member.getAuthType());
+
+            return new ResponseEntity<>(new Result<>(memberInfo, false), HttpStatus.CREATED);
+        } catch (IllegalStateException e) {
+            if (Objects.equals(e.getMessage(), "student already sign up")) {
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.CONFLICT);
+            }
+
+            if (Objects.equals(e.getMessage(), "unused refer code not found")) {
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
+            }
+
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
+        } catch (MethodArgumentNotValidException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
