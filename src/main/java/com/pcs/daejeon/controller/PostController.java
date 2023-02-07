@@ -13,6 +13,7 @@ import com.pcs.daejeon.service.ReportService;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -67,7 +68,7 @@ public class PostController {
             ));
 
             return ResponseEntity.ok().body(postResult);
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | InvalidDataAccessApiUsageException e) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
             if (e.getMessage().equals("need login")) status = HttpStatus.UNAUTHORIZED;
 
