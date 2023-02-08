@@ -40,9 +40,9 @@ public class PostController {
 
     @PostMapping("/posts")
     public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
-        Page<Tuple> posts = postService.findPagedPost(pageable);
 
         try {
+            Page<Tuple> posts = postService.findPagedPost(pageable);
 
             List<PostDto> postDto = posts.getContent()
                     .stream()
@@ -68,10 +68,8 @@ public class PostController {
             ));
 
             return ResponseEntity.ok().body(postResult);
-        } catch (IllegalStateException | InvalidDataAccessApiUsageException e) {
+        } catch (IllegalStateException e) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
-            if (e.getMessage().equals("need login")) status = HttpStatus.UNAUTHORIZED;
-
             return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -85,10 +83,8 @@ public class PostController {
             postService.writePost(post.getDescription());
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | MethodArgumentNotValidException e) {
             return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
-        } catch (MethodArgumentNotValidException e) {
-            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
