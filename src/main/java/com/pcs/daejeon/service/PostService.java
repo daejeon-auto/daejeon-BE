@@ -18,6 +18,7 @@ import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.Tuple;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,7 +48,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
+@Log4j2
 public class PostService {
 
     private final PostRepository postRepository;

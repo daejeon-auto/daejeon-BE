@@ -13,6 +13,8 @@ import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.ReferCodeRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
+@Log4j2
 public class MemberService {
 
     private final MemberRepository memberRepository;

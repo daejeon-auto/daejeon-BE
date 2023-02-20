@@ -1,7 +1,7 @@
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://containers-us-west-129.railway.app:6747/railway
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:postgresql://containers-us-west-129.railway.app:6747/railway
     username: postgres
     password: pU8DtkaPac3IrrVNRkiP
 

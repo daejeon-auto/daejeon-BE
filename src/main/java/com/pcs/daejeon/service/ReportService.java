@@ -8,6 +8,7 @@ import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Slf4j
+@Log4j2
 public class ReportService {
 
     private final ReportRepository reportRepository;
