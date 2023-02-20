@@ -15,6 +15,7 @@ import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
+@Log4j2
 public class AdminController {
 
     private final ReportService reportService;
