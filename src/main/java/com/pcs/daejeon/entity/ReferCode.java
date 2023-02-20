@@ -1,6 +1,7 @@
 package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pcs.daejeon.entity.basic.BasicTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;

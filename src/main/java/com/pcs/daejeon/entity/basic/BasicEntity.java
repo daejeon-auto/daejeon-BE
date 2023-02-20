@@ -1,6 +1,5 @@
-package com.pcs.daejeon.entity;
+package com.pcs.daejeon.entity.basic;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
