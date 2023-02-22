@@ -37,10 +37,6 @@ public class School extends BasicTime {
     private String instaId;
     private String instaPwd;
 
-    @OneToMany(mappedBy = "school",
-            fetch = FetchType.LAZY)
-    private List<Log> logs;
-
     public School(String name, String locate, String instaId, String instaPwd) {
         this.name = name;
         this.locate = locate;
