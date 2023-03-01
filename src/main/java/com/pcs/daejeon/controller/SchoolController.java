@@ -25,8 +25,9 @@ public class SchoolController {
             List<SchoolListDto> allSchool = schoolService.findAllSchool()
                     .stream()
                     .map(o -> new SchoolListDto(
-                        o.getName(),
-                        o.getLocate()
+                            o.getId(),
+                            o.getName(),
+                            o.getLocate()
                     )
             ).toList();
             return new ResponseEntity<>(new Result<>(allSchool, false), HttpStatus.OK);
