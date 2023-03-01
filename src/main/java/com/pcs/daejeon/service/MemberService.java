@@ -13,9 +13,7 @@ import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.ReferCodeRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +57,15 @@ public class MemberService {
         }
 
         return memberRepository.save(member);
+    }
+
+    public Member saveAdmin(SignUpDto signUpDto) throws MethodArgumentNotValidException {
+        Member member = saveMember(signUpDto);
+
+        member.setMemberType(MemberType.ACCEPT);
+        member.setRole(RoleTier.ROLE_TIER2);
+
+        return member;
     }
 
     public void acceptMember(Long memberId) {

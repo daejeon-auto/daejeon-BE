@@ -75,7 +75,7 @@ public class MemberController {
         try {
             School regist = schoolService.regist(signUpAdminDto.getSchool());
             signUpAdminDto.getMember().setSchoolId(regist.getId());
-            Member member = memberService.saveMember(signUpAdminDto.getMember());
+            Member member = memberService.saveAdmin(signUpAdminDto.getMember());
 
             MemberInfoDto memberInfo = new MemberInfoDto(member.getName(),
                     member.getStudentNumber(),
@@ -100,6 +100,7 @@ public class MemberController {
         } catch (MethodArgumentNotValidException e) {
             return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            log.error(e.toString());
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
