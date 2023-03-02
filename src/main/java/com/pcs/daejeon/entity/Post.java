@@ -39,7 +39,7 @@ public class Post extends BasicEntity {
     private List<Report> reports = new ArrayList<>();
 
     // 어느 학교의 게시글인지 확인
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "school_id")
     private School school;
 
