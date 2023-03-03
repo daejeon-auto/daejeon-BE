@@ -78,7 +78,7 @@ public class PostController {
     }
 
     @PostMapping("/post/write")
-    public ResponseEntity<Result<String>> writePost(@RequestBody @Valid Post post) {
+    public ResponseEntity<Result<String>> writePost(@RequestBody @Valid PostWriteDto post) {
         try {
             postService.writePost(post.getDescription());
 
