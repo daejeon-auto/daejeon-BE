@@ -145,6 +145,7 @@ public class MemberService {
             throw new IllegalStateException("not found member");
         }
 
+        referCodeRepository.deleteAll(member.getReferCodes());
         memberRepository.delete(member);
     }
 
