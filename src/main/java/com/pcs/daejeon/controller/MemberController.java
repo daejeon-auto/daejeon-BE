@@ -77,6 +77,10 @@ public class MemberController {
             signUpAdminDto.getMember().setSchoolId(regist.getId());
             Member member = memberService.saveAdmin(signUpAdminDto.getMember());
 
+            for (int i = 0; i < 3; i++) {
+                referCodeService.generateCode(member);
+            }
+
             MemberInfoDto memberInfo = new MemberInfoDto(member.getName(),
                     member.getStudentNumber(),
                     member.getBirthDay(),
@@ -104,8 +108,6 @@ public class MemberController {
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    // TODO 학교 및 관리자 계정 등록 만들기
 
     @PostMapping("/code/list")
     public ResponseEntity<Result<List<ReferCodeDto>>> getCodeList() {
