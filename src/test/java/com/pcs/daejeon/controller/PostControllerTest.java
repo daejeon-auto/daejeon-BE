@@ -105,7 +105,7 @@ class PostControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .post("/post/write")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"description\": \"test글 작성\"}"))
+                .content("{\"description\": \"test글 작성----------\"}"))
                 .andExpect(status().isOk());
     }
 
