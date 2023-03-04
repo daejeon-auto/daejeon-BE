@@ -36,7 +36,7 @@ public class MemberService {
 
 
     public Member saveMember(SignUpDto signUpDto) throws MethodArgumentNotValidException {
-        if (memberRepository.validStudentNum(signUpDto.getStudentNumber()) ||
+        if (memberRepository.validStudentNum(signUpDto.getStudentNumber(), util.getLoginMember().getSchool().getId()) ||
                 memberRepository.validLoginId(signUpDto.getLoginId())) {
             throw new IllegalStateException("student already sign up");
         }
@@ -100,11 +100,11 @@ public class MemberService {
     }
 
     public List<Member> getMembers(Long memberId, boolean onlyAdmin) {
-        return memberRepository.getMemberList(memberId, onlyAdmin);
+        return memberRepository.getMemberList(memberId, onlyAdmin, util.getLoginMember().getSchool());
     }
 
     public List<Member> getPendingMembers() {
-        return memberRepository.findAllByMemberTypeOrderByCreatedDateAsc(MemberType.PENDING);
+        return memberRepository.findAllByMemberTypeAndSchoolOrderByCreatedDateAsc(MemberType.PENDING, util.getLoginMember().getSchool());
     }
 
     public void acceptPendingMember(@Valid PendingMemberDto pendingMemberDto) {
@@ -145,11 +145,12 @@ public class MemberService {
             throw new IllegalStateException("not found member");
         }
 
+        referCodeRepository.deleteAll(member.getReferCodes());
         memberRepository.delete(member);
     }
 
     public Member findPersonalInfo(Long memberId) {
-        Optional<Member> byId = memberRepository.findById(memberId);
+        Optional<Member> byId = memberRepository.findByIdAndSchool(memberId, util.getLoginMember().getSchool());
 
         if (byId.isEmpty()) {
             throw new IllegalStateException("not found member");
@@ -159,7 +160,7 @@ public class MemberService {
     }
 
     public Member setMemberRole(Long memberId, RoleTier tier) {
-        Optional<Member> member = memberRepository.findById(memberId);
+        Optional<Member> member = memberRepository.findByIdAndSchool(memberId, util.getLoginMember().getSchool());
 
         if (member.isEmpty()) {
             throw new IllegalStateException("not found member");

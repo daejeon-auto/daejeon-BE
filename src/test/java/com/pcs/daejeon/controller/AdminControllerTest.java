@@ -62,6 +62,7 @@ class AdminControllerTest {
     long examplePostId = 0;
     long exampleSchoolId = 0;
     Member exampleMember = null;
+    Member sameSchoolExampleMember = null;
 
     private Member getLoginMember() {
         PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
@@ -102,6 +103,17 @@ class AdminControllerTest {
                 school
         ));
         exampleMember = member;
+
+        sameSchoolExampleMember = memberRepository.save(new Member(
+                "testMember",
+                "000000",
+                "01012341234",
+                "00000",
+                "password",
+                "loginId",
+                AuthType.DIRECT,
+                getLoginMember().getSchool()
+        ));
     }
 
     @Test
@@ -329,7 +341,7 @@ class AdminControllerTest {
     @DisplayName("개인 정보 가져오기 성공")
     void callPersonalInfo() throws Exception {
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
-                        .post("/admin/personal-info/" + exampleMember.getId()))
+                        .post("/admin/personal-info/" + sameSchoolExampleMember.getId()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -377,10 +389,10 @@ class AdminControllerTest {
     @DisplayName("권한 수정 성공")
     void setRole() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                        .post("/admin/member/set-role/" + exampleMember.getId() + "/ROLE_TIER1"))
+                        .post("/admin/member/set-role/" + sameSchoolExampleMember.getId() + "/ROLE_TIER1"))
                 .andExpect(status().isOk());
 
-        assertThat(exampleMember.getRole()).isEqualTo(RoleTier.ROLE_TIER1);
+        assertThat(sameSchoolExampleMember.getRole()).isEqualTo(RoleTier.ROLE_TIER1);
     }
     @Test
     @DisplayName("권한 수정 실패 - 권한 없음 1")

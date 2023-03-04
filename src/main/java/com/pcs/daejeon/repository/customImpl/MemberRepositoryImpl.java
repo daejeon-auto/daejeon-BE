@@ -1,6 +1,7 @@
 package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.custom.MemberRepositoryCustom;
@@ -19,13 +20,14 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory query;
 
     @Override
-    public boolean validStudentNum(String stdNum) {
+    public boolean validStudentNum(String stdNum, Long schoolId) {
         Long result = query
                 .select(member.count())
                 .from(member)
                 .where(
                         member.studentNumber.eq(stdNum),
-                        member.memberType.ne(MemberType.GRADUATE)
+                        member.memberType.ne(MemberType.GRADUATE),
+                        member.school.id.eq(schoolId)
                 )
                 .fetchOne();
 
@@ -47,8 +49,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public List<Member> getMemberList(Long memberId, boolean onlyAdmin) {
-        BooleanExpression codState = member.memberType.ne(MemberType.GRADUATE).and(member.memberType.ne(MemberType.PENDING));
+    public List<Member> getMemberList(Long memberId, boolean onlyAdmin, School school) {
+        BooleanExpression codState = member.memberType.ne(MemberType.GRADUATE)
+                .and(member.memberType.ne(MemberType.PENDING))
+                .and(member.school.id.eq(school.getId()));
         if (memberId != null) {
             codState = codState.and(member.id.eq(memberId));
         }

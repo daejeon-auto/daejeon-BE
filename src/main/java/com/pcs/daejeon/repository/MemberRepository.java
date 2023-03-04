@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Transactional
@@ -16,7 +17,9 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     Member findByLoginId(String id);
 
-    List<Member> findAllByMemberTypeOrderByCreatedDateAsc(MemberType memberType);
+    Optional<Member> findByIdAndSchool(Long id, School school);
+
+    List<Member> findAllByMemberTypeAndSchoolOrderByCreatedDateAsc(MemberType memberType, School school);
 
     Member findByNameAndBirthDayAndStudentNumberAndSchool(String name, String birthDay, String studentNumber, School School);
 }

@@ -21,7 +21,6 @@ import java.util.Objects;
 import static com.pcs.daejeon.entity.QLike.like;
 import static com.pcs.daejeon.entity.QPost.post;
 import static com.pcs.daejeon.entity.QReport.report;
-import static com.pcs.daejeon.entity.QSchool.*;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
@@ -100,12 +99,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     @Override
     public Page<Post> pagingRejectPost(Pageable page, Long memberId, Long reportCount) {
-//        todo: MEMBER로그인 기능 필요 없는거 확인 되면 삭제
-        //        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
-//                    .getContext()
-//                    .getAuthentication()
-//                    .getPrincipal();
-
         List<Post> result = query
                 .selectFrom(post)
                 .where(
@@ -126,12 +119,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }
     @Override
-    public Page<Post> searchPost(Pageable page, Long memberId, Long reportCount) {
+    public Page<Post> searchPost(Pageable page, Long memberId, Long reportCount, School school) {
         List<Post> result = query
                 .selectFrom(post)
                 .where(
                         memberIdEq(memberId),
-                        reportCountEq(reportCount)
+                        reportCountEq(reportCount),
+                        post.school.id.eq(school.getId())
                 )
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())

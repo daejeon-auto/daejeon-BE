@@ -79,7 +79,7 @@ public class Member extends BasicTime {
             fetch = FetchType.LAZY)
     private List<Report> reports = new ArrayList<>();
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "school_id")
     private School school;
 

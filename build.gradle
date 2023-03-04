@@ -76,6 +76,7 @@ compileQuerydsl {
 	options.annotationProcessorPath = configurations.querydsl
 }
 
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
