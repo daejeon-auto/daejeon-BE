@@ -20,13 +20,14 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory query;
 
     @Override
-    public boolean validStudentNum(String stdNum) {
+    public boolean validStudentNum(String stdNum, Long schoolId) {
         Long result = query
                 .select(member.count())
                 .from(member)
                 .where(
                         member.studentNumber.eq(stdNum),
-                        member.memberType.ne(MemberType.GRADUATE)
+                        member.memberType.ne(MemberType.GRADUATE),
+                        member.school.id.eq(schoolId)
                 )
                 .fetchOne();
 

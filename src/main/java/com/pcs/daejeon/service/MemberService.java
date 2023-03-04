@@ -36,7 +36,7 @@ public class MemberService {
 
 
     public Member saveMember(SignUpDto signUpDto) throws MethodArgumentNotValidException {
-        if (memberRepository.validStudentNum(signUpDto.getStudentNumber()) ||
+        if (memberRepository.validStudentNum(signUpDto.getStudentNumber(), util.getLoginMember().getSchool().getId()) ||
                 memberRepository.validLoginId(signUpDto.getLoginId())) {
             throw new IllegalStateException("student already sign up");
         }
