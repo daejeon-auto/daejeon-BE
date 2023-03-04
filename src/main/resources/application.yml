@@ -3,7 +3,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://containers-us-west-129.railway.app:6747/railway
     username: postgres
-    password: pU8DtkaPac3IrrVNRkiP
+    password: hGK1i4tdJCIyZqa7dk1w
   profiles:
     active: real
   jpa:
