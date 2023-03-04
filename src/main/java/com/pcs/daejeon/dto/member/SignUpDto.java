@@ -19,6 +19,7 @@ public class SignUpDto {
     @NotEmpty
     private String phoneNumber;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private AuthType authType;
 
