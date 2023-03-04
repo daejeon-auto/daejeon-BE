@@ -19,7 +19,6 @@ import com.querydsl.core.Tuple;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
@@ -153,7 +152,10 @@ public class PostService {
      */
     // TODO 게시글 아이디 만으로도 검색 가능토록 업데이트
     public Page<Post> searchPost(Pageable pageable, Long memberId, Long reportCount) {
-        return postRepository.searchPost(pageable, memberId, reportCount);
+        return postRepository.searchPost(pageable,
+                memberId,
+                reportCount,
+                util.getLoginMember().getSchool());
     }
 
     public Post findPostById(Long postId) {
