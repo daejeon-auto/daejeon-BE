@@ -16,14 +16,4 @@ public class QueryDslConfig {
     public JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(em);
     }
-
-//    @Bean
-//    public IGClient igClient() throws IGLoginException {
-//        IGClient client = IGClient.builder()
-//                .username("pcs_daejeon")
-//                .password("pcs13579")
-//                .login();
-//
-//        return client;
-//    }
 }

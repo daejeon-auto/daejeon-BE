@@ -4,10 +4,8 @@ spring:
     url: jdbc:postgresql://containers-us-west-129.railway.app:6747/railway
     username: postgres
     password: pU8DtkaPac3IrrVNRkiP
-
   profiles:
     active: real
-
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -26,7 +24,6 @@ spring:
 #logging.level:
 #  org.hibernate.SQL: debug
 #  org.hibernate.type: trace
-
 server:
   port: 80
   servlet:
@@ -36,7 +33,6 @@ server:
         secure: true
         same-site: none
         max-age: 3600
-
 #  ssl:
 #    enabled: true
 #    key-alias: ayokeystore

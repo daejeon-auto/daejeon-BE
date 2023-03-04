@@ -1,6 +1,7 @@
 package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pcs.daejeon.entity.basic.BasicEntity;
 import com.pcs.daejeon.entity.type.PostType;
 import lombok.Getter;
 
@@ -37,14 +38,20 @@ public class Post extends BasicEntity {
     @OneToMany(mappedBy = "reportedPost", cascade = CascadeType.ALL)
     private List<Report> reports = new ArrayList<>();
 
+    // 어느 학교의 게시글인지 확인
+    @ManyToOne()
+    @JoinColumn(name = "school_id")
+    private School school;
+
     public Post() {}
 
     public void setPostType(PostType postType) {
         this.postType = postType;
     }
 
-    public Post(String description) {
+    public Post(String description, School school) {
         this.description = description;
+        this.school = school;
     }
 
     @PrePersist

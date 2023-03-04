@@ -2,9 +2,13 @@ package com.pcs.daejeon;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
+import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
+import com.pcs.daejeon.service.ReferCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,10 +25,19 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
     @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    SchoolRepository schoolRepository;
+
+    @Autowired
+    ReferCodeService referCodeService;
+
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser annotation) {
 
         final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        School school = new School("부산컴퓨터과학고등학교", "부산 중구", "인스타아이디", "패스워드");
+        schoolRepository.save(school);
 
         Member member = new Member(
                 "test",
@@ -33,10 +46,15 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 "20201",
                 "password",
                 "loginId",
-                AuthType.DIRECT
+                AuthType.DIRECT,
+                school
         );
         member.setRole(RoleTier.ROLE_TIER2);
+        member.setMemberType(MemberType.ACCEPT);
         memberRepository.save(member);
+        for (int i = 0; i < 3; i++) {
+            referCodeService.generateCode(member);
+        }
 
         final UsernamePasswordAuthenticationToken authenticationToken
                 = new UsernamePasswordAuthenticationToken(new PrincipalDetails(

@@ -1,6 +1,7 @@
 package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pcs.daejeon.entity.basic.BasicTime;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
@@ -51,8 +52,8 @@ public class Member extends BasicTime {
             mappedBy = "createByMember")
     private List<Post> post;
 
-    @NotEmpty(message = "비밀번호는 필수 입력 값입니다.")
-    @Length(min = 4, max = 16, message = "비밀번호는 4자 이상, 16자 이하로 입력해주세요.")
+    @NotEmpty(message = "아이디는 필수 입력 값입니다.")
+    @Length(min = 4, max = 16, message = "아이디는 4자 이상, 16자 이하로 입력해주세요.")
     @Column(name = "login_id")
     private String loginId;
 
@@ -78,6 +79,10 @@ public class Member extends BasicTime {
             fetch = FetchType.LAZY)
     private List<Report> reports = new ArrayList<>();
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "school_id")
+    private School school;
+
     public void setMemberType(MemberType memberType) {
         this.memberType = memberType;
     }
@@ -91,7 +96,7 @@ public class Member extends BasicTime {
         usedCode.setIsUsed();
     }
 
-    public Member(String name, String birthDay, String phoneNumber, String studentNumber, String password, String loginId, AuthType authType) {
+    public Member(String name, String birthDay, String phoneNumber, String studentNumber, String password, String loginId, AuthType authType, School school) {
         this.name = name;
         this.birthDay = birthDay;
         this.phoneNumber = phoneNumber;
@@ -99,7 +104,8 @@ public class Member extends BasicTime {
         this.password = password;
         this.loginId = loginId;
         this.authType = authType;
+        this.school = school;
         this.role = RoleTier.ROLE_TIER0;
-        this .memberType = MemberType.PENDING;
+        this.memberType = MemberType.PENDING;
     }
 }

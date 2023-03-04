@@ -1,21 +1,31 @@
 package com.pcs.daejeon.service;
 
+import com.github.instagram4j.instagram4j.IGClient;
+import com.github.instagram4j.instagram4j.exceptions.IGLoginException;
+import com.github.instagram4j.instagram4j.requests.IGRequest;
+import com.github.instagram4j.instagram4j.requests.media.MediaConfigureTimelineRequest;
+import com.github.instagram4j.instagram4j.requests.upload.RuploadPhotoRequest;
+import com.github.instagram4j.instagram4j.responses.media.MediaResponse;
+import com.github.instagram4j.instagram4j.responses.media.RuploadPhotoResponse;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Like;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
-import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.Tuple;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -25,33 +35,37 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
+@Log4j2
 public class PostService {
 
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
-//    private final IGClient client;
+    private final Util util;
+    //    private final IGClient client;
 
-    public Long writePost(String description) {
+    public Long writePost(String description) throws MethodArgumentNotValidException {
         description = description.replace("\n", " ");
 
-        boolean isOk = isBadDesc(description);
-        if (!isOk) {
+        boolean isBad = isBadDesc(description);
+        if (isBad) {
             throw new IllegalArgumentException("bad words");
         }
 
-        Post save = postRepository.save(new Post(description));
+        Member loginMember = util.getLoginMember();
+        Post save = postRepository.save(new Post(description, loginMember.getSchool()));
         return save.getId();
     }
 
@@ -73,22 +87,22 @@ public class PostService {
 
             ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
             if (
-                !resultMap.hasBody() ||
-                resultMap.getBody().get("abuse") == "1" ||
-                resultMap.getBody().get("age") == "1" ||
-                resultMap.getBody().get("binan") == "1" ||
-                resultMap.getBody().get("gender") == "1" ||
-                resultMap.getBody().get("hansome") == "1" ||
-                resultMap.getBody().get("harassment") == "1" ||
-                resultMap.getBody().get("native") == "1" ||
-                resultMap.getBody().get("poli") == "1" ||
-                resultMap.getBody().get("race") == "1" ||
-                resultMap.getBody().get("religion") == "1"
+                resultMap.hasBody() && (
+                resultMap.getBody().get("abuse").equals(1) ||
+                resultMap.getBody().get("age").equals(1) ||
+                resultMap.getBody().get("binan").equals(1) ||
+                resultMap.getBody().get("gender").equals(1) ||
+                resultMap.getBody().get("hansome").equals(1) ||
+                resultMap.getBody().get("harassment").equals(1) ||
+                resultMap.getBody().get("native").equals(1) ||
+                resultMap.getBody().get("poli").equals(1) ||
+                resultMap.getBody().get("race").equals(1) ||
+                resultMap.getBody().get("religion").equals(1))
             ) {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new IllegalStateException("description valid api server error");
         }
@@ -98,16 +112,24 @@ public class PostService {
     public void deletePost(Long postId) {
         Post post = findPostById(postId);
 
+        if (!Objects.equals(util.getLoginMember().getSchool().getId(), post.getSchool().getId())) {
+            throw new IllegalStateException("school is different");
+        }
+
         post.setPostType(PostType.DELETE);
-        log.info("[delete-post] delete post: id["+ post.getId() +"]"+ memberRepository.getLoginMember().getId());
+        log.info("[delete-post] delete post: id["+ post.getId() +"]"+ util.getLoginMember().getId());
     }
 
     public void acceptPost(Long postId) {
         Post post = findPostById(postId);
 
+        if (!Objects.equals(util.getLoginMember().getSchool().getId(), post.getSchool().getId())) {
+            throw new IllegalStateException("school is different");
+        }
+
         post.setPostType(PostType.ACCEPTED);
 
-        Member loginMember = memberRepository.getLoginMember();
+        Member loginMember = util.getLoginMember();
         log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"] --- ");
     }
 
@@ -116,13 +138,20 @@ public class PostService {
     }
 
     public Page<Post> findPagedPostByMemberId(Pageable pageable) {
-        Member loginMember = memberRepository.getLoginMember();
+        Member loginMember = util.getLoginMember();
         return postRepository.pagingPostByMemberId(pageable, loginMember);
     }
+    /**
+        memberId와 reportCount는 검색을 위한 인자. nullable함
+     */
     public Page<Post> findPagedRejectedPost(Pageable page, Long memberId, Long reportCount) {
         return postRepository.pagingRejectPost(page, memberId, reportCount);
     }
 
+    /**
+     미신고 게시글도 함께 검색함.
+     */
+    // TODO 게시글 아이디 만으로도 검색 가능토록 업데이트
     public Page<Post> searchPost(Pageable pageable, Long memberId, Long reportCount) {
         return postRepository.searchPost(pageable, memberId, reportCount);
     }
@@ -138,28 +167,32 @@ public class PostService {
 
     public void addLike(Long postId) throws IOException, URISyntaxException {
         Optional<Post> post = postRepository.findById(postId);
-        if (!post.isPresent()) {
+        if (post.isEmpty()) {
             throw new IllegalStateException("post not found");
         }
+        Member loginMember = util.getLoginMember();
+        if (post.get().getSchool().getId() != loginMember.getSchool().getId()) {
+            throw new IllegalStateException("school is different");
+        }
 
-        if (likeRepository.validLike(memberRepository.getLoginMember(), postId)) {
-            Member loginMember = memberRepository.getLoginMember();
+        if (likeRepository.validLike(loginMember, postId)) {
             Like like = likeRepository.findByPostAndLikedBy(post.get(), loginMember);
             likeRepository.delete(like);
             return;
         }
 
-        Like like = new Like(memberRepository.getLoginMember(), post.get());
+        Like like = new Like(util.getLoginMember(), post.get());
         likeRepository.save(like);
 
         Long likedCount = likeRepository.countByPost(post.get());
         if (likedCount == 15) {
             drawImage(post.get().getDescription());
-//            uploadToInstagram();
+            School school = loginMember.getSchool();
+            uploadToInstagram(school.getInstaId(), school.getInstaPwd());
         }
     }
 
-    private void drawImage(String description) throws IOException, URISyntaxException {
+    private void drawImage(String description) {
         StringBuilder text = new StringBuilder(description);
         int iterCount = 0;
         for (int i = 1; i <= description.length(); i++) {
@@ -169,7 +202,7 @@ public class PostService {
             }
         }
 
-        String code = "<div style=\"font-family: Malgun Gothic; font-size: 70px;\">"+text.toString()+"</div>";
+        String code = "<div style=\"font-family: Malgun Gothic; font-size: 70px;\">"+text+"</div>";
 
         try {
             HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
@@ -183,15 +216,26 @@ public class PostService {
         }
     }
 
-//    private void uploadToInstagram() throws IOException {
-//        File file = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
-//        byte[] imgData = Files.readAllBytes(file.toPath());
-//        IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
-//        String id = client.sendRequest(uploadReq).join().getUpload_id();
-//        IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
-//                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption("👍👍"));
-//        MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
-//    }
+
+    private IGClient igClient(String instaId, String instaPwd) throws IGLoginException {
+    IGClient client = IGClient.builder()
+                .username(instaId)
+                .password(instaPwd)
+                .login();
+
+        return client;
+    }
+
+    private void uploadToInstagram(String instaId, String instaPwd) throws IOException {
+        IGClient client = igClient(instaId, instaPwd);
+        File file = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
+        byte[] imgData = Files.readAllBytes(file.toPath());
+        IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
+        String id = client.sendRequest(uploadReq).join().getUpload_id();
+        IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
+                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption("👍👍"));
+        MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
+    }
 
     private void convertPngToJpg() throws IOException {
         Path source = Paths.get(System.getProperty("user.dir")+"/src/textImage.png");

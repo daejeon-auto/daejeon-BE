@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 public class PendingMemberDto {
 
     @NotNull
-    private LocalDateTime created_date;
+    private Long schoolId;
     @NotNull
     private String birthday;
     @NotNull

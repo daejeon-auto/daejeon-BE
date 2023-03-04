@@ -13,13 +13,13 @@ import com.pcs.daejeon.service.ReportService;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -40,61 +40,54 @@ public class PostController {
 
     @PostMapping("/posts")
     public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
-        Page<Tuple> posts = postService.findPagedPost(pageable);
 
-        Stream<PostDto> postDto = posts.getContent()
-                .stream()
-                .map(o -> {
-                    Post post = o.get(QPost.post);
+        try {
+            Page<Tuple> posts = postService.findPagedPost(pageable);
 
-                    boolean isLiked = false;
-                    boolean isReported = false;
+            List<PostDto> postDto = posts.getContent()
+                    .stream()
+                    .map(o -> {
+                        Post post = o.get(QPost.post);
 
-                    if (o.get(QLike.like) != null) {
-                        isLiked = true;
-                    }
-                    if (o.get(QReport.report) != null) {
-                        isReported = true;
-                    }
+                        boolean isLiked = o.get(QLike.like) != null;
+                        boolean isReported = o.get(QReport.report) != null;
 
+                        return new PostDto(
+                                Objects.requireNonNull(post).getId(),
+                                post.getDescription(),
+                                post.getCreatedDate(),
+                                postRepository.getLikedCount(post),
+                                isLiked,
+                                isReported
+                        );
+                    }).toList();
+            Result<PostListDto> postResult = new Result<>(new PostListDto(
+                    postDto,
+                    posts.getTotalElements(),
+                    posts.getTotalPages()
+            ));
 
-                    return new PostDto(
-                            Objects.requireNonNull(post).getId(),
-                            post.getDescription(),
-                            post.getCreatedDate(),
-                            postRepository.getLikedCount(post),
-                            isLiked,
-                            isReported
-                    );
-                });
-        Result<PostListDto> postResult = new Result<>(new PostListDto(
-                postDto,
-                posts.getTotalElements(),
-                posts.getTotalPages()
-        ));
-
-        boolean isLogin = false;
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (principal instanceof UserDetails) {
-                isLogin = true;
-            }
+            return ResponseEntity.ok().body(postResult);
+        } catch (IllegalStateException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return ResponseEntity
-                .ok().header("isLogin", Boolean.toString(isLogin))
-                .body(postResult);
     }
 
     @PostMapping("/post/write")
-    public ResponseEntity<Result<String>> writePost(@RequestBody @Valid Post post) {
+    public ResponseEntity<Result<String>> writePost(@RequestBody @Valid PostWriteDto post) {
         try {
             postService.writePost(post.getDescription());
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            log.error("e = " + e);
+        } catch (IllegalArgumentException | MethodArgumentNotValidException e) {
             return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -105,34 +98,16 @@ public class PostController {
             reportService.report(reason.getReason(), postId);
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result<>("post not found"), HttpStatus.NOT_FOUND);
+        } catch (InvalidDataAccessApiUsageException e) {
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found post")) status = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
             log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>("bad request"), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PostMapping("/admin/post/accept/{id}")
-    public ResponseEntity<Result<String>> acceptPost(@PathVariable("id") Long id) {
-        try {
-            postService.acceptPost(id);
-
-            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
-        } catch (IllegalStateException e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    @PostMapping("/admin/post/reject/{id}")
-    public ResponseEntity<Result<String>> rejectedPost(@PathVariable("id") Long id) {
-        try {
-            postService.deletePost(id);
-
-            return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
-        } catch (IllegalStateException e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>("error on api server", true), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -144,17 +119,18 @@ public class PostController {
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalStateException e) {
-            if (Objects.equals(e.getMessage(), "member already liked this post")) {
-                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.CONFLICT);
-            } else if (Objects.equals(e.getMessage(), "post not found")) {
-                return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
-            }
+                HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (Objects.equals(e.getMessage(), "member already liked this post")) status = HttpStatus.CONFLICT;
+            if (Objects.equals(e.getMessage(), "post not found")) status = HttpStatus.NOT_FOUND;
+            if (e.getMessage().equals("school is different")) status = HttpStatus.FORBIDDEN;
 
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (IOException | URISyntaxException e) {
             log.error("e = " + e);
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
