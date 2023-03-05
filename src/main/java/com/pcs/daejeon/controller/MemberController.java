@@ -8,7 +8,6 @@ import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
-import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.ReferCodeService;
@@ -73,9 +72,7 @@ public class MemberController {
     public ResponseEntity<Result> signUpAdmin(@RequestBody @Valid SignUpAdminDto signUpAdminDto) {
 
         try {
-            School regist = schoolService.regist(signUpAdminDto.getSchool());
-            signUpAdminDto.getMember().setSchoolId(regist.getId());
-            Member member = memberService.saveAdmin(signUpAdminDto.getMember());
+            Member member = memberService.saveAdmin(signUpAdminDto.getMember(), signUpAdminDto.getSchool());
 
             for (int i = 0; i < 3; i++) {
                 referCodeService.generateCode(member);
@@ -97,6 +94,11 @@ public class MemberController {
 
             if (Objects.equals(e.getMessage(), "unused refer code not found")) {
                 return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
+            }
+
+            if (Objects.equals(e.getMessage(), "school already exist") ||
+                    Objects.equals(e.getMessage(), "instaId already used")) {
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.CONFLICT);
             }
 
             log.error("e = " + e);

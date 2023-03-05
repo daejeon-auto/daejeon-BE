@@ -173,7 +173,7 @@ public class PostService {
             throw new IllegalStateException("post not found");
         }
         Member loginMember = util.getLoginMember();
-        if (post.get().getSchool().getId() != loginMember.getSchool().getId()) {
+        if (!Objects.equals(post.get().getSchool().getId(), loginMember.getSchool().getId())) {
             throw new IllegalStateException("school is different");
         }
 

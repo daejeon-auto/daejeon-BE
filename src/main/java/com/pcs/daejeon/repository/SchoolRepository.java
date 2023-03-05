@@ -1,11 +1,12 @@
 package com.pcs.daejeon.repository;
 
 import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.repository.custom.SchoolRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public interface SchoolRepository extends JpaRepository<School, Long> {
+public interface SchoolRepository extends JpaRepository<School, Long>, SchoolRepositoryCustom {
 }
