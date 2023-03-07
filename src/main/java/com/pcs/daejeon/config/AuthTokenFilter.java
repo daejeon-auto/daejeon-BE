@@ -19,8 +19,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         // Validate the session
         if (validSession(request)) {
             filterChain.doFilter(request, response); // Proceed to the next filter in the chain
-        } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid session");
         }
     }
 
