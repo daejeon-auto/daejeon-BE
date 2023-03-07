@@ -17,7 +17,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:8000", "https://localhost", "https://daejeon.vercel.app", "https://daej-inab.netlify.app")
+                .allowedOrigins("http://localhost:8000", "https://localhost",
+                        "https://daejeon.vercel.app", "https://daej-inab.netlify.app", "https://daejeon.inab-devs.repl.co")
                 .allowCredentials(true)
                 .exposedHeaders("isLogin")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","));
