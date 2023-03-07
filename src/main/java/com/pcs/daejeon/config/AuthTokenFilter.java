@@ -14,12 +14,24 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String authToken = request.getHeader("X-Auth-Token");
-        if (authToken != null) {
-            // 세션을 찾아서 설정합니다.
-            HttpSession session = request.getSession();
-            session.setAttribute("SESSION_ID", authToken);
+        String sessionId = request.getHeader("sessionId");
+
+        // Validate the session
+        if (validSession(request)) {
+            filterChain.doFilter(request, response); // Proceed to the next filter in the chain
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid session");
         }
-        filterChain.doFilter(request, response);
+    }
+
+    private boolean validSession(HttpServletRequest request) {
+        String sessionId = request.getHeader("sessionid");
+
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getId().equals(sessionId) &&
+                sessionId != null && sessionId.startsWith("Bearer ")) {
+            return true;
+        }
+        return false;
     }
 }
