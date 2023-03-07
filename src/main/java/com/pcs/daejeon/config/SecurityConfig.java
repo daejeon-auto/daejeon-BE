@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -38,11 +39,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         AuthTokenFilter authTokenFilter = new AuthTokenFilter();
 
-        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
         http
                 .cors()
-                .and()
+            .and()
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/admin/personal-info/{id}", "/admin/member/set-role/**", "/admin/posts")
@@ -50,27 +49,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasAnyRole("TIER1", "TIER2") // 해당 권한을 가진 사람만 접근 가능
                 .antMatchers("/login", "/sign-up", "/school/list", "/signup-admin").permitAll()
                 .anyRequest().authenticated() // 다른 주소는 모두 허용
-                .and()
+            .and()
                 .formLogin()
                 .usernameParameter("loginId")
                 .loginProcessingUrl("/login")
                 .successHandler(authenticationSuccessHandler())
                 .failureHandler(authenticationFailureHandler())
-                .and()
+            .and()
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessHandler(((request, response, authentication) -> {
                     response.setStatus(HttpServletResponse.SC_OK);
                 }))
                 .invalidateHttpSession(true)
-                .and()
+            .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                .and()
-                .sessionManagement()
-                .sessionFixation().changeSessionId()
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(true);
+            .and()
+                .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);;
 
     }
 
