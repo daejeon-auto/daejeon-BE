@@ -46,6 +46,8 @@ public class CustomUrlAuthenticationSuccessHandler extends SimpleUrlAuthenticati
             }
         }
 
+        response.addHeader("sessionId", request.getSession().getId());
+
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
         MediaType jsonMimeType = MediaType.APPLICATION_JSON;
 
