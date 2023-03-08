@@ -3,7 +3,6 @@ package com.pcs.daejeon.config.oauth;
 import com.pcs.daejeon.dto.security.AccountResDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
@@ -47,7 +46,7 @@ public class DefaultAuthenticationSuccessHandler implements AuthenticationSucces
         String tokenValue = jwt.getTokenValue();
         log.debug("tokenValue: {}", tokenValue);
 
-        response.addHeader(HttpHeaders.AUTHORIZATION, tokenValue);
+        response.addHeader("X-Auth-Token", tokenValue);
 
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
         MediaType jsonMimeType = MediaType.APPLICATION_JSON;
