@@ -20,6 +20,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:63671", "https://localhost",
                         "https://daejeon.vercel.app", "https://daej-inab.netlify.app", "https://daejeon.inab-devs.repl.co")
                 .allowCredentials(true)
+                .allowedHeaders("Authorization")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","));
     }
 }
