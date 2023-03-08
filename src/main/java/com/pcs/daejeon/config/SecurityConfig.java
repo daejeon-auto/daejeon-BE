@@ -1,10 +1,10 @@
 package com.pcs.daejeon.config;
 
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.pcs.daejeon.config.auth.JwtUserDetailsService;
 import com.pcs.daejeon.config.handler.CustomUrlAuthenticationFailHandler;
 import com.pcs.daejeon.config.handler.CustomUrlAuthenticationSuccessHandler;
-import com.pcs.daejeon.config.oauth.DefaultAuthenticationSuccessHandler;
+import com.pcs.daejeon.config.oauth.JwtAuthenticationFilter;
+import com.pcs.daejeon.config.oauth.JwtConfig;
 import com.pcs.daejeon.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,11 +17,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsUtils;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -34,13 +35,13 @@ import javax.servlet.http.HttpServletResponse;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final MemberRepository memberRepository;
+    private final JwtConfig jwtConfig;
+    private SecretKeySpec jwtSecretKeySpec;
 
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-    private SecretKeySpec jwtSecretKeySpec;
 
     @Override
     public void init(WebSecurity web) throws Exception {
@@ -65,13 +66,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login", "/sign-up", "/school/list", "/signup-admin").permitAll()
                 .anyRequest().authenticated() // 다른 주소는 모두 허용
             .and()
+            .addFilterBefore(new JwtAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
                 .formLogin()
                 .usernameParameter("loginId")
                 .loginProcessingUrl("/login")
-                .successHandler(
-                    new DefaultAuthenticationSuccessHandler(new NimbusJwtEncoder(
-                            new ImmutableSecret<>(jwtSecretKeySpec)
-                    )))
+                .successHandler(jwtAuthenticationSuccessHandler())
                 .failureHandler(authenticationFailureHandler())
             .and()
                 .logout()
@@ -86,6 +85,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
                 .sessionManagement()
                 .sessionFixation().changeSessionId()
+                .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(true);
     }
@@ -95,6 +95,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth
                 .userDetailsService(new JwtUserDetailsService(memberRepository))
                 .passwordEncoder(new BCryptPasswordEncoder());
+    }
+
+    private AuthenticationSuccessHandler jwtAuthenticationSuccessHandler() {
+        return (request, response, authentication) -> {
+            String token = jwtConfig.createToken(authentication);
+            response.addHeader("X-Auth-Token", "Bearer " + token);
+        };
     }
 
     @Bean
