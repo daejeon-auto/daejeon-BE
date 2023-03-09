@@ -5,11 +5,15 @@ import com.pcs.daejeon.config.handler.CustomUrlAuthenticationFailHandler;
 import com.pcs.daejeon.config.handler.CustomUrlAuthenticationSuccessHandler;
 import com.pcs.daejeon.config.oauth.JwtAuthenticationFilter;
 import com.pcs.daejeon.config.oauth.JwtConfig;
+import com.pcs.daejeon.dto.security.AccountResDto;
 import com.pcs.daejeon.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -101,6 +105,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return (request, response, authentication) -> {
             String token = jwtConfig.createToken(authentication);
             response.addHeader("X-Auth-Token", "Bearer " + token);
+
+            MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+            MediaType jsonMimeType = MediaType.APPLICATION_JSON;
+
+            AccountResDto jsonResult = AccountResDto.success(null);
+            if (jsonConverter.canWrite(jsonResult.getClass(), jsonMimeType)) {
+                jsonConverter.write(jsonResult, jsonMimeType, new ServletServerHttpResponse(response));
+            }
         };
     }
 
