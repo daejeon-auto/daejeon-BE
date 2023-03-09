@@ -29,7 +29,7 @@ public class JwtConfig {
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
-                .setSubject(principal.getUsername())
+                .setSubject(principal.getMember().getLoginId())
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -55,7 +55,10 @@ public class JwtConfig {
     }
 
     public Authentication getAuthentication(String token) {
-        String id = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        Claims body = claimsJws
+                .getBody();
+        String id = body.getSubject();
         UserDetails userDetails = userDetailsService.loadUserByUsername(id);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
