@@ -88,10 +88,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//                .sessionFixation().changeSessionId()
-//                .maximumSessions(1)
-//                .maxSessionsPreventsLogin(true);
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionFixation().changeSessionId()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(true);
     }
 
     @Override
