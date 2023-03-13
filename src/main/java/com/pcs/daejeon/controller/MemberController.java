@@ -53,6 +53,9 @@ public class MemberController {
             if (Objects.equals(e.getMessage(), "student already sign up")) {
                 return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.CONFLICT);
             }
+            if (Objects.equals(e.getMessage(), "school not found")) {
+                return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
+            }
 
             if (Objects.equals(e.getMessage(), "unused refer code not found")) {
                 return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
