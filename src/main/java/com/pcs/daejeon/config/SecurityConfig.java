@@ -31,6 +31,7 @@ import org.springframework.web.cors.CorsUtils;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 @Configuration
 @EnableWebSecurity
@@ -83,6 +84,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     response.setStatus(HttpServletResponse.SC_OK);
                 }))
                 .invalidateHttpSession(true)
+            .and()
+                .rememberMe()
+                .key(UUID.randomUUID().toString())
+                .tokenValiditySeconds(604800)
             .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

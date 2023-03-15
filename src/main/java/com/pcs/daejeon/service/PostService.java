@@ -190,6 +190,7 @@ public class PostService {
         if (likedCount == 15) {
             drawImage(post.get().getDescription());
             School school = loginMember.getSchool();
+            imageCaption(post.get().getDescription());
             uploadToInstagram(school.getInstaId(), school.getInstaPwd());
         }
     }
@@ -261,5 +262,45 @@ public class PostService {
 
         // save an image
         ImageIO.write(newBufferedImage, "jpg", target.toFile());
+    }
+
+    private void imageCaption(String description) {
+        try {
+            String imagePath = System.getProperty("user.dir") + "/src/textImage.jpg";
+            String caption = "Your caption here";
+
+            BufferedImage image = ImageIO.read(new File(imagePath));
+
+            // create a graphics context for the image
+            Graphics2D g2d = image.createGraphics();
+
+            // set the font and color for the caption
+            Font font = new Font("Arial", Font.BOLD, 24);
+            Color color = Color.BLUE;
+
+            // get the dimensions of the image and caption text
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
+            int captionWidth = g2d.getFontMetrics(font).stringWidth(caption);
+            int captionHeight = g2d.getFontMetrics(font).getHeight();
+
+            // calculate the position to draw the caption in the center of the image
+            int x = (imageWidth - captionWidth) / 2;
+            int y = (imageHeight + captionHeight) / 2;
+
+            // draw the caption on the image
+            g2d.setFont(font);
+            g2d.setColor(color);
+            g2d.drawString(caption, x, y);
+
+            // dispose of the graphics context
+            g2d.dispose();
+
+            // save the image with the caption
+            String newImagePath = System.getProperty("user.dir") + "/src/textImage1.jpg";
+            ImageIO.write(image, "jpg", new File(newImagePath));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }
