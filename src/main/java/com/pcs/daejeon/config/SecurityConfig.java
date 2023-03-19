@@ -29,7 +29,6 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsUtils;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
@@ -41,7 +40,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final MemberRepository memberRepository;
     private final JwtConfig jwtConfig;
-    private SecretKeySpec jwtSecretKeySpec;
 
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -51,7 +49,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void init(WebSecurity web) throws Exception {
         final byte[] bytes = "test1234test15234test1234test1234test15234test1234".getBytes();
-        jwtSecretKeySpec = new SecretKeySpec(bytes, 0, bytes.length, "AES");
 
         super.init(web);
     }
