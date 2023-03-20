@@ -16,7 +16,6 @@ import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.PostRepository;
 import com.querydsl.core.Tuple;
-import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -38,8 +37,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -173,7 +170,7 @@ public class PostService {
             throw new IllegalStateException("post not found");
         }
         Member loginMember = util.getLoginMember();
-        if (post.get().getSchool().getId() != loginMember.getSchool().getId()) {
+        if (!Objects.equals(post.get().getSchool().getId(), loginMember.getSchool().getId())) {
             throw new IllegalStateException("school is different");
         }
 
@@ -188,36 +185,12 @@ public class PostService {
 
         Long likedCount = likeRepository.countByPost(post.get());
         if (likedCount == 15) {
-            drawImage(post.get().getDescription());
+            imageCaption(post.get().getDescription());
             School school = loginMember.getSchool();
+            convertPngToJpg();
             uploadToInstagram(school.getInstaId(), school.getInstaPwd());
         }
     }
-
-    private void drawImage(String description) {
-        StringBuilder text = new StringBuilder(description);
-        int iterCount = 0;
-        for (int i = 1; i <= description.length(); i++) {
-            if ((i % 20) == 0) {
-                text.insert(i + 6 * iterCount, "<br />");
-                iterCount++;
-            }
-        }
-
-        String code = "<div style=\"font-family: Malgun Gothic; font-size: 70px;\">"+text+"</div>";
-
-        try {
-            HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
-            imageGenerator.loadHtml(code);
-            imageGenerator.saveAsImage(System.getProperty("user.dir")+"/src/textImage.png");
-            convertPngToJpg();
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     private IGClient igClient(String instaId, String instaPwd) throws IGLoginException {
     IGClient client = IGClient.builder()
@@ -235,31 +208,89 @@ public class PostService {
         IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
         String id = client.sendRequest(uploadReq).join().getUpload_id();
         IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
-                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption("👍👍"));
+                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption(""));
         MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
     }
 
-    private void convertPngToJpg() throws IOException {
-        Path source = Paths.get(System.getProperty("user.dir")+"/src/textImage.png");
-        Path target = Paths.get(System.getProperty("user.dir")+"/src/textImage.jpg");
+    private void convertPngToJpg() {
+        try {
+            File inputFile = new File(System.getProperty("user.dir")+"/src/textImage.png");
+            BufferedImage inputImage = ImageIO.read(inputFile);
 
-        BufferedImage originalImage = ImageIO.read(source.toFile());
+            BufferedImage result = new BufferedImage(
+                    inputImage.getWidth(),
+                    inputImage.getHeight(),
+                    BufferedImage.TYPE_INT_RGB);
+            result.createGraphics().drawImage(inputImage, 0, 0, Color.WHITE, null);
+            File outputFile = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
 
-        // create a blank, RGB, same width and height
-        BufferedImage newBufferedImage = new BufferedImage(
-                originalImage.getWidth(),
-                originalImage.getHeight(),
-                BufferedImage.TYPE_INT_RGB);
+            ImageIO.write(result, "jpg", outputFile);
+        } catch (IOException ex) {
+            System.err.println("Error converting PNG to JPEG: " + ex.getMessage());
+        }
+    }
 
-        // draw a white background and puts the originalImage on it.
-        newBufferedImage.createGraphics()
-                .drawImage(originalImage,
-                        0,
-                        0,
-                        Color.WHITE,
-                        null);
+    private void imageCaption(String description) {
+        try {
+            String imagePath = System.getProperty("user.dir") + "/src/template.png";
 
-        // save an image
-        ImageIO.write(newBufferedImage, "jpg", target.toFile());
+            BufferedImage image = ImageIO.read(new File(imagePath));
+
+            // create a graphics context for the image
+            Graphics2D g2d = image.createGraphics();
+
+            // set the font and color for the caption
+            Font font = Font.createFont(Font.TRUETYPE_FONT, new File(System.getProperty("user.dir") + "/src/NotoSansKR-Bold.otf")).deriveFont(Font.BOLD, 50f);
+            Color color = Color.BLACK;
+
+            // get the dimensions of the image and caption text
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
+            int captionMaxWidth = imageWidth - 400;
+            int captionHeight = g2d.getFontMetrics(font).getHeight();
+
+            String[] lines = splitTextIntoLines(description, font, captionMaxWidth);
+
+            // calculate the position to draw the caption in the center of the image
+            int x = (imageWidth - captionMaxWidth) / 2;
+            int y = (imageHeight + captionHeight) / 2;
+
+            // draw the caption on the image
+            g2d.setFont(font);
+            g2d.setColor(color);
+
+            g2d.setFont(font);
+            g2d.setColor(color);
+            for (int i = 0; i < lines.length; i++) {
+                g2d.drawString(lines[i], x, y + (i * captionHeight));
+            }
+
+            // dispose of the graphics context
+            g2d.dispose();
+
+            // save the image with the caption
+            String newImagePath = System.getProperty("user.dir") + "/src/textImage.png";
+            ImageIO.write(image, "png", new File(newImagePath));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static String[] splitTextIntoLines(String text, Font font, int maxWidth) {
+        String[] words = text.split("");
+        StringBuilder currentLine = new StringBuilder();
+        java.util.List<String> lines = new java.util.ArrayList<String>();
+
+        for (String word : words) {
+            if (font.getStringBounds(currentLine + word, new java.awt.font.FontRenderContext(null, true, true)).getWidth() <= maxWidth) {
+                currentLine.append(word);
+            } else {
+                lines.add(currentLine.toString().trim());
+                currentLine = new StringBuilder(word);
+            }
+        }
+        lines.add(currentLine.toString().trim());
+
+        return lines.toArray(new String[lines.size()]);
     }
 }

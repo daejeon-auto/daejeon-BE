@@ -8,31 +8,31 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Getter
 @NoArgsConstructor
 public class SignUpDto {
     @NotEmpty
     private String name;
-    @NotEmpty
+    @NotEmpty @Size(max = 8, min = 8)
     private String birthDay;
-    @NotEmpty
+    @NotEmpty @Size(max = 11)
     private String phoneNumber;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     private AuthType authType;
 
-    @NotEmpty
+    @NotEmpty @Size(min = 4)
     private String studentNumber;
 
     @NotNull
     private Long schoolId;
 
-    @NotEmpty
+    @NotEmpty @Size(min = 8)
     private String password;
 
-    @NotEmpty
+    @NotEmpty @Size(min = 5)
     private String loginId;
 
     private String referCode = null;

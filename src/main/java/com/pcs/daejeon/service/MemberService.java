@@ -3,6 +3,7 @@ package com.pcs.daejeon.service;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
+import com.pcs.daejeon.dto.school.SchoolRegistDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.School;
@@ -36,7 +37,7 @@ public class MemberService {
 
 
     public Member saveMember(SignUpDto signUpDto) throws MethodArgumentNotValidException {
-        if (memberRepository.validStudentNum(signUpDto.getStudentNumber(), util.getLoginMember().getSchool().getId()) ||
+        if (memberRepository.validStudentNum(signUpDto.getStudentNumber(), signUpDto.getSchoolId()) ||
                 memberRepository.validLoginId(signUpDto.getLoginId())) {
             throw new IllegalStateException("student already sign up");
         }
@@ -59,7 +60,21 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    public Member saveAdmin(SignUpDto signUpDto) throws MethodArgumentNotValidException {
+    public Member saveAdmin(SignUpDto signUpDto, SchoolRegistDto schoolRegistDto) throws MethodArgumentNotValidException {
+        School school = new School(schoolRegistDto.getName(),
+                schoolRegistDto.getLocate(),
+                schoolRegistDto.getInstaId(),
+                schoolRegistDto.getInstaPwd());
+
+
+        if (schoolRepository.valiSchool(school))
+            throw new IllegalStateException("school already exist");
+        if (schoolRepository.validInstaId(school.getInstaId()))
+            throw new IllegalStateException("instaId already used");
+
+        School save = schoolRepository.save(school);
+
+        signUpDto.setSchoolId(save.getId());
         Member member = saveMember(signUpDto);
 
         member.setMemberType(MemberType.ACCEPT);
