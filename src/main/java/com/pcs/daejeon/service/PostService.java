@@ -55,10 +55,11 @@ public class PostService {
     public Long writePost(String description) throws MethodArgumentNotValidException {
         description = description.replace("\n", " ");
 
-        boolean isBad = isBadDesc(description);
-        if (isBad) {
-            throw new IllegalArgumentException("bad words");
-        }
+//        ------------- 욕설 필터링 임시 해지 --------------
+//        boolean isBad = isBadDesc(description);
+//        if (isBad) {
+//            throw new IllegalArgumentException("bad words");
+//        }
 
         Member loginMember = util.getLoginMember();
         Post save = postRepository.save(new Post(description, loginMember.getSchool()));
