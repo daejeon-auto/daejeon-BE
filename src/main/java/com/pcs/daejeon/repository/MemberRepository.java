@@ -18,8 +18,4 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     Member findByLoginId(String id);
 
     Optional<Member> findByIdAndSchool(Long id, School school);
-
-    List<Member> findAllByMemberTypeAndSchoolOrderByCreatedDateAsc(MemberType memberType, School school);
-
-    Member findByNameAndBirthDayAndStudentNumberAndSchool(String name, String birthDay, String studentNumber, School School);
 }
