@@ -44,8 +44,8 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/push-chk-code")
-    public ResponseEntity<Result> pushChkCode(@RequestBody @NotEmpty ChkCodeDto chkCodeDto) {
+    @PostMapping("/chk-code")
+    public ResponseEntity<Result> chkCode(@RequestBody @NotEmpty ChkCodeDto chkCodeDto) {
 
         try {
             boolean isCheck = memberService.checkCode(chkCodeDto.getCode(), chkCodeDto.getPhoneNumber());
