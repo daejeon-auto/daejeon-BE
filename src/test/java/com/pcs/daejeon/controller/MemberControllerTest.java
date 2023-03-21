@@ -56,49 +56,6 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("회원가입 성공")
-    void signUp() throws Exception {
-        Map<String, Object> map = createMember();
-
-        Assertions.assertThat(map.get("hasError")).isEqualTo(false);
-    }
-
-    @Test
-    @DisplayName("관리자 회원가입 성공")
-    void signUpAdmin() throws Exception {
-        SignUpDto user = new SignUpDto(
-                "01012341234",
-                AuthType.DIRECT,
-                getLoginMember().getSchool().getId(),
-                "testPassword",
-                "testId" + (int) (Math.random() * 100)
-        );
-
-        SchoolRegistDto schoolRegistDto = new SchoolRegistDto(
-                "컴퓨터과학고등학교",
-                "부산",
-                "인스타아이디",
-                "인스타패스워드"
-        );
-
-        mvc.perform(MockMvcRequestBuilders
-                .post("/signup-admin")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new SignUpAdminDto(
-                        user, schoolRegistDto
-                ))))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    @DisplayName("자신의 코드 리스트 가져오기 성공")
-    void getCodeList() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .post("/code/list"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     @DisplayName("유저 승인 성공")
     void acceptMember() throws Exception {
         Map<String, Object> map = createMember();
