@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface MemberRepositoryCustom {
 
-    boolean validStudentNum(String stdNum, Long schoolId);
     boolean validLoginId(String loginId);
+    boolean validPhoneNumber(String phoneNumber);
 
     List<Member> getMemberList(Long memberId, boolean onlyAdmin, School school);
 }

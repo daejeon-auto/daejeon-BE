@@ -43,11 +43,8 @@ class MemberRepositoryImplTest {
         School save = schoolRepository.save(school);
 
         SignUpDto signUpDto = new SignUpDto(
-                "test",
-                "010101",
                 "01012341234",
                 AuthType.DIRECT,
-                "20202",
                 save.getId(),
                 "password",
                 "test"

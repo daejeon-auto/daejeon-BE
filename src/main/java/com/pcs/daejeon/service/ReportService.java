@@ -39,7 +39,7 @@ public class ReportService {
         if (reportCount == 5) {
             post.get().setPostType(PostType.REJECTED);
         }
-        log.info("[add-report] report post: id["+ post.get().getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"] reason: " + reason);
+        log.info("[add-report] report post: id["+ post.get().getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"] reason: " + reason);
     }
 
     private void removeReport(Long postId) {
@@ -56,7 +56,7 @@ public class ReportService {
         }
 
         reportRepository.delete(report);
-        log.info("[remove-report] remove report post: id["+ post.get().getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"]");
+        log.info("[remove-report] remove report post: id["+ post.get().getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"]");
     }
 
     public List<Report> getReportList(Long postId) {

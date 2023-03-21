@@ -70,92 +70,13 @@ public class AdminController {
         try {
             List<Member> members = memberService.getMembers(memberId, onlyAdmin);
             List<MemberListDto> memberListDto = members.stream()
-                    .map(o -> new MemberListDto(o.getId(), o.getMemberType(), o.getUsedCode() != null ? o.getUsedCode().getCode() : ""))
+                    .map(o -> new MemberListDto(o.getId(), o.getMemberType()))
                     .toList();
 
             return new ResponseEntity<>(new Result<>(memberListDto, false), HttpStatus.OK);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PostMapping("/admin/members/pending")
-    public ResponseEntity<Result<List<PendingMemberDto>>> getPendingMembers() {
-        try {
-            List<Member> pendingMembers = memberService.getPendingMembers();
-
-            List<PendingMemberDto> pendingMemberDtos = pendingMembers.stream()
-                    .map(o -> new PendingMemberDto(
-                            o.getSchool().getId(),
-                            o.getBirthDay(),
-                            o.getName(),
-                            o.getStudentNumber()))
-                    .toList();
-            return new ResponseEntity<>(new Result<>(pendingMemberDtos, false), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PostMapping("/admin/pending-member/accept")
-    public ResponseEntity<Result<String>> acceptPendingMember(@RequestBody @Valid PendingMemberDto pendingMemberDto) {
-
-        try {
-            memberService.acceptPendingMember(pendingMemberDto);
-
-            log.info("[accept-pending-member] accept userName = "+pendingMemberDto.getName()+" | student number = "
-                    +pendingMemberDto.getStd_number()+" || by adminId = "+util.getLoginMember().getId());
-            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
-        }
-    }
-    @PostMapping("/admin/pending-member/reject")
-    public ResponseEntity<Result<String>> rejectPendingMember(@RequestBody @Valid PendingMemberDto pendingMemberDto) {
-
-        try {
-            memberService.rejectPendingMember(pendingMemberDto);
-
-            log.info("[reject-pending-member] reject userName = "+pendingMemberDto.getName()+" | student number = "
-                    +pendingMemberDto.getStd_number()+" || by adminId = "+util.getLoginMember().getId());
-            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PostMapping("/admin/personal-info/{id}")
-    public ResponseEntity<Result<PersonalInfo>> callPersonalInfo(@PathVariable("id") Long memberId) {
-
-        try {
-            Member member = memberService.findPersonalInfo(memberId);
-
-            PersonalInfo personalInfo = new PersonalInfo(
-                    member.getId(),
-                    member.getCreatedDate(),
-                    member.getBirthDay(),
-                    member.getName(),
-                    member.getPhoneNumber(),
-                    member.getStudentNumber(),
-                    member.getRole(),
-                    member.getUsedCode() != null ? member.getUsedCode().getCode() : ""
-            );
-
-            log.info("[call-personal-info] call by adminId = "+util.getLoginMember().getId());
-            return new ResponseEntity<>(new Result<>(personalInfo, false), HttpStatus.OK);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 

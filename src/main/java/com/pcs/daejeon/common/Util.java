@@ -27,10 +27,7 @@ public class Util {
         }
 
         return new Member(
-                signUpDto.getName(),
-                signUpDto.getBirthDay(),
                 signUpDto.getPhoneNumber(),
-                signUpDto.getStudentNumber(),
                 pwdEncoder.encode(signUpDto.getPassword()),
                 signUpDto.getLoginId(),
                 signUpDto.getAuthType(),

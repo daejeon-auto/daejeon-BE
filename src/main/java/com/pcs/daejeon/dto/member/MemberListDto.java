@@ -10,5 +10,4 @@ public class MemberListDto {
 
     private Long id;
     private MemberType status;
-    private String refer_code;
 }

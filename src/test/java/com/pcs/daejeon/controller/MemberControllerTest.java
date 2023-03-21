@@ -67,11 +67,8 @@ class MemberControllerTest {
     @DisplayName("관리자 회원가입 성공")
     void signUpAdmin() throws Exception {
         SignUpDto user = new SignUpDto(
-                "test1",
-                "200000101",
                 "01012341234",
                 AuthType.DIRECT,
-                "" + (int) (Math.random() * 100000),
                 getLoginMember().getSchool().getId(),
                 "testPassword",
                 "testId" + (int) (Math.random() * 100)
@@ -114,11 +111,8 @@ class MemberControllerTest {
 
     private Map<String, Object> createMember() throws Exception {
         SignUpDto user = new SignUpDto(
-                "test1",
-                "200000101",
                 "01012341234",
                 AuthType.DIRECT,
-                "" + (int) (Math.random() * 100000),
                 getLoginMember().getSchool().getId(),
                 "testPassword",
                 "testId" + (int) (Math.random() * 100)
@@ -175,10 +169,7 @@ class MemberControllerTest {
         );
 
         Member user = new Member(
-                "test1",
-                "200000101",
                 "01012341234",
-                "" + (int) (Math.random() * 100000),
                 "testPassword",
                 "testId" + (int) (Math.random() * 100),
                 AuthType.DIRECT,
@@ -239,10 +230,7 @@ class MemberControllerTest {
         );
 
         Member user = new Member(
-                "test1",
-                "200000101",
                 "01012341234",
-                "" + (int) (Math.random() * 100000),
                 "testPassword",
                 "testId" + (int) (Math.random() * 100),
                 AuthType.DIRECT,

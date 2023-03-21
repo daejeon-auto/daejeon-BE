@@ -127,7 +127,7 @@ public class PostService {
         post.setPostType(PostType.ACCEPTED);
 
         Member loginMember = util.getLoginMember();
-        log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"] --- ");
+        log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"] --- ");
     }
 
     public Page<Tuple> findPagedPost(Pageable page) {

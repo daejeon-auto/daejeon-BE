@@ -5,16 +5,18 @@ import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.dto.school.SchoolRegistDto;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.School;
-import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
-import com.pcs.daejeon.repository.ReferCodeRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.nurigo.sdk.NurigoApp;
+import net.nurigo.sdk.message.model.Message;
+import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
+import net.nurigo.sdk.message.response.SingleMessageSentResponse;
+import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,32 +32,22 @@ import java.util.Optional;
 @Log4j2
 public class MemberService {
 
+    private final String apiKey = "NCSBR7PKK7XZWLHQ",
+            apiSecret = "L6RFT06MA0GG604ZFOZJWYIKWCYSQBRO";
+
+    final DefaultMessageService messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
     private final MemberRepository memberRepository;
-    private final ReferCodeRepository referCodeRepository;
     private final SchoolRepository schoolRepository;
     private final Util util;
 
 
     public Member saveMember(SignUpDto signUpDto) throws MethodArgumentNotValidException {
-        if (memberRepository.validStudentNum(signUpDto.getStudentNumber(), signUpDto.getSchoolId()) ||
+        if (memberRepository.validPhoneNumber(signUpDto.getPhoneNumber()) ||
                 memberRepository.validLoginId(signUpDto.getLoginId())) {
             throw new IllegalStateException("student already sign up");
         }
 
         Member member = util.createMember(signUpDto); // password encode
-        if (member.getAuthType() == AuthType.INDIRECT) {
-            ReferCode referCode = referCodeRepository.findUnusedReferCode(signUpDto.getReferCode());
-            if (referCode == null) {
-                throw new IllegalStateException("unused refer code not found");
-            }
-            if (!member.getSchool().getId().equals(
-                    referCode.getCreatedBy().getSchool().getId())) {
-                throw new IllegalStateException("school is different");
-            }
-
-            member.setMemberType(MemberType.ACCEPT);
-            member.useCode(referCode);
-        }
 
         return memberRepository.save(member);
     }
@@ -118,60 +110,12 @@ public class MemberService {
         return memberRepository.getMemberList(memberId, onlyAdmin, util.getLoginMember().getSchool());
     }
 
-    public List<Member> getPendingMembers() {
-        return memberRepository.findAllByMemberTypeAndSchoolOrderByCreatedDateAsc(MemberType.PENDING, util.getLoginMember().getSchool());
-    }
-
-    public void acceptPendingMember(@Valid PendingMemberDto pendingMemberDto) {
-        Optional<School> school = getSchool(pendingMemberDto);
-        Member member = memberRepository.findByNameAndBirthDayAndStudentNumberAndSchool(
-                pendingMemberDto.getName(),
-                pendingMemberDto.getBirthday(),
-                pendingMemberDto.getStd_number(),
-                school.get()
-        );
-
-        if (member == null) {
-            throw new IllegalStateException("not found member");
-        }
-
-        member.setMemberType(MemberType.ACCEPT);
-    }
-
     @NotNull
     private Optional<School> getSchool(PendingMemberDto pendingMemberDto) {
         Optional<School> school = schoolRepository.findById(pendingMemberDto.getSchoolId());
 
         if (school.isEmpty()) throw new IllegalArgumentException("not found school");
         return school;
-    }
-
-    public void rejectPendingMember(PendingMemberDto pendingMemberDto) {
-        Optional<School> school = getSchool(pendingMemberDto);
-
-        Member member = memberRepository.findByNameAndBirthDayAndStudentNumberAndSchool(
-                pendingMemberDto.getName(),
-                pendingMemberDto.getBirthday(),
-                pendingMemberDto.getStd_number(),
-                school.get()
-        );
-
-        if (member == null) {
-            throw new IllegalStateException("not found member");
-        }
-
-        referCodeRepository.deleteAll(member.getReferCodes());
-        memberRepository.delete(member);
-    }
-
-    public Member findPersonalInfo(Long memberId) {
-        Optional<Member> byId = memberRepository.findByIdAndSchool(memberId, util.getLoginMember().getSchool());
-
-        if (byId.isEmpty()) {
-            throw new IllegalStateException("not found member");
-        }
-
-        return byId.get();
     }
 
     public Member setMemberRole(Long memberId, RoleTier tier) {

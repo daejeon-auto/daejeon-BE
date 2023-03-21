@@ -20,29 +20,22 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory query;
 
     @Override
-    public boolean validStudentNum(String stdNum, Long schoolId) {
-        Long result = query
-                .select(member.count())
-                .from(member)
-                .where(
-                        member.studentNumber.eq(stdNum),
-                        member.memberType.ne(MemberType.GRADUATE),
-                        member.school.id.eq(schoolId)
-                )
-                .fetchOne();
-
-        return result != 0;
-    }
-
-    @Override
     public boolean validLoginId(String loginId) {
         Long aLong = query
                 .select(member.count())
                 .from(member)
-                .where(
-                        member.loginId.eq(loginId),
-                        member.memberType.ne(MemberType.GRADUATE)
-                )
+                .where(member.loginId.eq(loginId))
+                .fetchOne();
+
+        return aLong != 0;
+    }
+
+    @Override
+    public boolean validPhoneNumber(String phoneNumber) {
+        Long aLong = query
+                .select(member.count())
+                .from(member)
+                .where(member.phoneNumber.eq(phoneNumber))
                 .fetchOne();
 
         return aLong != 0;
@@ -51,7 +44,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     @Override
     public List<Member> getMemberList(Long memberId, boolean onlyAdmin, School school) {
         BooleanExpression codState = member.memberType.ne(MemberType.GRADUATE)
-                .and(member.memberType.ne(MemberType.PENDING))
                 .and(member.school.id.eq(school.getId()));
         if (memberId != null) {
             codState = codState.and(member.id.eq(memberId));
