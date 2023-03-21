@@ -3,8 +3,6 @@ package com.pcs.daejeon.controller;
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.MemberListDto;
-import com.pcs.daejeon.dto.member.PendingMemberDto;
-import com.pcs.daejeon.dto.member.PersonalInfo;
 import com.pcs.daejeon.dto.post.RejectedPostDto;
 import com.pcs.daejeon.dto.report.ReportListDto;
 import com.pcs.daejeon.entity.Member;
@@ -16,7 +14,6 @@ import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -24,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Stream;
 

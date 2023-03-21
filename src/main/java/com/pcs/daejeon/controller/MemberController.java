@@ -2,12 +2,12 @@ package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
+import com.pcs.daejeon.dto.chkCode.ChkCodeDto;
+import com.pcs.daejeon.dto.chkCode.PushCodeDto;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
-import com.pcs.daejeon.dto.member.ReferCodeDto;
 import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.SchoolService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
+import javax.validation.constraints.NotEmpty;
 import java.util.Objects;
 
 @RestController
@@ -32,6 +32,30 @@ public class MemberController {
     private final MemberService memberService;
     private final SchoolService schoolService;
     private final Util util;
+
+    @PostMapping("/push-chk-code")
+    public ResponseEntity<Result> pushChkCode(@RequestBody @NotEmpty PushCodeDto pushCodeDto) {
+
+        try {
+            memberService.pushCheckCode(pushCodeDto.getPhoneNumber());
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/push-chk-code")
+    public ResponseEntity<Result> pushChkCode(@RequestBody @NotEmpty ChkCodeDto chkCodeDto) {
+
+        try {
+            boolean isCheck = memberService.checkCode(chkCodeDto.getCode(), chkCodeDto.getPhoneNumber());
+
+            return new ResponseEntity<>(new Result<>(null, !isCheck),
+                    isCheck ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PostMapping("/sign-up")
     public ResponseEntity<Result<String>> signUp(@RequestBody @Valid SignUpDto signUpDto) {
