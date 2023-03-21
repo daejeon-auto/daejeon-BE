@@ -129,7 +129,7 @@ class PostServiceTest {
     @Test
     @DisplayName("글 가져오기 성공")
     void findPagedPost() {
-        Page<Tuple> pagedPost = postService.findPagedPost(PageRequest.of(0, 15));
+        Page<Tuple> pagedPost = postService.findPagedPost(PageRequest.of(0, 15), util.getLoginMember().getSchool().getId());
 
         Assertions.assertTrue(pagedPost.hasContent());
         assertThat(pagedPost.getContent().size()).isEqualTo(15);

@@ -131,7 +131,7 @@ public class PostService {
     }
 
     public Page<Tuple> findPagedPost(Pageable page, Long schoolId) {
-        return postRepository.pagingPost(page);
+        return postRepository.pagingPost(page, schoolId);
     }
 
     public Page<Post> findPagedPostByMemberId(Pageable pageable) {
