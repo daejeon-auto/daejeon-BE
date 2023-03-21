@@ -130,7 +130,7 @@ public class PostService {
         log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"] --- ");
     }
 
-    public Page<Tuple> findPagedPost(Pageable page) {
+    public Page<Tuple> findPagedPost(Pageable page, Long schoolId) {
         return postRepository.pagingPost(page);
     }
 

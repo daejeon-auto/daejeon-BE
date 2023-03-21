@@ -38,11 +38,11 @@ public class PostController {
     private final PostRepository postRepository;
     private final ReportService reportService;
 
-    @PostMapping("/posts")
-    public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
+    @PostMapping("/posts/:schoolId")
+    public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable, @RequestParam Long schoolId) {
 
         try {
-            Page<Tuple> posts = postService.findPagedPost(pageable);
+            Page<Tuple> posts = postService.findPagedPost(pageable, schoolId);
 
             List<PostDto> postDto = posts.getContent()
                     .stream()
