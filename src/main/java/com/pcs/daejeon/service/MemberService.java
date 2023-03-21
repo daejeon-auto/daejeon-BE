@@ -54,6 +54,8 @@ public class MemberService {
     }
 
     public void pushCheckCode(String phoneNumber) {
+        Optional<NumChkCode> byPhoneNumber = numChkCodeRepository.findByPhoneNumber(phoneNumber);
+
         Message message = new Message();
 
         message.setFrom("01027729778");
@@ -61,7 +63,11 @@ public class MemberService {
 
         int code = generateUniqueCode();
 
-        numChkCodeRepository.save(new NumChkCode(code, phoneNumber));
+        if (byPhoneNumber.isEmpty()) {
+            numChkCodeRepository.save(new NumChkCode(code, phoneNumber));
+        } else {
+            byPhoneNumber.get().setCode(code);
+        }
 
         message.setText("[INAB] 대신전해드립니다 - 가입번호 ["+code+"]");
 

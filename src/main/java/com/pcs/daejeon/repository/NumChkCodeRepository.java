@@ -9,4 +9,5 @@ public interface NumChkCodeRepository extends JpaRepository<NumChkCode, Long> {
 
     Optional<NumChkCode> findByCode(Integer code);
     Optional<NumChkCode> findByCodeAndPhoneNumber(Integer code, String phoneNumber);
+    Optional<NumChkCode> findByPhoneNumber(String phoneNumber);
 }
