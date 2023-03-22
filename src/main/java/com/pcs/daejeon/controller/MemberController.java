@@ -34,18 +34,19 @@ public class MemberController {
     private final Util util;
 
     @PostMapping("/push-chk-code")
-    public ResponseEntity<Result> pushChkCode(@RequestBody @NotEmpty PushCodeDto pushCodeDto) {
+    public ResponseEntity<Result> pushChkCode(@RequestBody @Valid PushCodeDto pushCodeDto) {
 
         try {
             memberService.pushCheckCode(pushCodeDto.getPhoneNumber());
             return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
         } catch (Exception e) {
+            log.error(e.getMessage());
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/chk-code")
-    public ResponseEntity<Result> chkCode(@RequestBody @NotEmpty ChkCodeDto chkCodeDto) {
+    public ResponseEntity<Result> chkCode(@RequestBody @Valid ChkCodeDto chkCodeDto) {
 
         try {
             boolean isCheck = memberService.checkCode(chkCodeDto.getCode(), chkCodeDto.getPhoneNumber());
