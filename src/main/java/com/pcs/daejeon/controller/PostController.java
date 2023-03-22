@@ -38,8 +38,9 @@ public class PostController {
     private final PostRepository postRepository;
     private final ReportService reportService;
 
-    @PostMapping("/posts/:schoolId")
-    public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable, @RequestParam Long schoolId) {
+    @PostMapping("/posts")
+    public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable,
+                                                           @RequestParam("schoolId") Long schoolId) {
 
         try {
             Page<Tuple> posts = postService.findPagedPost(pageable, schoolId);
@@ -70,6 +71,7 @@ public class PostController {
             return ResponseEntity.ok().body(postResult);
         } catch (IllegalStateException e) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (Objects.equals(e.getMessage(), "not found school")) status = HttpStatus.NOT_FOUND;
             return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -92,7 +94,8 @@ public class PostController {
     }
 
     @PostMapping("/post/report/{id}")
-    public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId, @RequestBody @Valid ReportReasonDto reason) {
+    public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId,
+                                                     @RequestBody @Valid ReportReasonDto reason) {
 
         try {
             reportService.report(reason.getReason(), postId);

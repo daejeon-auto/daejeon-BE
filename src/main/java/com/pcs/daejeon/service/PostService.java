@@ -15,6 +15,7 @@ import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.PostRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -49,6 +50,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
+    private final SchoolRepository schoolRepository;
     private final Util util;
     //    private final IGClient client;
 
@@ -131,6 +133,10 @@ public class PostService {
     }
 
     public Page<Tuple> findPagedPost(Pageable page, Long schoolId) {
+        Optional<School> school = schoolRepository.findById(schoolId);
+
+        if (school.isEmpty()) throw new IllegalStateException("not found school");
+
         return postRepository.pagingPost(page, schoolId);
     }
 
