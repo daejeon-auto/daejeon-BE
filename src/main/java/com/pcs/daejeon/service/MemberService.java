@@ -59,7 +59,7 @@ public class MemberService {
         Message message = new Message();
 
         message.setFrom("01027729778");
-        message.setTo("phoneNumber");
+        message.setTo(phoneNumber);
 
         int code = generateUniqueCode();
 
@@ -88,11 +88,11 @@ public class MemberService {
     private int generateUniqueCode() {
         Random random = new Random();
         random.setSeed(System.currentTimeMillis());
-        int code = random.nextInt(100000, 100000);
+        int code = random.nextInt(0, 100001);
         Optional<NumChkCode> byCode = numChkCodeRepository.findByCode(code);
 
         // 만약 코드가 있다면 새로운 코드 뽑기
-        if (byCode.isEmpty()) {
+        if (byCode.isPresent()) {
             return generateUniqueCode();
         }
         return code;
