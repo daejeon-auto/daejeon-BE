@@ -2,9 +2,7 @@ package com.pcs.daejeon.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -12,6 +10,7 @@ import javax.persistence.Id;
 public class NumChkCode {
 
     @Id @Column(name = "num_chk_code_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Integer code;
