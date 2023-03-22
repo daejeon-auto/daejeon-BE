@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class SchoolListDto {
+public class SchoolInfoDto {
     private Long id;
     private String name;
     private String locate;

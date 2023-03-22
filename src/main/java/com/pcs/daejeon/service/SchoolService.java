@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -20,5 +21,10 @@ public class SchoolService {
     public List<School> findAllSchool() {
         return schoolRepository.findAll();
     }
+    public School findSchool(Long schoolId) {
+        Optional<School> school = schoolRepository.findById(schoolId);
 
+        if (school.isEmpty()) throw new IllegalStateException("school not found");
+        return school.get();
+    }
 }
