@@ -45,7 +45,7 @@ public class PostController {
                                                            @RequestParam(value = "schoolId", required = false) Long schoolId) {
 
         try {
-            if (schoolId == null) {
+            if (schoolId == null || schoolId == 0) {
                 if (util.getLoginMember() != null) {
                     schoolId = util.getLoginMember()
                                     .getSchool().getId();
