@@ -1,6 +1,7 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.post.*;
 import com.pcs.daejeon.dto.report.ReportReasonDto;
 import com.pcs.daejeon.entity.Post;
@@ -37,12 +38,22 @@ public class PostController {
     private final PostService postService;
     private final PostRepository postRepository;
     private final ReportService reportService;
+    private final Util util;
 
     @PostMapping("/posts")
     public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable,
-                                                           @RequestParam("schoolId") Long schoolId) {
+                                                           @RequestParam(value = "schoolId", required = false) Long schoolId) {
 
         try {
+            if (schoolId == null) {
+                if (util.getLoginMember() != null) {
+                    schoolId = util.getLoginMember()
+                                    .getSchool().getId();
+                } else {
+                    throw new IllegalStateException("need schoolId");
+                }
+            }
+
             Page<Tuple> posts = postService.findPagedPost(pageable, schoolId);
 
             List<PostDto> postDto = posts.getContent()
@@ -72,6 +83,8 @@ public class PostController {
         } catch (IllegalStateException e) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
             if (Objects.equals(e.getMessage(), "not found school")) status = HttpStatus.NOT_FOUND;
+            if (Objects.equals(e.getMessage(), "need schoolId")) status = HttpStatus.BAD_REQUEST;
+
             return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
             log.error(e.getMessage());
