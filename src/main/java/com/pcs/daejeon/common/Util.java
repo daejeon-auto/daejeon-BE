@@ -35,10 +35,14 @@ public class Util {
     }
 
     public Member getLoginMember() {
-        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return member.getMember();
+        try {
+            PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal();
+            return member.getMember();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
