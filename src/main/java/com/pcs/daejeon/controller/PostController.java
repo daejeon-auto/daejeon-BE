@@ -67,7 +67,7 @@ public class PostController {
                         return new PostDto(
                                 Objects.requireNonNull(post).getId(),
                                 post.getDescription(),
-                                post.getCreatedDate(),
+                                post.getCreatedDate().toString(),
                                 postRepository.getLikedCount(post),
                                 isLiked,
                                 isReported
