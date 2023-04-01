@@ -8,9 +8,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class MemberInfoDto {
 
-    private String name;
-    private String std_num;
-    private String birthDay;
     private String phoneNumber;
     private String schoolName;
     private String schoolLocate;

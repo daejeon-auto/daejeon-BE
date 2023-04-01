@@ -1,6 +1,7 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.post.*;
 import com.pcs.daejeon.dto.report.ReportReasonDto;
 import com.pcs.daejeon.entity.Post;
@@ -37,12 +38,23 @@ public class PostController {
     private final PostService postService;
     private final PostRepository postRepository;
     private final ReportService reportService;
+    private final Util util;
 
     @PostMapping("/posts")
-    public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable) {
+    public ResponseEntity<Result<PostListDto>> getPostPage(@PageableDefault(size = 15) Pageable pageable,
+                                                           @RequestParam(value = "schoolId", required = false) Long schoolId) {
 
         try {
-            Page<Tuple> posts = postService.findPagedPost(pageable);
+            if (schoolId == null || schoolId == 0) {
+                if (util.getLoginMember() != null) {
+                    schoolId = util.getLoginMember()
+                                    .getSchool().getId();
+                } else {
+                    throw new IllegalStateException("need schoolId");
+                }
+            }
+
+            Page<Tuple> posts = postService.findPagedPost(pageable, schoolId);
 
             List<PostDto> postDto = posts.getContent()
                     .stream()
@@ -55,7 +67,7 @@ public class PostController {
                         return new PostDto(
                                 Objects.requireNonNull(post).getId(),
                                 post.getDescription(),
-                                post.getCreatedDate(),
+                                post.getCreatedDate().toString(),
                                 postRepository.getLikedCount(post),
                                 isLiked,
                                 isReported
@@ -70,6 +82,9 @@ public class PostController {
             return ResponseEntity.ok().body(postResult);
         } catch (IllegalStateException e) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (Objects.equals(e.getMessage(), "not found school")) status = HttpStatus.NOT_FOUND;
+            if (Objects.equals(e.getMessage(), "need schoolId")) status = HttpStatus.BAD_REQUEST;
+
             return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -92,7 +107,8 @@ public class PostController {
     }
 
     @PostMapping("/post/report/{id}")
-    public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId, @RequestBody @Valid ReportReasonDto reason) {
+    public ResponseEntity<Result<String>> reportPost(@PathVariable("id") Long postId,
+                                                     @RequestBody @Valid ReportReasonDto reason) {
 
         try {
             reportService.report(reason.getReason(), postId);

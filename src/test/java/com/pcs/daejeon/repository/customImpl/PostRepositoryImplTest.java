@@ -57,16 +57,11 @@ class PostRepositoryImplTest {
     private MockMvc mvc;
 
     PageRequest pageable = PageRequest.of(0, 10);
+    Long schoolId;
 
     @BeforeEach
     public void initData() {
-            School school = new School(
-                    "테스트학교",
-                    "지역",
-                    "인스타아이디",
-                    "인스타비밀번호"
-            );
-            schoolRepository.save(school);
+        School school = util.getLoginMember().getSchool();
         for (int i = 0; i < 100; i++) {
             postRepository.save(new Post("test value " + i, school));
         }
@@ -75,7 +70,7 @@ class PostRepositoryImplTest {
     @Test
     public void 신고된_글_리스트() {
         // == reject post 생성 ==
-        Page<Tuple> tuples = postRepository.pagingPost(pageable);
+        Page<Tuple> tuples = postRepository.pagingPost(pageable, schoolId);
 
         for (Tuple tuple : tuples.getContent()) {
             Objects.requireNonNull(tuple.get(QPost.post)).setPostType(PostType.REJECTED);

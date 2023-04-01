@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostRepositoryCustom {
 
-    Page<Tuple> pagingPost(Pageable page);
+    Page<Tuple> pagingPost(Pageable page, Long schoolId);
     Page<Post> pagingPostByMemberId(Pageable page, Member member);
     Page<Post> pagingRejectPost(Pageable page, Long memberId, Long reportCount);
     Page<Post> searchPost(Pageable page, Long memberId, Long reportCount, School school);

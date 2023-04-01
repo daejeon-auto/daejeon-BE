@@ -27,10 +27,7 @@ public class Util {
         }
 
         return new Member(
-                signUpDto.getName(),
-                signUpDto.getBirthDay(),
                 signUpDto.getPhoneNumber(),
-                signUpDto.getStudentNumber(),
                 pwdEncoder.encode(signUpDto.getPassword()),
                 signUpDto.getLoginId(),
                 signUpDto.getAuthType(),
@@ -38,10 +35,14 @@ public class Util {
     }
 
     public Member getLoginMember() {
-        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return member.getMember();
+        try {
+            PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal();
+            return member.getMember();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

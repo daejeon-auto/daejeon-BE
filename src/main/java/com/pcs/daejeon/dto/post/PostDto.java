@@ -13,7 +13,7 @@ public class PostDto {
 
     private Long postId;
     private String description;
-    private LocalDateTime created;
+    private String created;
     private Long likedCount;
     private Boolean isLiked;
     private Boolean isReported;

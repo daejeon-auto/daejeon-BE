@@ -24,18 +24,11 @@ public class Member extends BasicTime {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
-    @Column(nullable = false)
-    private String birthDay;
-    @Column(nullable = false)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AuthType authType;
-
-    @Column(nullable = false)
-    private String studentNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -64,16 +57,6 @@ public class Member extends BasicTime {
     @JsonIgnore
     private List<Like> like = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name = "refer_code_id")
-    @JsonIgnore
-    private ReferCode usedCode;
-
-    @OneToMany(mappedBy = "createdBy",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY)
-    private List<ReferCode> referCodes = new ArrayList<>();
-
     @OneToMany(mappedBy = "reportedBy",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
@@ -91,21 +74,13 @@ public class Member extends BasicTime {
         this.role = role;
     }
 
-    public void useCode(ReferCode usedCode) {
-        this.usedCode = usedCode;
-        usedCode.setIsUsed();
-    }
-
-    public Member(String name, String birthDay, String phoneNumber, String studentNumber, String password, String loginId, AuthType authType, School school) {
-        this.name = name;
-        this.birthDay = birthDay;
+    public Member(String phoneNumber, String password, String loginId, AuthType authType, School school) {
         this.phoneNumber = phoneNumber;
-        this.studentNumber = studentNumber;
         this.password = password;
         this.loginId = loginId;
         this.authType = authType;
         this.school = school;
         this.role = RoleTier.ROLE_TIER0;
-        this.memberType = MemberType.PENDING;
+        this.memberType = MemberType.ACCEPT;
     }
 }

@@ -15,6 +15,7 @@ import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.LikeRepository;
 import com.pcs.daejeon.repository.PostRepository;
+import com.pcs.daejeon.repository.SchoolRepository;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -49,16 +50,18 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
+    private final SchoolRepository schoolRepository;
     private final Util util;
     //    private final IGClient client;
 
     public Long writePost(String description) throws MethodArgumentNotValidException {
         description = description.replace("\n", " ");
 
-        boolean isBad = isBadDesc(description);
-        if (isBad) {
-            throw new IllegalArgumentException("bad words");
-        }
+//        ------------- 욕설 필터링 임시 해지 --------------
+//        boolean isBad = isBadDesc(description);
+//        if (isBad) {
+//            throw new IllegalArgumentException("bad words");
+//        }
 
         Member loginMember = util.getLoginMember();
         Post save = postRepository.save(new Post(description, loginMember.getSchool()));
@@ -126,11 +129,15 @@ public class PostService {
         post.setPostType(PostType.ACCEPTED);
 
         Member loginMember = util.getLoginMember();
-        log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getName()+"["+ loginMember.getId()+"] --- ");
+        log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"] --- ");
     }
 
-    public Page<Tuple> findPagedPost(Pageable page) {
-        return postRepository.pagingPost(page);
+    public Page<Tuple> findPagedPost(Pageable page, Long schoolId) {
+        Optional<School> school = schoolRepository.findById(schoolId);
+
+        if (school.isEmpty()) throw new IllegalStateException("not found school");
+
+        return postRepository.pagingPost(page, schoolId);
     }
 
     public Page<Post> findPagedPostByMemberId(Pageable pageable) {

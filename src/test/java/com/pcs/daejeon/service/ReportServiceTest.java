@@ -87,10 +87,7 @@ class ReportServiceTest {
 
         for (int i = 0; i < 4; i++) {
             Member testMember = new Member(
-                    "testMember",
-                    "20202" + i,
                     "01012341234",
-                    "00000" + i,
                     "password" + i,
                     "loginId" + i,
                     AuthType.DIRECT,

@@ -6,14 +6,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.common.Result;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.config.auth.PrincipalDetails;
-import com.pcs.daejeon.dto.member.PendingMemberDto;
-import com.pcs.daejeon.dto.member.PersonalInfo;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.AuthType;
-import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
@@ -24,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
@@ -59,44 +56,29 @@ class AdminControllerTest {
 
     ObjectMapper mapper = new ObjectMapper();
 
+    @Autowired
+    Util util;
+
     long examplePostId = 0;
     long exampleSchoolId = 0;
     Member exampleMember = null;
     Member sameSchoolExampleMember = null;
 
-    private Member getLoginMember() {
-        PrincipalDetails member = (PrincipalDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return member.getMember();
-    }
-
     @BeforeEach
     void setUp() {
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        School school = util.getLoginMember().getSchool();
+        exampleSchoolId = school.getId();
 
         for (int i = 0; i < 100; i++) {
             Post save = postRepository.save(
-                    new Post("testPost" + i, getLoginMember().getSchool()));
+                    new Post("testPost" + i, school));
             examplePostId = save.getId();
         }
 
-        School school = schoolRepository.save(new School(
-                "부산컴퓨터과학고",
-                "부산",
-                "인스타아이디",
-                "인스타패스워드"
-        ));
-
-        exampleSchoolId = school.getId();
-
         Member member = memberRepository.save(new Member(
-                "testMember",
-                "000000",
                 "01012341234",
-                "00000",
                 "password",
                 "loginId",
                 AuthType.DIRECT,
@@ -105,14 +87,11 @@ class AdminControllerTest {
         exampleMember = member;
 
         sameSchoolExampleMember = memberRepository.save(new Member(
-                "testMember",
-                "000000",
                 "01012341234",
-                "00000",
                 "password",
                 "loginId",
                 AuthType.DIRECT,
-                getLoginMember().getSchool()
+                school
         ));
     }
 
@@ -171,218 +150,6 @@ class AdminControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .post("/admin/members"))
                 .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @DisplayName("대기 유저 가져오기 성공")
-    void getPendingMembers() throws Exception {
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
-                        .post("/admin/members/pending"))
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-    @Test
-    @DisplayName("대기 유저 가져오기 실패 - 권한 부족")
-    @WithMockCustomUser(role = "ROLE_TIER0")
-    void getPendingMembers403() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .post("/admin/members/pending"))
-                .andExpect(status().isForbidden());
-    }
-    @Test
-    @DisplayName("대기 유저 가져오기 실패 - 미 로그인")
-    void getPendingMembers401() throws Exception {
-        mvc.perform(logout()).andExpect(status().isOk());
-        mvc.perform(MockMvcRequestBuilders
-                .post("/admin/members/pending"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @DisplayName("대기 유저 승인 성공")
-    void acceptPendingMember() throws Exception {
-
-        mvc.perform(MockMvcRequestBuilders
-                .post("/admin/pending-member/accept")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        mapper.writeValueAsString(new PendingMemberDto(
-                            exampleSchoolId,
-                            exampleMember.getBirthDay(),
-                            exampleMember.getName(),
-                            exampleMember.getStudentNumber()
-                        ))
-                ))
-                .andExpect(status().isAccepted());
-
-        MemberType memberType = exampleMember.getMemberType();
-        assertThat(memberType).isEqualTo(MemberType.ACCEPT);
-    }
-    @Test
-    @DisplayName("대기 유저 승인 실패 - 권한 부족")
-    @WithMockCustomUser(role = "ROLE_TIER0")
-    void acceptPendingMember403() throws Exception {
-
-        mvc.perform(MockMvcRequestBuilders
-                .post("/admin/pending-member/accept")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        mapper.writeValueAsString(new PendingMemberDto(
-                            exampleSchoolId,
-                            exampleMember.getBirthDay(),
-                            exampleMember.getName(),
-                            exampleMember.getStudentNumber()
-                        ))
-                ))
-                .andExpect(status().isForbidden());
-    }
-    @Test
-    @DisplayName("대기 유저 승인 실패 - 미로그인")
-    void acceptPendingMember401() throws Exception {
-        mvc.perform(logout()).andExpect(status().isOk());
-        mvc.perform(MockMvcRequestBuilders
-                .post("/admin/pending-member/accept")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        mapper.writeValueAsString(new PendingMemberDto(
-                            exampleSchoolId,
-                            exampleMember.getBirthDay(),
-                            exampleMember.getName(),
-                            exampleMember.getStudentNumber()
-                        ))
-                ))
-                .andExpect(status().isUnauthorized());
-    }
-    @Test
-    @DisplayName("대기 유저 승인 실패 - 유저 없음")
-    void acceptPendingMember404() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .post("/admin/pending-member/accept")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        mapper.writeValueAsString(new PendingMemberDto(
-                            exampleSchoolId,
-                            "123123",
-                            exampleMember.getName(),
-                            exampleMember.getStudentNumber()
-                        ))
-                ))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("대기 유저 거절 성공")
-    void rejectPendingMember() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .post("/admin/pending-member/reject")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        mapper.writeValueAsString(new PendingMemberDto(
-                                exampleSchoolId,
-                                exampleMember.getBirthDay(),
-                                exampleMember.getName(),
-                                exampleMember.getStudentNumber()
-                        ))
-                ))
-                .andExpect(status().isAccepted());
-    }
-    @Test
-    @DisplayName("대기 유저 거절 실패 - 미로그인")
-    void rejectPendingMember401() throws Exception {
-        mvc.perform(logout()).andExpect(status().isOk());
-        mvc.perform(MockMvcRequestBuilders
-                .post("/admin/pending-member/reject")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        mapper.writeValueAsString(new PendingMemberDto(
-                                exampleSchoolId,
-                                exampleMember.getBirthDay(),
-                                exampleMember.getName(),
-                                exampleMember.getStudentNumber()
-                        ))
-                ))
-                .andExpect(status().isUnauthorized());
-    }
-    @Test
-    @DisplayName("대기 유저 거절 실패 - 권한 부족")
-    @WithMockCustomUser(role = "ROLE_TIER0")
-    void rejectPendingMember403() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .post("/admin/pending-member/reject")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        mapper.writeValueAsString(new PendingMemberDto(
-                                exampleSchoolId,
-                                exampleMember.getBirthDay(),
-                                exampleMember.getName(),
-                                exampleMember.getStudentNumber()
-                        ))
-                ))
-                .andExpect(status().isForbidden());
-    }
-    @Test
-    @DisplayName("대기 유저 거절 실패 - 유저 없음")
-    void rejectPendingMember404() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                        .post("/admin/pending-member/reject")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                mapper.writeValueAsString(new PendingMemberDto(
-                                        exampleSchoolId,
-                                        "123123",
-                                        exampleMember.getName(),
-                                        exampleMember.getStudentNumber()
-                                ))
-                        ))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("개인 정보 가져오기 성공")
-    void callPersonalInfo() throws Exception {
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
-                        .post("/admin/personal-info/" + sameSchoolExampleMember.getId()))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        Result<PersonalInfo> result = mapper.readValue(mvcResult.getResponse().getContentAsString(),
-                new TypeReference<Result<PersonalInfo>>() {});
-
-        assertThat(result.getData().getName()).isEqualTo(exampleMember.getName());
-    }
-    @Test
-    @DisplayName("개인 정보 가져오기 실패 - 미로그인")
-    void callPersonalInfo401() throws Exception {
-        mvc.perform(logout()).andExpect(status().isOk());
-        mvc.perform(MockMvcRequestBuilders
-                        .post("/admin/personal-info/" + exampleMember.getId()))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @DisplayName("개인 정보 가져오기 실패 - 권한 부족 1")
-    @WithMockCustomUser(role = "ROLE_TIER0")
-    void callPersonalInfo403_1() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                        .post("/admin/personal-info/" + exampleMember.getId()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @DisplayName("개인 정보 가져오기 실패 - 권한 부족 2")
-    @WithMockCustomUser(role = "ROLE_TIER1")
-    void callPersonalInfo403_2() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                        .post("/admin/personal-info/" + exampleMember.getId()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @DisplayName("개인 정보 가져오기 실패 - 유저 없음")
-    void callPersonalInfo404() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                        .post("/admin/personal-info/0"))
-                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -28,7 +28,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory query;
 
     @Override
-    public Page<Tuple> pagingPost(Pageable page) {
+    public Page<Tuple> pagingPost(Pageable page, Long schoolId) {
         PrincipalDetails member = null;
         if (SecurityContextHolder.getContext().getAuthentication() != null &&
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal()!= null &&
@@ -49,22 +49,19 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .select(post, like, report)
                 .from(post)
                 .leftJoin(post.like, like);
-        if (member == null) {
-            throw new IllegalStateException("need login");
-        }
 
         tupleJPAQuery
                 .leftJoin(like.post, likePost)
                 .leftJoin(like.likedBy, likedBy)
-                .on(likePost.id.eq(post.id), likedBy.id.eq(member.getMember().getId()))
+                .on(likePost.id.eq(post.id), likedBy.id.eq(member == null ? 0L : member.getMember().getId()))
                 .leftJoin(post.reports, report)
                 .leftJoin(report.reportedPost, reportedPost)
                 .leftJoin(report.reportedBy, reportedBy)
-                .on(reportedPost.id.eq(post.id), reportedBy.id.eq(member.getMember().getId()));
+                .on(reportedPost.id.eq(post.id), reportedBy.id.eq(member == null ? 0L : member.getMember().getId()));
 
         List<Tuple> result = tupleJPAQuery
                 .where(post.postType.eq(PostType.ACCEPTED),
-                        post.school.id.eq(Objects.requireNonNull(member).getMember().getSchool().getId()))
+                        post.school.id.eq(schoolId))
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
                 .limit(page.getPageSize())

@@ -2,17 +2,14 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.common.Util;
-import com.pcs.daejeon.dto.member.PendingMemberDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.ReferCode;
 import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,8 +34,6 @@ class MemberServiceTest {
     private MemberService memberService;
     @Autowired
     MemberRepository memberRepository;
-    @Autowired
-    ReferCodeService referCodeService;
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -57,11 +51,8 @@ class MemberServiceTest {
         public CreateTestMember() {
 
             SignUpDto signUpDto = new SignUpDto(
-                    "test1",
-                    "200000101",
                     "01012341234",
                     AuthType.DIRECT,
-                    ""+(int) (Math.random()*100000),
                     util.getLoginMember().getSchool().getId(),
                     "testPassword",
                     "testId"+(int) (Math.random()*100)
@@ -88,91 +79,22 @@ class MemberServiceTest {
     }
 
     @Test
-    public void 코드_없이_회원가입() {
-        CreateTestMember member = new CreateTestMember();
-
-        Optional<Member> findMember = memberRepository.findById(member.saveMember.getId());
-
-        assertThat(findMember.get().getStudentNumber()).isEqualTo(member.signUpDto.getStudentNumber());
-        assertThat(MemberType.PENDING).isEqualTo(findMember.get().getMemberType());
-    }
-
-    @Test
-    public void 코드_있이_회원가입() throws MethodArgumentNotValidException {
-        List<ReferCode> referCodeList = referCodeService.getReferCodeList();
-
+    public void 회원가입() throws MethodArgumentNotValidException {
         SignUpDto signUpDto = new SignUpDto(
-                "test1",
-                "200000101",
                 "01012341234",
                 AuthType.INDIRECT,
-                "20203",
                 util.getLoginMember().getSchool().getId(),
                 "testPassword",
-                "testId3",
-                referCodeList.get(0).getCode()
+                "testId3"
         );
 
         Member saveMember = memberService.saveMember(signUpDto);
         Optional<Member> findMember = memberRepository.findById(saveMember.getId());
 
-        assertThat(findMember.get().getStudentNumber()).isEqualTo(signUpDto.getStudentNumber());
+        assertThat(findMember.get().getLoginId()).isEqualTo(signUpDto.getLoginId());
         assertThat(MemberType.ACCEPT).isEqualTo(findMember.get().getMemberType());
     }
 
-    @Test
-    public void 중복코드_회원가입() throws MethodArgumentNotValidException {
-        List<ReferCode> referCodeList = referCodeService.getReferCodeList();
-
-        Long schoolId = util.getLoginMember().getSchool().getId();
-        SignUpDto signUpDto = new SignUpDto(
-                "test1",
-                "200000101",
-                "01012341234",
-                AuthType.INDIRECT,
-                "20786",
-                schoolId,
-                "testPassword",
-                "testId0921939",
-                referCodeList.get(0).getCode()
-        );
-        memberService.saveMember(signUpDto);
-
-        SignUpDto signUpDto2 = new SignUpDto(
-                "test1",
-                "200000101",
-                "01012341234",
-                AuthType.INDIRECT,
-                "12323",
-                schoolId,
-                "testPassword",
-                "testId23212",
-                referCodeList.get(0).getCode()
-        );
-
-        Assertions.assertThrows(IllegalStateException.class, () -> memberService.saveMember(signUpDto2));
-    }
-
-    @Test
-    @DisplayName("다른 학교 코드 가입")
-    void otherSchoolCode() {
-        Member loginMember = util.getLoginMember();
-        List<ReferCode> referCodeList = referCodeService.getReferCodeList();
-
-        Long schoolId = util.getLoginMember().getSchool().getId();
-        SignUpDto signUpDto = new SignUpDto(
-                "test1",
-                "200000101",
-                "01012341234",
-                AuthType.INDIRECT,
-                "20786",
-                loginMember.getSchool().getId() + 1,
-                "testPassword",
-                "testId0921939",
-                referCodeList.get(1).getCode()
-        );
-        Assertions.assertThrows(Exception.class, () -> memberService.saveMember(signUpDto));
-    }
     // === 회원가입 ===
 
 
@@ -205,67 +127,6 @@ class MemberServiceTest {
         Assertions.assertThrows(IllegalStateException.class, () -> memberService.acceptMember(100L));
     }
 
-    @Test
-    public void 승인대기회원_승인_200() {
-        CreateTestMember createTestMember = new CreateTestMember();
-
-        Member member = createTestMember.saveMember;
-        memberService.acceptPendingMember(new PendingMemberDto(
-                member.getSchool().getId(),
-                member.getBirthDay(),
-                member.getName(),
-                member.getStudentNumber()
-        ));
-
-        assertThat(member.getMemberType()).isEqualTo(MemberType.ACCEPT);
-    }
-
-    @Test
-    public void 승인대기회원_승인_404() {
-        CreateTestMember createTestMember = new CreateTestMember();
-
-        Member member = createTestMember.saveMember;
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            memberService.acceptPendingMember(new PendingMemberDto(
-                    member.getSchool().getId(),
-                    member.getBirthDay(),
-                    "",
-                    member.getStudentNumber()
-            ));
-        });
-    }
-    @Test
-    public void 승인대기회원_거절_200() {
-        CreateTestMember createTestMember = new CreateTestMember();
-
-        Member member = createTestMember.saveMember;
-        Long memberId = member.getId();
-
-        memberService.rejectPendingMember(new PendingMemberDto(
-                member.getSchool().getId(),
-                member.getBirthDay(),
-                member.getName(),
-                member.getStudentNumber()
-        ));
-
-        assertThat(memberRepository.findById(memberId)).isEqualTo(Optional.empty());
-    }
-
-    @Test
-    public void 승인대기회원_거절_404() {
-        CreateTestMember createTestMember = new CreateTestMember();
-
-        Member member = createTestMember.saveMember;
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            memberService.rejectPendingMember(new PendingMemberDto(
-                    member.getSchool().getId(),
-                    member.getBirthDay(),
-                    "",
-                    member.getStudentNumber()
-            ));
-        });
-    }
-    // === 회원 승인, 거절 관련 ===
 
     // === 회원 권한 수정 ===
     @Test
