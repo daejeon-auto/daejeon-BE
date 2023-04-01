@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://containers-us-west-129.railway.app:6747/railway
+    url: jdbc:postgresql://pcs.pah.kr:1101/daejeon
     username: postgres
-    password: hGK1i4tdJCIyZqa7dk1w
+    password: daejeon
   profiles:
     active: real
   jpa:
@@ -21,11 +21,29 @@ spring:
 #        show_sql: true
 #        format_sql: true
 
+#spring:
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/test
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+#
+#  jpa:
+#    database: h2
+#    database-platform: org.hibernate.dialect.H2Dialect
+#    hibernate:
+#      ddl-auto: create
+#    properties:
+#      hibernate:
+#        default_batch_fetch_size: 100
+#        show_sql: true
+#  #        format_sql: true
+
 #logging.level:
 #  org.hibernate.SQL: debug
 #  org.hibernate.type: trace
 server:
-  port: 80
+  port: 1100
   servlet:
     session:
       timeout: 43200
