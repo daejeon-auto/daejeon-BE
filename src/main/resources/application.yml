@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://db.inab.site/dbmomin108902
+    url: jdbc:postgresql://db.inab.site:5432/dbmomin108902
     username: momin108902
     password: koldin13579
   profiles:
