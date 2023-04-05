@@ -1,6 +1,9 @@
 package com.pcs.daejeon.dto.post;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -9,6 +12,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Setter @Getter
 public class PostWriteDto {
-    @NotEmpty @Size(min = 15, max = 100)
+    @NotEmpty @Size(min = 10, max = 100)
     private String description;
 }
