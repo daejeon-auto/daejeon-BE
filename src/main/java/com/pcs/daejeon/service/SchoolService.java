@@ -1,5 +1,6 @@
 package com.pcs.daejeon.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
@@ -8,8 +9,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.*;
 
 @Service
 @Transactional
@@ -32,5 +40,71 @@ public class SchoolService {
 
         if (school.isEmpty()) throw new IllegalStateException("school not found");
         return school.get();
+    }
+
+    public String getMealServiceInfo(
+            String provincialOfficeCode,
+            String schoolCode
+    ) throws IOException, ProtocolException {
+        String url = "https://open.neis.go.kr/hub/mealServiceDietInfo?" +
+                "KEY=a8e69872fc664568bb1e7a03259d0fd9" +
+                "&Type=xml" +
+                "&pIndex=1" +
+                "&pSize=100" +
+                "&ATPT_OFCDC_SC_CODE=" + provincialOfficeCode +
+                "&SD_SCHUL_CODE=" + schoolCode;
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("GET");
+
+        InputStream responseStream = connection.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream));
+        String line;
+        StringBuilder response = new StringBuilder();
+
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
+        }
+
+        reader.close();
+        responseStream.close();
+        // Parse the response and return it in your desired format
+        return response.toString();
+    }
+
+    public String getSchoolCode(String schoolName, String location) throws IOException {
+        String url = "https://open.neis.go.kr/hub/schoolInfo?" +
+                "Type=json" +
+                "&pSize=3" +
+                URLEncoder.encode(
+                        "&SCHUL_NM=" +schoolName +
+                        "&LCTN_SC_NM=" + location,
+                    "UTF-8"); // 한글 인코딩
+
+        URL apiUrl = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+        connection.setRequestMethod("GET");
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            ObjectMapper objectMapper = new ObjectMapper();
+            LinkedHashMap map = objectMapper.readValue(response.toString(), LinkedHashMap.class);
+            ArrayList schoolInfoList = objectMapper.readValue(objectMapper.writeValueAsString(map.get("schoolInfo")), ArrayList.class);
+            LinkedHashMap schoolInfo = objectMapper.readValue(objectMapper.writeValueAsString(schoolInfoList.get(1)), LinkedHashMap.class);
+            LinkedHashMap[] rows = objectMapper.readValue(objectMapper.writeValueAsString(schoolInfo.get("row")), LinkedHashMap[].class);
+            LinkedHashMap code = objectMapper.readValue(objectMapper.writeValueAsString(rows[0]), LinkedHashMap.class);
+
+            return code.get("SD_SCHUL_CODE").toString();
+        } else {
+            throw new IOException("Error retrieving school information: " + responseCode);
+        }
     }
 }

@@ -98,9 +98,10 @@ public class MemberService {
         return code;
     }
 
-    public Member saveAdmin(SignUpDto signUpDto, SchoolRegistDto schoolRegistDto) throws MethodArgumentNotValidException {
+    public Member saveAdmin(SignUpDto signUpDto, SchoolRegistDto schoolRegistDto, String code) throws MethodArgumentNotValidException {
         School school = new School(schoolRegistDto.getName(),
                 schoolRegistDto.getLocate(),
+                code,
                 schoolRegistDto.getInstaId(),
                 schoolRegistDto.getInstaPwd());
 

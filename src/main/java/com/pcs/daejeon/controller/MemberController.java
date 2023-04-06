@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.Objects;
 
 @RestController
@@ -92,7 +91,11 @@ public class MemberController {
     public ResponseEntity<Result> signUpAdmin(@RequestBody @Valid SignUpAdminDto signUpAdminDto) {
 
         try {
-            Member member = memberService.saveAdmin(signUpAdminDto.getMember(), signUpAdminDto.getSchool());
+            String schoolCode = schoolService.getSchoolCode(
+                    signUpAdminDto.getSchool().getName(),
+                    signUpAdminDto.getSchool().getLocate());
+
+            Member member = memberService.saveAdmin(signUpAdminDto.getMember(), signUpAdminDto.getSchool(), schoolCode);
 
             MemberInfoDto memberInfo = new MemberInfoDto(
                     member.getPhoneNumber(),
