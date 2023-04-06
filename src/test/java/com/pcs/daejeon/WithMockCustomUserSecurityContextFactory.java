@@ -32,9 +32,9 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
 
         final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
-        School school = new School("부산컴퓨터과학고등학교", "부산","", "인스타아이디", "패스워드");
+        School school = new School("부산컴퓨터과학고등학교", "부산","", "", "인스타아이디", "패스워드");
         schoolRepository.save(school);
-        School school2 = new School("미림정보여자고등학교", "서울", "","인스타아이디2", "패스워드");
+        School school2 = new School("미림정보여자고등학교", "서울", "", "","인스타아이디2", "패스워드");
         schoolRepository.save(school2);
 
         Member member = new Member(

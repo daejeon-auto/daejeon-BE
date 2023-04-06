@@ -91,11 +91,11 @@ public class MemberController {
     public ResponseEntity<Result> signUpAdmin(@RequestBody @Valid SignUpAdminDto signUpAdminDto) {
 
         try {
-            String schoolCode = schoolService.getSchoolCode(
+            String[] schoolCodes = schoolService.getSchoolCodes(
                     signUpAdminDto.getSchool().getName(),
                     signUpAdminDto.getSchool().getLocate());
 
-            Member member = memberService.saveAdmin(signUpAdminDto.getMember(), signUpAdminDto.getSchool(), schoolCode);
+            Member member = memberService.saveAdmin(signUpAdminDto.getMember(), signUpAdminDto.getSchool(), schoolCodes);
 
             MemberInfoDto memberInfo = new MemberInfoDto(
                     member.getPhoneNumber(),

@@ -1,7 +1,10 @@
 package com.pcs.daejeon.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcs.daejeon.common.Util;
+import com.pcs.daejeon.dto.school.MealDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.repository.SchoolRepository;
@@ -17,6 +20,8 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -42,17 +47,24 @@ public class SchoolService {
         return school.get();
     }
 
-    public String getMealServiceInfo(
-            String provincialOfficeCode,
-            String schoolCode
+    public List<MealDto> getMealServiceInfo(
+            String schoolCode,        // 학교 코드
+            String ATPT_OFCDC_SC_CODE // 교육청 코드
     ) throws IOException, ProtocolException {
+        LocalDateTime now = LocalDateTime.now(java.time.ZoneId.of("Asia/Seoul"));
+
+        // format 변경
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String today = now.format(formatter);
+        String tommorrow = now.plusDays(1).format(formatter);
         String url = "https://open.neis.go.kr/hub/mealServiceDietInfo?" +
-                "KEY=a8e69872fc664568bb1e7a03259d0fd9" +
-                "&Type=xml" +
+                URLEncoder.encode("&Type=json" +
                 "&pIndex=1" +
                 "&pSize=100" +
-                "&ATPT_OFCDC_SC_CODE=" + provincialOfficeCode +
-                "&SD_SCHUL_CODE=" + schoolCode;
+                "&ATPT_OFCDC_SC_CODE=" + ATPT_OFCDC_SC_CODE +
+                "&SD_SCHUL_CODE=" + schoolCode +
+                "&MLSV_FROM_YMD=" + today +
+                "&MLSV_TO_YMD=" + tommorrow, "UTF-8");
 
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod("GET");
@@ -68,11 +80,20 @@ public class SchoolService {
 
         reader.close();
         responseStream.close();
-        // Parse the response and return it in your desired format
-        return response.toString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        LinkedHashMap map = objectMapper.readValue(response.toString(), LinkedHashMap.class);
+        ArrayList mealServiceDietInfo = objectMapper.readValue(objectMapper.writeValueAsString(map.get("mealServiceDietInfo")), ArrayList.class);
+        LinkedHashMap mealInfo = objectMapper.readValue(objectMapper.writeValueAsString(mealServiceDietInfo.get(1)), LinkedHashMap.class);
+        List<MealDto> rows = objectMapper.readValue(
+                objectMapper.writeValueAsString(mealInfo.get("row")),
+                new TypeReference<List<MealDto>>() {}
+        );
+
+        return rows;
     }
 
-    public String getSchoolCode(String schoolName, String location) throws IOException {
+    public String[] getSchoolCodes(String schoolName, String location) throws IOException {
         String url = "https://open.neis.go.kr/hub/schoolInfo?" +
                 "Type=json" +
                 "&pSize=3" +
@@ -102,7 +123,9 @@ public class SchoolService {
             LinkedHashMap[] rows = objectMapper.readValue(objectMapper.writeValueAsString(schoolInfo.get("row")), LinkedHashMap[].class);
             LinkedHashMap code = objectMapper.readValue(objectMapper.writeValueAsString(rows[0]), LinkedHashMap.class);
 
-            return code.get("SD_SCHUL_CODE").toString();
+            return new String[]{
+                    code.get("SD_SCHUL_CODE").toString(),
+                    code.get("ATPT_OFCDC_SC_CODE").toString()};
         } else {
             throw new IOException("Error retrieving school information: " + responseCode);
         }
