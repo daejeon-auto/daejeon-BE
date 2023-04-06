@@ -51,9 +51,9 @@ dependencies {
 	implementation ('org.springframework.boot:spring-boot-starter-web') {
 		exclude module: 'spring-boot-starter-tomcat'
 	}
-	implementation 'com.github.hkirk:java-html2image:0.9'
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	implementation 'com.github.instagram4j:instagram4j:2.0.7'
+	implementation 'com.github.alvin0319:NeisAPI:1.1.1'
 	compile("org.springframework.boot:spring-boot-starter-security")
 
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
