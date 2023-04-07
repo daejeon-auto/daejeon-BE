@@ -23,6 +23,7 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -47,7 +48,7 @@ public class SchoolService {
         return school.get();
     }
 
-    public List<MealDto> getMealServiceInfo(
+    public List<List<String>> getMealServiceInfo(
             String schoolCode,        // 학교 코드
             String ATPT_OFCDC_SC_CODE // 교육청 코드
     ) throws IOException, ProtocolException {
@@ -90,7 +91,15 @@ public class SchoolService {
                 new TypeReference<List<MealDto>>() {}
         );
 
-        return rows;
+        Stream<String> meals = rows.stream().map(MealDto::getDishName);
+
+        List<List<String>> meal = meals.map(val -> { // 석식 중식 나누기
+            List<String> stream = Arrays.stream(val.split("<br/>")).toList();
+            return stream.stream()
+                    .map(br -> br.split(" ")[0]).toList();
+        }).toList();
+
+        return meal;
     }
 
     public String[] getSchoolCodes(String schoolName, String location) throws IOException {

@@ -32,8 +32,6 @@ class SchoolServiceTest {
 
     @Test
     void getSchoolMeal() throws IOException {
-        List<MealDto> mealServiceInfo = schoolService.getMealServiceInfo("7150337", "C10");
-
-        System.out.println("mealServiceInfo = " + mealServiceInfo);
+        schoolService.getMealServiceInfo("7150337", "C10");
     }
 }

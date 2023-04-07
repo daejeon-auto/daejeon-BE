@@ -30,10 +30,11 @@ public class SchoolController {
         try {
             String schoolCode = util.getLoginMember().getSchool().getCode();
             String locationCode = util.getLoginMember().getSchool().getLocationCode();
-            List<MealDto> mealServiceInfo = schoolService.getMealServiceInfo(schoolCode, locationCode);
+            List<List<String>> mealServiceInfo = schoolService.getMealServiceInfo(schoolCode, locationCode);
 
             return new ResponseEntity<>(new Result<>(mealServiceInfo, false), HttpStatus.OK);
         } catch (Exception e) {
+            System.out.println("e = " + e.toString());
             return new ResponseEntity<>(new Result<>("", false), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
