@@ -32,14 +32,18 @@ public class School extends BasicTime {
 
     private String name;
     private String locate;
+    private String code;
+    private String locationCode;
 
     private String instaId;
     private String instaPwd;
 
-    public School(String name, String locate, String instaId, String instaPwd) {
+    public School(String name, String locate, String code, String locationCode, String instaId, String instaPwd) {
         this.name = name;
         this.locate = locate;
+        this.code = code;
         this.instaId = instaId;
         this.instaPwd = instaPwd;
+        this.locationCode = locationCode;
     }
 }

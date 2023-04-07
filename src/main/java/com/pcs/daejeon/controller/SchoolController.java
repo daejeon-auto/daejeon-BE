@@ -1,6 +1,8 @@
 package com.pcs.daejeon.controller;
 
 import com.pcs.daejeon.common.Result;
+import com.pcs.daejeon.common.Util;
+import com.pcs.daejeon.dto.school.MealDto;
 import com.pcs.daejeon.dto.school.SchoolInfoDto;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.service.SchoolService;
@@ -21,6 +23,21 @@ import java.util.List;
 public class SchoolController {
 
     private final SchoolService schoolService;
+    private final Util util;
+
+    @PostMapping("/school/meal")
+    public ResponseEntity<Result> schoolMeal() {
+        try {
+            String schoolCode = util.getLoginMember().getSchool().getCode();
+            String locationCode = util.getLoginMember().getSchool().getLocationCode();
+            List<List<String>> mealServiceInfo = schoolService.getMealServiceInfo(schoolCode, locationCode);
+
+            return new ResponseEntity<>(new Result<>(mealServiceInfo, false), HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println("e = " + e.toString());
+            return new ResponseEntity<>(new Result<>("", false), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/school/list")
     public ResponseEntity<Result<List<SchoolInfoDto>>> schoolList() {

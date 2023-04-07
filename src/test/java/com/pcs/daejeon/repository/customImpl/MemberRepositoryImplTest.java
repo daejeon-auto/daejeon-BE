@@ -37,6 +37,7 @@ class MemberRepositoryImplTest {
     public void 회원가입() {
         School school = new School("부산컴과고",
                 "부산",
+                "", "",
                 "인스타아이디",
                 "인스타비밀번호");
 

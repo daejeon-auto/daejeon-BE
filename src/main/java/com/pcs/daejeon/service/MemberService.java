@@ -98,12 +98,12 @@ public class MemberService {
         return code;
     }
 
-    public Member saveAdmin(SignUpDto signUpDto, SchoolRegistDto schoolRegistDto) throws MethodArgumentNotValidException {
+    public Member saveAdmin(SignUpDto signUpDto, SchoolRegistDto schoolRegistDto, String[] codes) throws MethodArgumentNotValidException {
         School school = new School(schoolRegistDto.getName(),
                 schoolRegistDto.getLocate(),
+                codes[0], codes[1],
                 schoolRegistDto.getInstaId(),
                 schoolRegistDto.getInstaPwd());
-
 
         if (schoolRepository.valiSchool(school))
             throw new IllegalStateException("school already exist");

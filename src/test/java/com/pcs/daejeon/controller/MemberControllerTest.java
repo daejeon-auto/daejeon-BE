@@ -121,6 +121,7 @@ class MemberControllerTest {
         School school = new School(
                 "테스트학교",
                 "테스트지역",
+                "", "",
                 "인스타아이디",
                 "인스타패스워드"
         );
@@ -182,6 +183,7 @@ class MemberControllerTest {
         School school = new School(
                 "테스트학교",
                 "테스트지역",
+                "", "",
                 "인스타아이디",
                 "인스타패스워드"
         );

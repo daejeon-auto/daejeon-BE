@@ -22,7 +22,7 @@ public class Post extends BasicEntity {
     @Enumerated(EnumType.STRING)
     private PostType postType;
 
-    @Size(max = 100, min = 5)
+    @Size(max = 100, min = 10)
     @NotNull
     private String description;
 
