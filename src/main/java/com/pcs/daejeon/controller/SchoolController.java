@@ -30,7 +30,7 @@ public class SchoolController {
         try {
             String schoolCode = util.getLoginMember().getSchool().getCode();
             String locationCode = util.getLoginMember().getSchool().getLocationCode();
-            List<List<String>> mealServiceInfo = schoolService.getMealServiceInfo(schoolCode, locationCode);
+            MealDto mealServiceInfo = schoolService.getMealServiceInfo(schoolCode, locationCode);
 
             return new ResponseEntity<>(new Result<>(mealServiceInfo, false), HttpStatus.OK);
         } catch (Exception e) {
