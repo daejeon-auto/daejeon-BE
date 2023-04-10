@@ -95,14 +95,14 @@ public class SchoolService {
 
         MealDto meals = new MealDto();
 
-
         rows.stream().forEach(val -> {
             Object[] dish = Arrays.stream(val.getDishName().split("<br/>")).map(br -> br.split("\s")[0]).toArray();
-            String mealName = val.getMealName();
 
-            if (Objects.equals(mealName, "조식"))      meals.setBreakfast(dish);
-            else if (Objects.equals(mealName, "중식")) meals.setLunch(dish);
-            else if (Objects.equals(mealName, "석식")) meals.setDinner(dish);
+            String mealCode = val.getMealCode();
+
+            if (Objects.equals(mealCode, "1"))      meals.setBreakfast(dish);
+            else if (Objects.equals(mealCode, "2")) meals.setLunch(dish);
+            else if (Objects.equals(mealCode, "3")) meals.setDinner(dish);
         });
 
         return meals;
