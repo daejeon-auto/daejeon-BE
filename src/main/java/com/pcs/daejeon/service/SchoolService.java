@@ -1,9 +1,9 @@
 package com.pcs.daejeon.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcs.daejeon.common.Util;
+import com.pcs.daejeon.dto.school.MealApiDto;
 import com.pcs.daejeon.dto.school.MealDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
@@ -17,13 +17,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -48,16 +46,20 @@ public class SchoolService {
         return school.get();
     }
 
-    public List<List<String>> getMealServiceInfo(
+    public MealDto getMealServiceInfo(
             String schoolCode,        // 학교 코드
             String ATPT_OFCDC_SC_CODE // 교육청 코드
-    ) throws IOException, ProtocolException {
+    ) throws IOException {
         LocalDateTime now = LocalDateTime.now(java.time.ZoneId.of("Asia/Seoul"));
+
+
+        if (now.getHour() > 14) {
+            now = now.plusDays(1);
+        }
 
         // format 변경
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String today = now.format(formatter);
-        String tommorrow = now.plusDays(1).format(formatter);
         String url = "https://open.neis.go.kr/hub/mealServiceDietInfo?" +
                 URLEncoder.encode("&Type=json" +
                 "&pIndex=1" +
@@ -65,7 +67,7 @@ public class SchoolService {
                 "&ATPT_OFCDC_SC_CODE=" + ATPT_OFCDC_SC_CODE +
                 "&SD_SCHUL_CODE=" + schoolCode +
                 "&MLSV_FROM_YMD=" + today +
-                "&MLSV_TO_YMD=" + tommorrow, "UTF-8");
+                "&MLSV_TO_YMD=" + today, "UTF-8");
 
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod("GET");
@@ -86,20 +88,24 @@ public class SchoolService {
         LinkedHashMap map = objectMapper.readValue(response.toString(), LinkedHashMap.class);
         ArrayList mealServiceDietInfo = objectMapper.readValue(objectMapper.writeValueAsString(map.get("mealServiceDietInfo")), ArrayList.class);
         LinkedHashMap mealInfo = objectMapper.readValue(objectMapper.writeValueAsString(mealServiceDietInfo.get(1)), LinkedHashMap.class);
-        List<MealDto> rows = objectMapper.readValue(
+        List<MealApiDto> rows = objectMapper.readValue(
                 objectMapper.writeValueAsString(mealInfo.get("row")),
-                new TypeReference<List<MealDto>>() {}
+                new TypeReference<List<MealApiDto>>() {}
         );
 
-        Stream<String> meals = rows.stream().map(MealDto::getDishName);
+        MealDto meals = new MealDto();
 
-        List<List<String>> meal = meals.map(val -> { // 석식 중식 나누기
-            List<String> stream = Arrays.stream(val.split("<br/>")).toList();
-            return stream.stream()
-                    .map(br -> br.split(" ")[0]).toList();
-        }).toList();
 
-        return meal;
+        rows.stream().forEach(val -> {
+            Object[] dish = Arrays.stream(val.getDishName().split("<br/>")).map(br -> br.split("\s")[0]).toArray();
+            String mealName = val.getMealName();
+
+            if (Objects.equals(mealName, "조식"))      meals.setBreakfast(dish);
+            else if (Objects.equals(mealName, "중식")) meals.setLunch(dish);
+            else if (Objects.equals(mealName, "석식")) meals.setDinner(dish);
+        });
+
+        return meals;
     }
 
     public String[] getSchoolCodes(String schoolName, String location) throws IOException {
