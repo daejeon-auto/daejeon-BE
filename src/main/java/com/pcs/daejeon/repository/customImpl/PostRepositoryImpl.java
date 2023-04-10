@@ -1,6 +1,6 @@
 package com.pcs.daejeon.repository.customImpl;
 
-import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.*;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.custom.PostRepositoryCustom;
@@ -12,11 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
-import java.util.Objects;
 
 import static com.pcs.daejeon.entity.QLike.like;
 import static com.pcs.daejeon.entity.QPost.post;
@@ -26,19 +23,12 @@ import static com.pcs.daejeon.entity.QReport.report;
 public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory query;
+    private final Util util;
 
     @Override
     public Page<Tuple> pagingPost(Pageable page, Long schoolId) {
-        PrincipalDetails member = null;
-        if (SecurityContextHolder.getContext().getAuthentication() != null &&
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal()!= null &&
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDetails) {
 
-            member = (PrincipalDetails) SecurityContextHolder
-                    .getContext()
-                    .getAuthentication()
-                    .getPrincipal();
-        }
+        Member loginMember = util.getLoginMember();
 
         QPost likePost = new QPost("likePost");
         QPost reportedPost = new QPost("reportedPost");
@@ -46,18 +36,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         QMember reportedBy = new QMember("reportedBy");
 
         JPAQuery<Tuple> tupleJPAQuery = query
-                .select(post, like, report)
+                .select(post, likedBy, reportedBy)
                 .from(post)
-                .leftJoin(post.like, like);
-
-        tupleJPAQuery
-                .leftJoin(like.post, likePost)
-                .leftJoin(like.likedBy, likedBy)
-                .on(likePost.id.eq(post.id), likedBy.id.eq(member == null ? 0L : member.getMember().getId()))
+                .leftJoin(post.like, like) // 해당 포스트의 like를 like라는 이름으로 갖고옴
+                .leftJoin(like.likedBy, likedBy) // 좋아요 박은 유저 ID
+                    .on(likedBy.id.eq(loginMember == null ? 0L : loginMember.getId())) // 로그인 유저가 아니면 FALSE
                 .leftJoin(post.reports, report)
-                .leftJoin(report.reportedPost, reportedPost)
                 .leftJoin(report.reportedBy, reportedBy)
-                .on(reportedPost.id.eq(post.id), reportedBy.id.eq(member == null ? 0L : member.getMember().getId()));
+                    .on(reportedBy.id.eq(loginMember == null ? 0L : loginMember.getId())); // 로그인 유저가 아니면 FALSE
 
         List<Tuple> result = tupleJPAQuery
                 .where(post.postType.eq(PostType.ACCEPTED),
