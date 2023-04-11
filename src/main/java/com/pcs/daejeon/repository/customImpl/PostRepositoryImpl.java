@@ -36,18 +36,17 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         QMember reportedBy = new QMember("reportedBy");
 
         JPAQuery<Tuple> tupleJPAQuery = query
-                .select(post, likedBy, reportedBy)
+                .select(post, like, report)
+                .distinct() // 1:N 관계에서 첫 인덱스가 중복으로 불리는 것을 해결(쿼리에 따라 작동 안할수도)
                 .from(post)
-                .leftJoin(post.like, like) // 해당 포스트의 like를 like라는 이름으로 갖고옴
-                .leftJoin(like.likedBy, likedBy) // 좋아요 박은 유저 ID
-                    .on(likedBy.id.eq(loginMember == null ? 0L : loginMember.getId())) // 로그인 유저가 아니면 FALSE
-                .leftJoin(post.reports, report)
-                .leftJoin(report.reportedBy, reportedBy)
-                    .on(reportedBy.id.eq(loginMember == null ? 0L : loginMember.getId())); // 로그인 유저가 아니면 FALSE
-
-        List<Tuple> result = tupleJPAQuery
                 .where(post.postType.eq(PostType.ACCEPTED),
                         post.school.id.eq(schoolId))
+                .leftJoin(post.like, like) // 해당 포스트의 like를 like라는 이름으로 갖고옴
+                    .on(like.likedBy.id.eq(loginMember == null ? 0L : loginMember.getId())) // 해당 유저가 한 좋아요 필터링
+                .leftJoin(post.reports, report) // 해당 포스트의 report를 report라는 이름으로 갖고옴
+                    .on(report.reportedBy.id.eq(loginMember == null ? 0L : loginMember.getId())); // 유저가 작성한 신고 필터링
+
+        List<Tuple> result = tupleJPAQuery
                 .orderBy(post.id.desc())
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
@@ -56,7 +55,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         JPAQuery<Long> total = query
                 .select(post.count())
                 .from(post)
-                .where(post.postType.eq(PostType.ACCEPTED));
+                .where(post.postType.eq(PostType.ACCEPTED),
+                        post.school.id.eq(schoolId));
 
         return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }
