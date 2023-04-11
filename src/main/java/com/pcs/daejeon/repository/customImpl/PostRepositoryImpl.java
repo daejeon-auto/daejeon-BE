@@ -56,7 +56,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         JPAQuery<Long> total = query
                 .select(post.count())
                 .from(post)
-                .where(post.postType.eq(PostType.ACCEPTED));
+                .where(post.postType.eq(PostType.ACCEPTED),
+                        post.school.id.eq(schoolId));
 
         return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }
