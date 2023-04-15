@@ -101,7 +101,8 @@ public class MemberController {
                     member.getPhoneNumber(),
                     member.getSchool().getName(),
                     member.getSchool().getLocate(),
-                    member.getAuthType());
+                    member.getAuthType(),
+                    member.getPunish());
 
             return new ResponseEntity<>(new Result<>(memberInfo, false), HttpStatus.CREATED);
         } catch (IllegalStateException e) {
@@ -186,8 +187,8 @@ public class MemberController {
                     loginMember.getPhoneNumber(),
                     loginMember.getSchool().getName(),
                     loginMember.getSchool().getLocate(),
-                    loginMember.getAuthType()
-            );
+                    loginMember.getAuthType(),
+                    loginMember.getPunish());
 
             return new ResponseEntity<>(new Result<>(memberInfoDto, false), HttpStatus.ACCEPTED);
         } catch (Exception e) {
