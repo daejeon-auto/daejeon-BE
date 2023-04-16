@@ -1,14 +1,11 @@
-package com.pcs.daejeon.controller;
+package com.pcs.daejeon.controller.Admin;
 
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
-import com.pcs.daejeon.dto.member.MemberListDto;
 import com.pcs.daejeon.dto.post.RejectedPostDto;
 import com.pcs.daejeon.dto.report.ReportListDto;
-import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.Report;
-import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
@@ -19,7 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -54,41 +54,6 @@ public class AdminController {
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-
-    @PostMapping("/admin/members")
-    public ResponseEntity<Result<List<MemberListDto>>> getMembers(
-            @RequestParam(value = "memberId", required = false) Long memberId,
-            @RequestParam(value = "onlyAdmin", required = false) boolean onlyAdmin) {
-
-        try {
-            List<Member> members = memberService.getMembers(memberId, onlyAdmin);
-            List<MemberListDto> memberListDto = members.stream()
-                    .map(o -> new MemberListDto(o.getId(), o.getMemberType()))
-                    .toList();
-
-            return new ResponseEntity<>(new Result<>(memberListDto, false), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PostMapping("/admin/member/set-role/{id}/{role}")
-    public ResponseEntity<Result<String>> setRole(@PathVariable("id") Long memberId, @PathVariable("role") RoleTier tier) {
-
-        try {
-            Member member = memberService.setMemberRole(memberId, tier);
-
-            log.info("[set-role] set role memberId = "+member.getId()+" changed role = "+member.getRole().toString()+" by adminId = "+util.getLoginMember().getId());
-            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.OK);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>("server error", true), HttpStatus.BAD_REQUEST);
         }
     }
 
