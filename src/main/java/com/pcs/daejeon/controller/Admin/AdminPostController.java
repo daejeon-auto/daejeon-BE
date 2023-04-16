@@ -6,7 +6,6 @@ import com.pcs.daejeon.dto.post.RejectedPostDto;
 import com.pcs.daejeon.dto.report.ReportListDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.Report;
-import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +26,9 @@ import java.util.stream.Stream;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-public class AdminController {
+public class AdminPostController {
 
     private final ReportService reportService;
-    private final MemberService memberService;
     private final PostService postService;
     private final Util util;
 

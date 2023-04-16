@@ -1,8 +1,8 @@
 package com.pcs.daejeon.service;
 
+import com.pcs.daejeon.dto.punish.PunishAddDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Punish;
-import com.pcs.daejeon.entity.type.PunishRating;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PunishRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,20 +21,19 @@ public class PunishService {
     private final PunishRepository punishRepository;
     private final MemberRepository memberRepository;
 
-    public void addPunish(Member member, String reason, LocalDateTime expireDate, PunishRating punishRating) {
+    public void addPunish(PunishAddDto punishAddDto) {
 
-        Optional<Member> isValidMember = memberRepository.findById(member.getId());
+        Optional<Member> isValidMember = memberRepository.findById(punishAddDto.getMemberId());
 
         if (isValidMember.isEmpty()) {
             throw new IllegalStateException("member not found");
         }
 
         Punish punish = new Punish(
-                reason,
-                expireDate,
-                punishRating,
-                member
-        );
+                punishAddDto.getReason(),
+                punishAddDto.getExpiredDate(),
+                punishAddDto.getRating(),
+                isValidMember.get());
         punishRepository.save(punish);
     }
 
