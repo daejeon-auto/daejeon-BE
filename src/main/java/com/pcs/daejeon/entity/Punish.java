@@ -31,9 +31,8 @@ public class Punish extends BasicEntity {
 
     private PunishRating rating;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne @JsonIgnore
     @JoinColumn(name = "member_id")
-    @JsonIgnore
     private Member member;
 
     public Punish(String reason, LocalDateTime expired_date, PunishRating rating, Member member) {

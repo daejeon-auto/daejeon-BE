@@ -66,7 +66,8 @@ public class Member extends BasicTime {
     @JoinColumn(name = "school_id")
     private School school;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member",
+            fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Punish> punish;
 

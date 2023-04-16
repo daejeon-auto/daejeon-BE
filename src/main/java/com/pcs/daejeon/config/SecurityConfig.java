@@ -9,8 +9,10 @@ import com.pcs.daejeon.config.oauth.JwtConfig;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.security.AccountResDto;
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.Punish;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.repository.MemberRepository;
+import com.pcs.daejeon.service.PunishService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +38,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.UUID;
 
 @Configuration
@@ -45,6 +48,7 @@ import java.util.UUID;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final MemberRepository memberRepository;
+    private final PunishService punishService;
     private final JwtConfig jwtConfig;
 
     @Override
@@ -128,11 +132,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             Member member = securityUser.getMember();
             School school = member.getSchool();
-            MemberInfoDto memberInfoDto = new MemberInfoDto(member.getPhoneNumber(),
+            // securityUser의 트랜젝션이 끝났기에 punish만 따로 불러옴
+            List<Punish> punish = punishService.getPunish(member);
+            MemberInfoDto memberInfoDto = new MemberInfoDto(
+                    member.getPhoneNumber(),
                     school.getName(),
                     school.getLocate(),
                     member.getAuthType(),
-                    member.getPunish());
+                    punish);
 
             AccountResDto jsonResult = AccountResDto.success(AccountResDto.success(memberInfoDto));
             if (jsonConverter.canWrite(jsonResult.getClass(), jsonMimeType)) {
