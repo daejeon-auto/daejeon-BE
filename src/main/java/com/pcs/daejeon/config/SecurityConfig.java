@@ -2,10 +2,13 @@ package com.pcs.daejeon.config;
 
 import com.pcs.daejeon.config.auth.JwtUserDetailsService;
 import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.config.auth.PrincipalDetailsService;
 import com.pcs.daejeon.config.handler.CustomUrlAuthenticationFailHandler;
 import com.pcs.daejeon.config.handler.CustomUrlAuthenticationSuccessHandler;
+import com.pcs.daejeon.config.oauth.CustomRememberMeServices;
 import com.pcs.daejeon.config.oauth.JwtAuthenticationFilter;
 import com.pcs.daejeon.config.oauth.JwtConfig;
+import com.pcs.daejeon.config.oauth.RememberMeHeaderFilter;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.security.AccountResDto;
 import com.pcs.daejeon.entity.Member;
@@ -31,15 +34,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.*;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.web.cors.CorsUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import java.util.List;
-import java.util.UUID;
 
 @Configuration
 @EnableWebSecurity
@@ -48,12 +49,21 @@ import java.util.UUID;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final MemberRepository memberRepository;
+    private final PrincipalDetailsService principalDetailsService;
     private final PunishService punishService;
     private final JwtConfig jwtConfig;
 
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public RememberMeServices rememberMeServices() {
+        CustomRememberMeServices customRememberMeServices = new CustomRememberMeServices("secret key", principalDetailsService);
+        customRememberMeServices.setParameter("X-Remember-Me");
+        customRememberMeServices.setTokenValiditySeconds((int) Duration.ofDays(30).getSeconds());
+        return customRememberMeServices;
     }
 
     @Override
@@ -93,8 +103,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 }))
                 .invalidateHttpSession(true)
             .and()
+                // remember me가 true여서 쿠키값 나가는걸 헤더(X-Remember-Me)로 바꿔줌
+                .addFilterAfter(new RememberMeHeaderFilter(), AbstractPreAuthenticatedProcessingFilter.class)
                 .rememberMe()
-                .key(UUID.randomUUID().toString())
+                .key("secret keys")
+                .rememberMeParameter("X-Remember-Me")
+                // remember me 실행 조건 설정
+                .rememberMeServices(rememberMeServices())
                 .tokenValiditySeconds(604800)
             .and()
                 .exceptionHandling()
