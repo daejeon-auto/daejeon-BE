@@ -9,6 +9,7 @@ import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.service.MemberService;
+import com.pcs.daejeon.service.RefreshTokenService;
 import com.pcs.daejeon.service.SchoolService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Objects;
 
@@ -30,6 +32,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final SchoolService schoolService;
+    private final RefreshTokenService refreshTokenService;
     private final Util util;
 
     @PostMapping("/push-chk-code")
@@ -191,6 +194,21 @@ public class MemberController {
                     loginMember.getPunish());
 
             return new ResponseEntity<>(new Result<>(memberInfoDto, false), HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Result> refreshAuth(HttpServletRequest request) {
+
+        try {
+            String refreshToken = refreshTokenService.createRefreshToken(request);
+
+            return ResponseEntity.ok()
+                    .header("X-Auth-Token", "Bearer " + refreshToken)
+                    .body(new Result<>(null, false));
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
