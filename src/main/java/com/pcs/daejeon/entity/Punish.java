@@ -45,13 +45,4 @@ public class Punish extends BasicEntity {
     public void changeValid() {
         isValid = !isValid;
     }
-
-    public void setExpired_date(LocalDateTime expired_date) {
-        this.expired_date = expired_date;
-    }
-
-    public void setRating(PunishRating rating) {
-        this.rating = rating;
-    }
-
 }

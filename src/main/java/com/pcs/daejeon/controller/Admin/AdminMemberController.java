@@ -4,9 +4,7 @@ import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.MemberListDto;
 import com.pcs.daejeon.dto.punish.PunishAddDto;
-import com.pcs.daejeon.dto.punish.PunishUpdateDto;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.Punish;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.PunishService;
@@ -92,22 +90,6 @@ public class AdminMemberController {
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>("server error", true), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    /**
-     * 정지 기록 수정
-     */
-    @PostMapping("/admin/member/punish/update")
-    public ResponseEntity<Result<Punish>> updatePunish(@RequestBody @Valid PunishUpdateDto punishUpdateDto) {
-
-        try {
-
-            Punish punish = punishService.updatePunish(punishUpdateDto);
-            return new ResponseEntity<>(new Result<>(punish, false), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
