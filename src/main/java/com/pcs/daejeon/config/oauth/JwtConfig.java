@@ -13,28 +13,33 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
 public class JwtConfig {
 
-    private static String key = "asoijwoiajosidjwoakjsdijwoi";
+    private static String key;
 
-//    @PostConstruct
-//    private void JwtConfig() {
-//        KeyGenerator keyGen = null;
-//        try {
-//            keyGen = KeyGenerator.getInstance("AES");
-//        } catch (NoSuchAlgorithmException e) {
-//            throw new RuntimeException(e);
-//        }
-//        keyGen.init(256); // 키 길이 설정
-//        SecretKey secretKey = keyGen.generateKey();
-//        key = Arrays.toString(secretKey.getEncoded());
-//        byte[] encodedKey = secretKey.getEncoded();
-//    }
+    @PostConstruct
+    private void JwtConfig() {
+        KeyGenerator keyGen = null;
+        try {
+            keyGen = KeyGenerator.getInstance("AES");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        keyGen.init(256); // 키 길이 설정
+        SecretKey secretKey = keyGen.generateKey();
+        key = Arrays.toString(secretKey.getEncoded());
+        byte[] encodedKey = secretKey.getEncoded();
+    }
 
     private final UserDetailsService userDetailsService;
 

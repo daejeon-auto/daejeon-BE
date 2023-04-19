@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.LinkedHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +38,6 @@ public class RefreshTokenService {
 
         // 토큰 유효성 검사
         if (token == null || !jwtConfig.validateToken(token)) return null;
-
-        LinkedHashMap<String, Date> session = refreshSessionRepository.getSession();
 
         Date expiredDate = refreshSessionRepository.getData(token);
         if (expiredDate == null) return null;

@@ -119,6 +119,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             String token = jwtConfig.createToken(authentication);
             response.addHeader("X-Auth-Token", "Bearer " + token);
 
+            // 만약 remember가 true일 때 X-Refresh-Token 발급
             if (Objects.equals(request.getParameter("rememberMe"), "true")) {
                 String refreshToken = jwtConfig.createRefreshToken(authentication);
                 response.addHeader("X-Refresh-Token", "Bearer " + refreshToken);
