@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PunishAddDto {
 
-    @NotEmpty
+    @NotNull
     @JsonProperty("member_id")
     private Long memberId;
 
