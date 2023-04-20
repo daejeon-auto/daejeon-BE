@@ -168,6 +168,13 @@ public class MemberService {
         return member.get();
     }
 
+    public Member findMember(Long id) {
+        Optional<Member> byId = memberRepository.findById(id);
+        if (byId.isEmpty()) throw new IllegalStateException("member not found");
+
+        return byId.get();
+    }
+
     private boolean isNotSameSchool(Member acceptMember) {
         Member admin = util.getLoginMember();
         return admin.getSchool() != acceptMember.getSchool();

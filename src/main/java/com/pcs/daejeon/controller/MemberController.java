@@ -184,7 +184,7 @@ public class MemberController {
     public ResponseEntity<Result<MemberInfoDto>> memberInfo() {
 
         try {
-            Member loginMember = util.getLoginMember();
+            Member loginMember = memberService.findMember(util.getLoginMember().getId());
 
             MemberInfoDto memberInfoDto = new MemberInfoDto(
                     loginMember.getPhoneNumber(),
