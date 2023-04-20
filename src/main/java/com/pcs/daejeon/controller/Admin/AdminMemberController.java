@@ -36,8 +36,6 @@ public class AdminMemberController {
             @RequestParam(value = "onlyAdmin", required = false) boolean onlyAdmin) {
 
         try {
-            if (!util.getLoginMember().getRole().equals(RoleTier.ROLE_TIER1))
-                throw new IllegalStateException("unauthorization");
             List<Member> members = memberService.getMembers(memberId, onlyAdmin);
             List<MemberListDto> memberListDto = members.stream()
                     .map(o -> new MemberListDto(o.getId(), o.getMemberType()))
