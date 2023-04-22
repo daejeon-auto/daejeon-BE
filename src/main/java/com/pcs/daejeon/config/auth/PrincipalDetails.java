@@ -1,12 +1,15 @@
 package com.pcs.daejeon.config.auth;
 
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.Punish;
 import com.pcs.daejeon.entity.type.MemberType;
+import com.pcs.daejeon.entity.type.PunishRating;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -44,7 +47,14 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return member.getMemberType() != MemberType.PENDING; // 유저 타입이 Pendding이면 lock
+        // 정지 기록중 활성 상태이며 ACCESS_DENY급 정지일 시 로그인 실패
+        for (Punish punish : member.getPunish()) {
+            if (punish.getRating().equals(PunishRating.ACCESS_DENY) &&
+                punish.getExpired_date().isAfter(LocalDateTime.now()))
+                return false;
+        }
+        
+        return true;
     }
 
     @Override

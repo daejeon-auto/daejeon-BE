@@ -1,10 +1,8 @@
 package com.pcs.daejeon.entity.type;
 
-import lombok.Getter;
-
 public enum PunishRating {
-    WRITE_DENY,
-    ACCESS_DENY,
-    REPLY_DENY,
+    WRITE_DENY,   // 글 작성 금지
+    ACCESS_DENY, // 로그인 금지
+    REPLY_DENY,  // 댓글 금지
     CAN_DO // 정지 없는 사람
 }

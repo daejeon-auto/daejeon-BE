@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,5 +43,22 @@ public class PunishService {
         if (findMember.isEmpty()) throw new IllegalStateException("member not found");
 
         return punishRepository.findAllByMember(member);
+    }
+
+    public List<Punish> getActivePunish(Long memberId) {
+        Optional<Member> findMember = memberRepository.findById(memberId);
+        if (findMember.isEmpty()) throw new IllegalStateException("member not found");
+
+        List<Punish> punish = getPunish(findMember.get());
+
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Punish> activePunish = punish.stream().map(val -> {
+            if (val.getExpired_date().isAfter(now)) return null;
+
+            return val;
+        }).toList();
+
+        return activePunish;
     }
 }

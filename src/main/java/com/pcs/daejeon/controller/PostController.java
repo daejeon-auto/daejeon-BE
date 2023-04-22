@@ -4,12 +4,11 @@ import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.post.*;
 import com.pcs.daejeon.dto.report.ReportReasonDto;
-import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.QLike;
-import com.pcs.daejeon.entity.QPost;
-import com.pcs.daejeon.entity.QReport;
+import com.pcs.daejeon.entity.*;
+import com.pcs.daejeon.entity.type.PunishRating;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.service.PostService;
+import com.pcs.daejeon.service.PunishService;
 import com.pcs.daejeon.service.ReportService;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +37,7 @@ public class PostController {
     private final PostService postService;
     private final PostRepository postRepository;
     private final ReportService reportService;
+    private final PunishService punishService;
     private final Util util;
 
     @PostMapping("/posts")
@@ -95,11 +95,24 @@ public class PostController {
     @PostMapping("/post/write")
     public ResponseEntity<Result<String>> writePost(@RequestBody @Valid PostWriteDto post) {
         try {
+            Long memberId = util.getLoginMember().getId();
+            List<Punish> activePunish = punishService.getActivePunish(memberId);
+
+            activePunish.forEach(val -> {
+                if (val.getRating().equals(PunishRating.WRITE_DENY))
+                    throw new IllegalStateException("limited account");
+            });
+
             postService.writePost(post.getDescription());
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalArgumentException | MethodArgumentNotValidException e) {
-            return new ResponseEntity<>(new Result<>("bad words", true), HttpStatus.BAD_REQUEST);
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+
+            if (Objects.equals(e.getMessage(), "limited account")) status = HttpStatus.FORBIDDEN;
+
+            return new ResponseEntity<>(new Result<>(status == HttpStatus.FORBIDDEN ?
+                    "계정이 일부 기능 정지 상태입니다." : null, true), status);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
