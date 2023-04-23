@@ -2,7 +2,6 @@ package com.pcs.daejeon.config;
 
 import com.pcs.daejeon.config.auth.JwtUserDetailsService;
 import com.pcs.daejeon.config.auth.PrincipalDetails;
-import com.pcs.daejeon.config.auth.PrincipalDetailsService;
 import com.pcs.daejeon.config.handler.CustomUrlAuthenticationFailHandler;
 import com.pcs.daejeon.config.handler.CustomUrlAuthenticationSuccessHandler;
 import com.pcs.daejeon.config.oauth.JwtAuthenticationFilter;
@@ -50,7 +49,7 @@ import java.util.Objects;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final MemberRepository memberRepository;
-    private final PrincipalDetailsService principalDetailsService;
+    private final JwtUserDetailsService jwtUserDetailsService;
     private final PunishService punishService;
     private final JwtConfig jwtConfig;
     private final RefreshTokenService refreshTokenService;
