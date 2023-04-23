@@ -100,7 +100,7 @@ public class PostController {
 
             activePunish.forEach(val -> {
                 if (val.getRating().equals(PunishRating.WRITE_DENY))
-                    throw new IllegalStateException("limited account");
+                    throw new IllegalArgumentException("limited account");
             });
 
             postService.writePost(post.getDescription());
