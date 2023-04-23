@@ -156,30 +156,6 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/admin/member/reject/{id}")
-    public ResponseEntity<Result<String>> rejectMember(@PathVariable("id") Long id) {
-        try {
-            memberService.rejectMember(id);
-
-            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
-        } catch (IllegalStateException e ) {
-            HttpStatus status = HttpStatus.BAD_REQUEST;
-            if (Objects.equals(e.getMessage(), "member not found")) {
-                status = HttpStatus.NOT_FOUND;
-            }
-
-            if (Objects.equals(e.getMessage(), "school is different")) {
-                status = HttpStatus.FORBIDDEN;
-            }
-
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>( null, true), status);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @PostMapping("/member/info")
     public ResponseEntity<Result<MemberInfoDto>> memberInfo() {
 

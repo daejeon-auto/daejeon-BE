@@ -137,20 +137,20 @@ public class MemberService {
         log.info("[accept-member] accept member: id["+ member.getId() +"]"+ util.getLoginMember().getId());
     }
 
-    public void rejectMember(Long memberId) {
-        Optional<Member> byId = memberRepository.findById(memberId);
-        if (byId.isEmpty()) {
-            throw new IllegalStateException("member not found");
-        }
-        Member member = byId.get();
-
-        if (isNotSameSchool(member)) {
-            throw new IllegalStateException("school is different");
-        }
-
-        member.setMemberType(MemberType.REJECT);
-        log.info("[reject-member] reject member: id["+ member.getId() +"]"+ util.getLoginMember().getId());
-    }
+//    public void rejectMember(Long memberId) {
+//        Optional<Member> byId = memberRepository.findById(memberId);
+//        if (byId.isEmpty()) {
+//            throw new IllegalStateException("member not found");
+//        }
+//        Member member = byId.get();
+//
+//        if (isNotSameSchool(member)) {
+//            throw new IllegalStateException("school is different");
+//        }
+//
+//        member.setMemberType(MemberType.REJECT);
+//        log.info("[reject-member] reject member: id["+ member.getId() +"]"+ util.getLoginMember().getId());
+//    }
 
     public List<Member> getMembers(Long memberId, boolean onlyAdmin) {
         return memberRepository.getMemberList(memberId, onlyAdmin, util.getLoginMember().getSchool());
