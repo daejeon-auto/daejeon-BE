@@ -42,7 +42,13 @@ public class PunishService {
         Optional<Member> findMember = memberRepository.findById(member.getId());
         if (findMember.isEmpty()) throw new IllegalStateException("member not found");
 
-        return punishRepository.findAllByMember(member);
+        List<Punish> punishes = punishRepository.findAllByMember(member);
+        punishes.forEach(val -> {
+            if (val.getExpired_date().isAfter(LocalDateTime.now()))
+                val.changeValid();
+        });
+
+        return punishes;
     }
 
     public List<Punish> getActivePunish(Long memberId) {
@@ -53,11 +59,7 @@ public class PunishService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        List<Punish> activePunish = punish.stream().map(val -> {
-            if (val.getExpired_date().isAfter(now)) return null;
-
-            return val;
-        }).toList();
+        List<Punish> activePunish = punish.stream().map(val -> val.isValid() ? val : null).toList();
 
         return activePunish;
     }
