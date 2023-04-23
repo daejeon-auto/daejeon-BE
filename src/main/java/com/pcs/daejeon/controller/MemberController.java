@@ -8,6 +8,7 @@ import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.Punish;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.RefreshTokenService;
 import com.pcs.daejeon.service.SchoolService;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -161,13 +163,16 @@ public class MemberController {
 
         try {
             Member loginMember = memberService.findMember(util.getLoginMember().getId());
+            List<Punish> activePunish = loginMember.getPunish().stream()
+                    .map(val -> val.isValid() ? val : null).toList();
 
             MemberInfoDto memberInfoDto = new MemberInfoDto(
                     loginMember.getPhoneNumber(),
                     loginMember.getSchool().getName(),
                     loginMember.getSchool().getLocate(),
                     loginMember.getAuthType(),
-                    loginMember.getPunish());
+                    activePunish
+                    );
 
             return new ResponseEntity<>(new Result<>(memberInfoDto, false), HttpStatus.ACCEPTED);
         } catch (Exception e) {
