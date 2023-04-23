@@ -1,5 +1,6 @@
 package com.pcs.daejeon.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pcs.daejeon.entity.basic.BasicEntity;
 import com.pcs.daejeon.entity.type.PunishRating;
@@ -24,6 +25,7 @@ public class Punish extends BasicEntity {
     @NotEmpty
     private String reason;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
     private LocalDateTime expired_date;
 
     // 신고가 활성화 돼 있는지 - 누적 신고 확인을 위해
