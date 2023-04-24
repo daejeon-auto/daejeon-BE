@@ -20,6 +20,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedOrigins("https://anonpost.netlify.app")
                 .allowCredentials(true)
                 .exposedHeaders("X-Auth-Token")
+                .exposedHeaders("X-Refresh-Token")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","));
     }
 }

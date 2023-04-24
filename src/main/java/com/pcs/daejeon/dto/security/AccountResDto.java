@@ -1,50 +1,25 @@
 package com.pcs.daejeon.dto.security;
 
-public class AccountResDto {
-    private String result;
-    private String message;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@Getter @Setter
+public class AccountResDto<T> {
+    private T data;
+    private boolean hasError;
 
     public static AccountResDto success(Object data) {
-        return new AccountResDto("success", null);
+        return new AccountResDto(data, false);
     }
 
-    public static AccountResDto success(Object data, String value) {
-        return new AccountResDto("success", value);
+    public static AccountResDto fail(Object data) {
+        return new AccountResDto(data, true);
     }
 
-    public static AccountResDto fail(String message) {
-        return new AccountResDto("fail", message);
-    }
-
-    private AccountResDto(String result, String message) {
-        this.result = result;
-        this.message = message;
-    }
-
-    public AccountResDto() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public String toString() {
-        return "AccountResDto [result=" + result + ", message=" + message + "]";
+    private AccountResDto(T data, boolean hasError) {
+        this.data = data;
+        this.hasError = hasError;
     }
 }

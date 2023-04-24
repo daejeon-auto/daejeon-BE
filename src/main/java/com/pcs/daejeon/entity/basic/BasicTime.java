@@ -1,9 +1,8 @@
 package com.pcs.daejeon.entity.basic;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -17,8 +16,10 @@ import java.time.LocalDateTime;
 public class BasicTime {
 
     @CreatedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
     private LocalDateTime createdDate;
 
     @LastModifiedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
     private LocalDateTime updatedDate;
 }

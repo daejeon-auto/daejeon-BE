@@ -1,5 +1,6 @@
 package com.pcs.daejeon.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pcs.daejeon.entity.basic.BasicTime;
 import lombok.AccessLevel;
@@ -35,6 +36,7 @@ public class Report extends BasicTime {
     private Post reportedPost;
 
     @CreatedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
     private LocalDateTime reportedAt;
 
     public Report(String reason, Member reportedBy, Post reportedPost) {

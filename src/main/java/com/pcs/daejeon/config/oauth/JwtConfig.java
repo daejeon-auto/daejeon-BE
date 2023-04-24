@@ -13,26 +13,64 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
 public class JwtConfig {
-    private final String secretKey = "secret";
-    private final long validityInMilliseconds = 3600000; // 1h
+
+    private static String key;
+
+    @PostConstruct
+    private void JwtConfig() {
+        KeyGenerator keyGen = null;
+        try {
+            keyGen = KeyGenerator.getInstance("AES");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        keyGen.init(256); // 키 길이 설정
+        SecretKey secretKey = keyGen.generateKey();
+        key = Arrays.toString(secretKey.getEncoded());
+        byte[] encodedKey = secretKey.getEncoded();
+    }
+
     private final UserDetailsService userDetailsService;
 
     public String createToken(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Date now = new Date();
+        // 3H
+        long validityInMilliseconds = 1000L * 60 * 60 * 3;
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
                 .setSubject(principal.getMember().getLoginId())
                 .setIssuedAt(now)
                 .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
+    }
+
+    public String createRefreshToken(Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Date now = new Date();
+
+        // 1M
+        long validityInMilliseconds = 1000L * 60 * 60 * 24 * 30;
+        Date validity = new Date(now.getTime() + validityInMilliseconds);
+
+        return Jwts.builder()
+                .setSubject(principal.getMember().getLoginId())
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
     }
 
@@ -44,10 +82,21 @@ public class JwtConfig {
         return null;
     }
 
+    /**
+     * refresh JWT 토큰 디코딩
+     */
+    public String resolveRefreshToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("X-Refresh-Token");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
     // 토큰의 유효성 + 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
+            Jws<Claims> claims = Jwts.parser().setSigningKey(key).parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
@@ -55,7 +104,7 @@ public class JwtConfig {
     }
 
     public Authentication getAuthentication(String token) {
-        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
         Claims body = claimsJws
                 .getBody();
         String id = body.getSubject();

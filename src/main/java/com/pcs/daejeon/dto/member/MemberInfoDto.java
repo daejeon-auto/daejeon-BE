@@ -1,10 +1,14 @@
 package com.pcs.daejeon.dto.member;
 
+import com.pcs.daejeon.entity.Punish;
 import com.pcs.daejeon.entity.type.AuthType;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+import java.util.List;
+
+@Getter @Setter
 @AllArgsConstructor
 public class MemberInfoDto {
 
@@ -12,4 +16,5 @@ public class MemberInfoDto {
     private String schoolName;
     private String schoolLocate;
     private AuthType auth_type;
+    private List<Punish> punishes;
 }
