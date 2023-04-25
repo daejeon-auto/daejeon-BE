@@ -146,7 +146,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     member.getPhoneNumber(),
                     school.getName(),
                     school.getLocate(),
-                    member.getAuthType(),
                     punish);
 
             AccountResDto jsonResult = AccountResDto.success(memberInfoDto);

@@ -30,7 +30,6 @@ public class Util {
                 signUpDto.getPhoneNumber(),
                 pwdEncoder.encode(signUpDto.getPassword()),
                 signUpDto.getLoginId(),
-                signUpDto.getAuthType(),
                 school.get());
     }
 
