@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -104,5 +105,19 @@ class MemberServiceTest {
 
         // then
         assertThat(exception.getMessage()).isEqualTo("school not found");
+    }
+
+    @Test
+    @DisplayName("학생 리스트 가져오기 성공")
+    public  void getStudentList() {
+
+        // given
+        Member loginMember = util.getLoginMember();
+
+        // when
+        List<Member> members = memberService.getMembers(null, false);
+
+        // then
+        assertThat(members).isNotNull();
     }
 }
