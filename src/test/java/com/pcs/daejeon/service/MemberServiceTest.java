@@ -120,4 +120,35 @@ class MemberServiceTest {
         // then
         assertThat(members).isNotNull();
     }
+
+    @Test
+    @DisplayName("특정 학생 찾기 성공")
+    public void getStudent() {
+
+        // given
+        Member loginMember = util.getLoginMember();
+
+        // when
+        Member member = memberService.findMember(loginMember.getId());
+
+        // then
+        assertThat(member).isEqualTo(loginMember);
+    }
+
+
+    @Test
+    @DisplayName("특정 학생 찾기 실패 - Id 없음")
+    public void getStudentFail() {
+
+
+        // given
+        Long id = 99999L;
+
+        // when
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+                () -> memberService.findMember(id));
+
+        // then
+        assertThat(exception.getMessage()).isEqualTo("member not found");
+    }
 }
