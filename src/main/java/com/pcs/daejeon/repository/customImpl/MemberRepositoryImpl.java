@@ -50,8 +50,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         }
         if (onlyAdmin) {
             codState = codState
-                        .and(member.role.eq(RoleTier.ROLE_TIER1))
-                        .or(member.role.eq(RoleTier.ROLE_TIER2));
+                        .and(member.role.eq(RoleTier.ROLE_TIER1));
         }
 
         return query

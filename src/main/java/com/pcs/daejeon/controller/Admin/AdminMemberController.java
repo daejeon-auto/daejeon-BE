@@ -32,7 +32,9 @@ public class AdminMemberController {
      */
     @PostMapping("/admin/members")
     public ResponseEntity<Result<List<MemberListDto>>> getMembers(
+            // 특정 유저를 가져올지
             @RequestParam(value = "memberId", required = false) Long memberId,
+            // 관리자 리스트를 뽑을때 true
             @RequestParam(value = "onlyAdmin", required = false) boolean onlyAdmin) {
 
         try {
