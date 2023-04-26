@@ -2,7 +2,6 @@ package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pcs.daejeon.entity.basic.BasicTime;
-import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import lombok.AccessLevel;
@@ -25,10 +24,6 @@ public class Member extends BasicTime {
 
     @Column(nullable = false)
     private String phoneNumber;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AuthType authType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -55,12 +50,12 @@ public class Member extends BasicTime {
 
     @OneToMany(mappedBy = "likedBy")
     @JsonIgnore
-    private List<Like> like = new ArrayList<>();
+    private final List<Like> like = new ArrayList<>();
 
     @OneToMany(mappedBy = "reportedBy",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
-    private List<Report> reports = new ArrayList<>();
+    private final List<Report> reports = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "school_id")
@@ -79,11 +74,10 @@ public class Member extends BasicTime {
         this.role = role;
     }
 
-    public Member(String phoneNumber, String password, String loginId, AuthType authType, School school) {
+    public Member(String phoneNumber, String password, String loginId, School school) {
         this.phoneNumber = phoneNumber;
         this.password = password;
         this.loginId = loginId;
-        this.authType = authType;
         this.school = school;
         this.role = RoleTier.ROLE_TIER0;
         this.memberType = MemberType.ACCEPT;

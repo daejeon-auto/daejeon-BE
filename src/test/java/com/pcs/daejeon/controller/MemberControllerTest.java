@@ -3,14 +3,10 @@ package com.pcs.daejeon.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.config.auth.PrincipalDetails;
-import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
-import com.pcs.daejeon.dto.school.SchoolRegistDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
-import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.repository.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +65,6 @@ class MemberControllerTest {
     private Map<String, Object> createMember() throws Exception {
         SignUpDto user = new SignUpDto(
                 "01012341234",
-                AuthType.DIRECT,
                 getLoginMember().getSchool().getId(),
                 "testPassword",
                 "testId" + (int) (Math.random() * 100)
@@ -130,7 +125,6 @@ class MemberControllerTest {
                 "01012341234",
                 "testPassword",
                 "testId" + (int) (Math.random() * 100),
-                AuthType.DIRECT,
                 school
         );
 
@@ -192,7 +186,6 @@ class MemberControllerTest {
                 "01012341234",
                 "testPassword",
                 "testId" + (int) (Math.random() * 100),
-                AuthType.DIRECT,
                 school
         );
 

@@ -4,12 +4,10 @@ import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.type.AuthType;
-import com.pcs.daejeon.entity.type.MemberType;
-import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.persistence.EntityManager;
-import java.util.Optional;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,103 +41,114 @@ class MemberServiceTest {
     @Autowired
     EntityManager em;
 
-
-    private class CreateTestMember {
-        private Member saveMember;
-        private SignUpDto signUpDto;
-
-        public CreateTestMember() {
-
-            SignUpDto signUpDto = new SignUpDto(
-                    "01012341234",
-                    AuthType.DIRECT,
-                    util.getLoginMember().getSchool().getId(),
-                    "testPassword",
-                    "testId"+(int) (Math.random()*100)
-            );
-
-            try {
-                this.saveMember = memberService.saveMember(signUpDto);
-                this.signUpDto = signUpDto;
-            } catch(Exception e) {
-                // 만일 같은 값을 가져 already signed up 에러가 뜨면 새로 랜덤값을 뽑음
-                CreateTestMember member = new CreateTestMember();
-                this.saveMember = member.saveMember;
-                this.signUpDto = member.signUpDto;
-            }
-        }
-    }
-
-    // === 회원가입 ===
     @Test
-    public void 회원가입_실패_존재하는_계정() {
-        CreateTestMember createTestMember = new CreateTestMember();
+    @DisplayName("회원가입 성공")
+    void signUp() throws MethodArgumentNotValidException {
 
-        Assertions.assertThrows(IllegalStateException.class, () -> memberService.saveMember(createTestMember.signUpDto));
-    }
+        Member loginMember = util.getLoginMember();
 
-    @Test
-    public void 회원가입() throws MethodArgumentNotValidException {
+        // given
         SignUpDto signUpDto = new SignUpDto(
                 "01012341234",
-                AuthType.INDIRECT,
-                util.getLoginMember().getSchool().getId(),
+                loginMember.getSchool().getId(),
                 "testPassword",
-                "testId3"
+                "signUpLoginId"
         );
 
-        Member saveMember = memberService.saveMember(signUpDto);
-        Optional<Member> findMember = memberRepository.findById(saveMember.getId());
+        // when
+        Member member = memberService.saveMember(signUpDto);
 
-        assertThat(findMember.get().getLoginId()).isEqualTo(signUpDto.getLoginId());
-        assertThat(MemberType.ACCEPT).isEqualTo(findMember.get().getMemberType());
+        // then
+        assertThat(member.getLoginId()).isEqualTo(signUpDto.getLoginId());
+        assertThat(member.getPassword()).isNotEqualTo(signUpDto.getPassword());
     }
 
-    // === 회원가입 ===
-
-
-    // === 회원 승인, 거절 관련 ===
-    @Test
-    public void 회원_승인_200() {
-        CreateTestMember member = new CreateTestMember();
-
-        memberService.acceptMember(member.saveMember.getId());
-
-        assertThat(member.saveMember.getMemberType()).isEqualTo(MemberType.ACCEPT);
-    }
 
     @Test
-    public void 회원_승인_404() {
-        Assertions.assertThrows(IllegalStateException.class, () -> memberService.acceptMember(0L));
-    }
+    @DisplayName("회원가입 실패 - 중복가입")
+    void signUpFailDuplicateLoginId() throws MethodArgumentNotValidException {
 
-    @Test
-    public void 회원_거절_200() {
-        CreateTestMember member = new CreateTestMember();
+        // given
+        Long schooolId = util.getLoginMember().getSchool().getId();
 
-        memberService.rejectMember(member.saveMember.getId());
+        SignUpDto signUpDto = new SignUpDto(
+                "01012341234",
+                schooolId,
+                "testPassword",
+                "signUpLoginId"
+        );
+        memberService.saveMember(signUpDto);
 
-        assertThat(member.saveMember.getMemberType()).isEqualTo(MemberType.REJECT);
+        // when
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+                () -> memberService.saveMember(signUpDto));
+
+        // then
+        assertThat(exception.getMessage()).isEqualTo("student already sign up");
     }
 
     @Test
-    public void 회원_거절_404() {
-        Assertions.assertThrows(IllegalStateException.class, () -> memberService.acceptMember(100L));
+    @DisplayName("회원가입 실패 - 없는 학교")
+    void signUpFailSchoolId() throws MethodArgumentNotValidException {
+
+        // given
+        SignUpDto signUpDto = new SignUpDto(
+                "01012341234",
+                99999L,
+                "testPassword",
+                "signUpLoginId"
+        );
+
+        // when
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+                () -> memberService.saveMember(signUpDto));
+
+        // then
+        assertThat(exception.getMessage()).isEqualTo("school not found");
     }
 
-
-    // === 회원 권한 수정 ===
     @Test
-    public void 회원_권한_수정_200() {
-        CreateTestMember createTestMember = new CreateTestMember();
-        memberService.setMemberRole(createTestMember.saveMember.getId(), RoleTier.ROLE_TIER2);
+    @DisplayName("학생 리스트 가져오기 성공")
+    public  void getStudentList() {
 
-        assertThat(createTestMember.saveMember.getRole()).isEqualTo(RoleTier.ROLE_TIER2);
+        // given
+        Member loginMember = util.getLoginMember();
+
+        // when
+        List<Member> members = memberService.getMembers(null, false);
+
+        // then
+        assertThat(members).isNotNull();
     }
 
     @Test
-    public void 회원_권한_수정_404() {
-        Assertions.assertThrows(IllegalStateException.class, () -> memberService.setMemberRole(0L, RoleTier.ROLE_TIER2));
+    @DisplayName("특정 학생 찾기 성공")
+    public void getStudent() {
+
+        // given
+        Member loginMember = util.getLoginMember();
+
+        // when
+        Member member = memberService.findMember(loginMember.getId());
+
+        // then
+        assertThat(member).isEqualTo(loginMember);
     }
-    // === 회원 권한 수정 ===
+
+
+    @Test
+    @DisplayName("특정 학생 찾기 실패 - Id 없음")
+    public void getStudentFail() {
+
+
+        // given
+        Long id = 99999L;
+
+        // when
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+                () -> memberService.findMember(id));
+
+        // then
+        assertThat(exception.getMessage()).isEqualTo("member not found");
+    }
 }

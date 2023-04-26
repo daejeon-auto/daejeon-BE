@@ -6,7 +6,6 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.Report;
 import com.pcs.daejeon.entity.School;
-import com.pcs.daejeon.entity.type.AuthType;
 import com.pcs.daejeon.entity.type.PostType;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
@@ -90,7 +89,6 @@ class ReportServiceTest {
                     "01012341234",
                     "password" + i,
                     "loginId" + i,
-                    AuthType.DIRECT,
                     school
             );
             memberRepository.save(testMember);

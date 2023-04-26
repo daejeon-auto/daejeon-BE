@@ -106,7 +106,6 @@ public class MemberController {
                     member.getPhoneNumber(),
                     member.getSchool().getName(),
                     member.getSchool().getLocate(),
-                    member.getAuthType(),
                     member.getPunish());
 
             return new ResponseEntity<>(new Result<>(memberInfo, false), HttpStatus.CREATED);
@@ -170,7 +169,6 @@ public class MemberController {
                     loginMember.getPhoneNumber(),
                     loginMember.getSchool().getName(),
                     loginMember.getSchool().getLocate(),
-                    loginMember.getAuthType(),
                     activePunish
                     );
 
