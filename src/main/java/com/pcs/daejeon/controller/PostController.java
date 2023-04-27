@@ -83,7 +83,7 @@ public class PostController {
         } catch (IllegalStateException e) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
             if (Objects.equals(e.getMessage(), "not found school")) status = HttpStatus.NOT_FOUND;
-            if (Objects.equals(e.getMessage(), "need schoolId")) status = HttpStatus.BAD_REQUEST;
+            if (Objects.equals(e.getMessage(), "need schoolId")) status = HttpStatus.UNAUTHORIZED;
 
             return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
