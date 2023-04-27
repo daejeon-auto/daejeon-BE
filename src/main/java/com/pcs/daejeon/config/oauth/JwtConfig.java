@@ -1,10 +1,7 @@
 package com.pcs.daejeon.config.oauth;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,33 +10,28 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
 public class JwtConfig {
 
-    private static String key;
+    private static final String key = "inab@anonpost.secretKey";
 
-    @PostConstruct
-    private void JwtConfig() {
-        KeyGenerator keyGen = null;
-        try {
-            keyGen = KeyGenerator.getInstance("AES");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        keyGen.init(256); // 키 길이 설정
-        SecretKey secretKey = keyGen.generateKey();
-        key = Arrays.toString(secretKey.getEncoded());
-        byte[] encodedKey = secretKey.getEncoded();
-    }
+//    @PostConstruct
+//    private void JwtConfig() {
+//        KeyGenerator keyGen = null;
+//        try {
+//            keyGen = KeyGenerator.getInstance("AES");
+//        } catch (NoSuchAlgorithmException e) {
+//            throw new RuntimeException(e);
+//        }
+//        keyGen.init(256); // 키 길이 설정
+//        SecretKey secretKey = keyGen.generateKey();
+//        key = Arrays.toString(secretKey.getEncoded());
+//        byte[] encodedKey = secretKey.getEncoded();
+//    }
 
     private final UserDetailsService userDetailsService;
 
@@ -97,8 +89,10 @@ public class JwtConfig {
     public boolean validateToken(String jwtToken) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(key).parseClaimsJws(jwtToken);
-            return !claims.getBody().getExpiration().before(new Date());
+            return true;
         } catch (Exception e) {
+            if (e.getClass() == ExpiredJwtException.class) return false;
+
             return false;
         }
     }
