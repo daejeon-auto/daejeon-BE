@@ -87,6 +87,10 @@ public class SchoolService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         LinkedHashMap map = objectMapper.readValue(response.toString(), LinkedHashMap.class);
+        if (map.get("RESULT") != null) {
+            return new MealDto();
+        }
+
         ArrayList mealServiceDietInfo = objectMapper.readValue(objectMapper.writeValueAsString(map.get("mealServiceDietInfo")), ArrayList.class);
         LinkedHashMap mealInfo = objectMapper.readValue(objectMapper.writeValueAsString(mealServiceDietInfo.get(1)), LinkedHashMap.class);
         List<MealApiDto> rows = objectMapper.readValue(
