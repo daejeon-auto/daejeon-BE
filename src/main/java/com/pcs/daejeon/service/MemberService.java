@@ -105,8 +105,6 @@ public class MemberService {
 
         if (schoolRepository.valiSchool(school))
             throw new IllegalStateException("school already exist");
-        if (schoolRepository.validInstaId(school.getInstaId()))
-            throw new IllegalStateException("instaId already used");
 
         School save = schoolRepository.save(school);
 

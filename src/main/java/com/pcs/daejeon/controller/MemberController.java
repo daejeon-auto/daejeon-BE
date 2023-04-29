@@ -118,8 +118,7 @@ public class MemberController {
                 return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.NOT_FOUND);
             }
 
-            if (Objects.equals(e.getMessage(), "school already exist") ||
-                    Objects.equals(e.getMessage(), "instaId already used")) {
+            if (Objects.equals(e.getMessage(), "school already exist")) {
                 return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.CONFLICT);
             }
 
