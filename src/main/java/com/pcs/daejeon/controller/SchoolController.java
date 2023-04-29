@@ -1,5 +1,7 @@
 package com.pcs.daejeon.controller;
 
+import com.github.instagram4j.instagram4j.IGClient;
+import com.github.instagram4j.instagram4j.exceptions.IGResponseException;
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.school.InstaInfoUpdateDto;
@@ -80,16 +82,24 @@ public class SchoolController {
     public ResponseEntity<Result> updateInstaInfo(@RequestBody @Valid InstaInfoUpdateDto instaInfoUpdateDto) {
 
         try {
+            IGClient c = IGClient.builder()
+                    .username(instaInfoUpdateDto.getInstaId())
+                    .password(instaInfoUpdateDto.getInstaPwd())
+                    .login();
+
             schoolService.updateInstaInfo(
                     instaInfoUpdateDto.getInstaId(),
                     instaInfoUpdateDto.getInstaPwd());
 
             return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
-        } catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
             if (e.getMessage().equals("not found school")) status = HttpStatus.NOT_FOUND;
 
             return new ResponseEntity<>(new Result<>(null, true), status);
+        } catch (IGResponseException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            return new ResponseEntity<>(new Result<>("instagram id or password is not exist", true), status);
         } catch (Exception e) {
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
             log.info(e.getMessage());
