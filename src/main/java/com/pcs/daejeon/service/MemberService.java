@@ -25,6 +25,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -98,12 +99,18 @@ public class MemberService {
         return code;
     }
 
-    public Member saveAdmin(SignUpDto signUpDto, SchoolRegistDto schoolRegistDto, String[] codes) throws MethodArgumentNotValidException {
+    public Member saveAdmin(SignUpDto signUpDto, SchoolRegistDto schoolRegistDto, String[] codes) throws Exception {
+        String salt = UUID.randomUUID().toString();
+
+        String encryptedInstaId = Util.encrypt(schoolRegistDto.getInstaId(), salt);
+        String encryptedInstaPwd = Util.encrypt(schoolRegistDto.getInstaPwd(), salt);
+
         School school = new School(schoolRegistDto.getName(),
                 schoolRegistDto.getLocate(),
                 codes[0], codes[1],
-                schoolRegistDto.getInstaId(),
-                schoolRegistDto.getInstaPwd());
+                encryptedInstaId,
+                encryptedInstaPwd,
+                salt);
 
         if (schoolRepository.valiSchool(school))
             throw new IllegalStateException("school already exist");

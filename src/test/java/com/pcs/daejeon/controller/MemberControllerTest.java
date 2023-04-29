@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -118,7 +119,8 @@ class MemberControllerTest {
                 "테스트지역",
                 "", "",
                 "인스타아이디",
-                "인스타패스워드"
+                "인스타패스워드",
+                UUID.randomUUID().toString()
         );
 
         Member user = new Member(
@@ -179,7 +181,8 @@ class MemberControllerTest {
                 "테스트지역",
                 "", "",
                 "인스타아이디",
-                "인스타패스워드"
+                "인스타패스워드",
+                UUID.randomUUID().toString()
         );
 
         Member user = new Member(

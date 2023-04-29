@@ -17,8 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
@@ -38,10 +38,10 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
         final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
         School school = new School("부산컴퓨터과학고등학교", "부산광역시","", "",
-                "인스타아이디", "패스워드");
+                "인스타아이디", "패스워드", UUID.randomUUID().toString());
         schoolRepository.save(school);
         School school2 = new School("미림정보여자고등학교", "서울특별시", "", "",
-                "인스타아이디2", "패스워드");
+                "인스타아이디2", "패스워드", UUID.randomUUID().toString());
         schoolRepository.save(school2);
 
         Member member = new Member(
