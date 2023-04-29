@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -67,7 +68,7 @@ public class SchoolService {
                 "&ATPT_OFCDC_SC_CODE=" + ATPT_OFCDC_SC_CODE +
                 "&SD_SCHUL_CODE=" + schoolCode +
                 "&MLSV_FROM_YMD=" + today +
-                "&MLSV_TO_YMD=" + today, "UTF-8");
+                "&MLSV_TO_YMD=" + today, StandardCharsets.UTF_8);
 
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod("GET");
@@ -96,7 +97,7 @@ public class SchoolService {
         MealDto meals = new MealDto();
 
         rows.stream().forEach(val -> {
-            Object[] dish = Arrays.stream(val.getDishName().split("<br/>")).map(br -> br.split("\s")[0]).toArray();
+            Object[] dish = Arrays.stream(val.getDishName().split("<br/>")).map(br -> br.split(" ")[0]).toArray();
 
             String mealCode = val.getMealCode();
 
@@ -115,7 +116,7 @@ public class SchoolService {
                 URLEncoder.encode(
                         "&SCHUL_NM=" +schoolName +
                         "&LCTN_SC_NM=" + location,
-                    "UTF-8"); // 한글 인코딩
+                        StandardCharsets.UTF_8); // 한글 인코딩
 
         URL apiUrl = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
@@ -144,5 +145,21 @@ public class SchoolService {
         } else {
             throw new IOException("Error retrieving school information: " + responseCode);
         }
+    }
+
+    public void updateInstaInfo(String instaId, String instaPw) throws Exception {
+        Member loginMember = util.getLoginMember();
+
+        School school = schoolRepository.findById(loginMember.getSchool().getId()).get();
+        school.setIsableInstagram(true);
+        school.updateInstagram(instaId, instaPw);
+    }
+
+    public void disableInsta() throws Exception {
+        Member loginMember = util.getLoginMember();
+
+        School school = schoolRepository.findById(loginMember.getSchool().getId()).get();
+        school.setIsableInstagram(false);
+        school.updateInstagram("", "");
     }
 }
