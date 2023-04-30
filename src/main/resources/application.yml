@@ -1,31 +1,8 @@
-#spring:
-#  datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://db.inab.site:5432/dbmomin108902
-#    username: momin108902
-#    password: koldin13579
-#  profiles:
-#    active: real
-#  jpa:
-#    database: postgresql
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
-#    hibernate:
-#      ddl-auto: update
-#    properties:
-#      hibernate:
-#        default_batch_fetch_size: 100
-#
-#  mvc:
-#    pathmatch:
-#      matching-strategy: ant_path_matcher
-#  #        show_sql: true
-#  #        format_sql: true#spring:
-
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/anonpost_test
-    username: postgres
+    url: jdbc:postgresql://db.inab.site:5432/dbmomin108902
+    username: momin108902
     password: koldin13579
   profiles:
     active: real
@@ -42,6 +19,29 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   #        show_sql: true
+  #        format_sql: true#spring:
+
+#spring:
+#  datasource:
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:postgresql://localhost:5432/anonpost_test
+#    username: postgres
+#    password: "#koldin13579"
+#  profiles:
+#    active: real
+#  jpa:
+#    database: postgresql
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#    hibernate:
+#      ddl-auto: update
+#    properties:
+#      hibernate:
+#        default_batch_fetch_size: 100
+#
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ant_path_matcher
+#  #        show_sql: true
 ##  #        format_sql: true
 
 server:
