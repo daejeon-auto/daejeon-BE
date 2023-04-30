@@ -1,6 +1,7 @@
 package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.basic.BasicTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Entity
@@ -35,15 +37,32 @@ public class School extends BasicTime {
     private String code;
     private String locationCode;
 
-    private String instaId;
-    private String instaPwd;
+    private String instaId = null;
+    private String instaPwd = null;
 
-    public School(String name, String locate, String code, String locationCode, String instaId, String instaPwd) {
+    private final String salt = null;
+
+    private boolean isAbleInstagram = false;
+
+    public School(String name, String locate, String code,
+                  String locationCode) {
         this.name = name;
         this.locate = locate;
         this.code = code;
-        this.instaId = instaId;
-        this.instaPwd = instaPwd;
         this.locationCode = locationCode;
+    }
+
+    public void setIsableInstagram(boolean isAbleInstagram) {
+        this.isAbleInstagram = isAbleInstagram;
+    }
+
+    public void updateInstagram(String instaId, String instaPwd) throws Exception {
+        String salt = UUID.randomUUID().toString();
+
+        String encryptedInstaId = Util.encrypt(instaId, salt);
+        String encryptedInstaPwd = Util.encrypt(instaPwd, salt);
+
+        this.instaId = encryptedInstaId;
+        this.instaPwd = encryptedInstaPwd;
     }
 }

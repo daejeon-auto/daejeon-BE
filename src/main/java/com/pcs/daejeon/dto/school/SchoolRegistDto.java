@@ -17,10 +17,4 @@ public class SchoolRegistDto {
 
     @NotEmpty
     private String locate;
-
-    @NotEmpty
-    private String instaId;
-
-    @NotEmpty
-    private String instaPwd;
 }

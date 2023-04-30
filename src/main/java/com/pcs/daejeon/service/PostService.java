@@ -36,7 +36,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
@@ -85,23 +84,17 @@ public class PostService {
             UriComponents uri = UriComponentsBuilder.fromHttpUrl("https://spocjaxkrk.execute-api.ap-northeast-2.amazonaws.com/v1/detect?comment=" + description).build();
 
             ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
-            if (
-                resultMap.hasBody() && (
-                resultMap.getBody().get("abuse").equals(1) ||
-                resultMap.getBody().get("age").equals(1) ||
-                resultMap.getBody().get("binan").equals(1) ||
-                resultMap.getBody().get("gender").equals(1) ||
-                resultMap.getBody().get("hansome").equals(1) ||
-                resultMap.getBody().get("harassment").equals(1) ||
-                resultMap.getBody().get("native").equals(1) ||
-                resultMap.getBody().get("poli").equals(1) ||
-                resultMap.getBody().get("race").equals(1) ||
-                resultMap.getBody().get("religion").equals(1))
-            ) {
-                return true;
-            }
-
-            return false;
+            return resultMap.hasBody() && (
+                    resultMap.getBody().get("abuse").equals(1) ||
+                            resultMap.getBody().get("age").equals(1) ||
+                            resultMap.getBody().get("binan").equals(1) ||
+                            resultMap.getBody().get("gender").equals(1) ||
+                            resultMap.getBody().get("hansome").equals(1) ||
+                            resultMap.getBody().get("harassment").equals(1) ||
+                            resultMap.getBody().get("native").equals(1) ||
+                            resultMap.getBody().get("poli").equals(1) ||
+                            resultMap.getBody().get("race").equals(1) ||
+                            resultMap.getBody().get("religion").equals(1));
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new IllegalStateException("description valid api server error");
         }
@@ -171,7 +164,7 @@ public class PostService {
     }
 
 
-    public void addLike(Long postId) throws IOException, URISyntaxException {
+    public void addLike(Long postId) throws Exception {
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
             throw new IllegalStateException("post not found");
@@ -195,7 +188,9 @@ public class PostService {
             imageCaption(post.get().getDescription());
             School school = loginMember.getSchool();
             convertPngToJpg();
-            uploadToInstagram(school.getInstaId(), school.getInstaPwd());
+            uploadToInstagram(school.getInstaId(),
+                    school.getInstaPwd(),
+                    school.getSalt());
         }
     }
 
@@ -208,8 +203,11 @@ public class PostService {
         return client;
     }
 
-    private void uploadToInstagram(String instaId, String instaPwd) throws IOException {
-        IGClient client = igClient(instaId, instaPwd);
+    private void uploadToInstagram(String instaId, String instaPwd, String salt) throws Exception {
+        String decryptedInstaId = Util.decrypt(instaId, salt);
+        String decryptedInstaPwd = Util.decrypt(instaPwd, salt);
+
+        IGClient client = igClient(decryptedInstaId, decryptedInstaPwd);
         File file = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
         byte[] imgData = Files.readAllBytes(file.toPath());
         IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");

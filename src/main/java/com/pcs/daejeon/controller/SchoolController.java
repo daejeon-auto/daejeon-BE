@@ -1,7 +1,10 @@
 package com.pcs.daejeon.controller;
 
+import com.github.instagram4j.instagram4j.IGClient;
+import com.github.instagram4j.instagram4j.exceptions.IGResponseException;
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
+import com.pcs.daejeon.dto.school.InstaInfoUpdateDto;
 import com.pcs.daejeon.dto.school.MealDto;
 import com.pcs.daejeon.dto.school.SchoolInfoDto;
 import com.pcs.daejeon.entity.School;
@@ -10,11 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -34,7 +35,7 @@ public class SchoolController {
 
             return new ResponseEntity<>(new Result<>(mealServiceInfo, false), HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println("e = " + e.toString());
+            System.out.println("e = " + e);
             return new ResponseEntity<>(new Result<>("", false), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -73,6 +74,53 @@ public class SchoolController {
             return new ResponseEntity<>(new Result<>(null, true), status);
         } catch (Exception e) {
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        }
+    }
+
+    @PostMapping("/admin/update-insta-info")
+    public ResponseEntity<Result> updateInstaInfo(@RequestBody @Valid InstaInfoUpdateDto instaInfoUpdateDto) {
+
+        try {
+            IGClient c = IGClient.builder()
+                    .username(instaInfoUpdateDto.getInstaId())
+                    .password(instaInfoUpdateDto.getInstaPwd())
+                    .login();
+
+            schoolService.updateInstaInfo(
+                    instaInfoUpdateDto.getInstaId(),
+                    instaInfoUpdateDto.getInstaPwd());
+
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found school")) status = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        } catch (IGResponseException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            return new ResponseEntity<>(new Result<>("instagram id or password is not exist", true), status);
+        } catch (Exception e) {
+            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+            log.info(e.getMessage());
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        }
+    }
+    @PostMapping("/admin/disable-insta")
+    public ResponseEntity<Result> disableInsta() {
+
+        try {
+            schoolService.disableInsta();
+
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (IllegalStateException e){
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found school")) status = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        } catch (Exception e) {
+            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+            log.info(e.getMessage());
             return new ResponseEntity<>(new Result<>(null, true), status);
         }
     }

@@ -98,25 +98,20 @@ public class MemberService {
         return code;
     }
 
-    public Member saveAdmin(SignUpDto signUpDto, SchoolRegistDto schoolRegistDto, String[] codes) throws MethodArgumentNotValidException {
+    public Member saveAdmin(SignUpDto signUpDto, SchoolRegistDto schoolRegistDto, String[] codes) throws Exception {
         School school = new School(schoolRegistDto.getName(),
                 schoolRegistDto.getLocate(),
-                codes[0], codes[1],
-                schoolRegistDto.getInstaId(),
-                schoolRegistDto.getInstaPwd());
+                codes[0], codes[1]);
 
         if (schoolRepository.valiSchool(school))
             throw new IllegalStateException("school already exist");
-        if (schoolRepository.validInstaId(school.getInstaId()))
-            throw new IllegalStateException("instaId already used");
 
         School save = schoolRepository.save(school);
 
         signUpDto.setSchoolId(save.getId());
         Member member = saveMember(signUpDto);
 
-        member.setMemberType(MemberType.ACCEPT);
-        member.setRole(RoleTier.ROLE_TIER2);
+        member.setRole(RoleTier.ROLE_TIER1);
 
         return member;
     }
