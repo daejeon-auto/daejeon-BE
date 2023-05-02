@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -129,30 +128,6 @@ public class MemberController {
         } catch (Exception e) {
             log.error(e.toString());
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PostMapping("/admin/member/accept/{id}")
-    public ResponseEntity<Result<String>> acceptMember(@PathVariable("id") Long id) {
-        try {
-            memberService.acceptMember(id);
-
-            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
-        } catch (IllegalStateException e ) {
-            HttpStatus status = HttpStatus.BAD_REQUEST;
-            if (Objects.equals(e.getMessage(), "member not found")) {
-                status = HttpStatus.NOT_FOUND;
-            }
-
-            if (Objects.equals(e.getMessage(), "school is different")) {
-                status = HttpStatus.FORBIDDEN;
-            }
-
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>( null, true), status);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
         }
     }
 
