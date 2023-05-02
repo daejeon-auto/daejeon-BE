@@ -1,4 +1,4 @@
-package com.pcs.daejeon.service;
+package com.pcs.daejeon.service.sanction;
 
 import com.pcs.daejeon.dto.sanction.punish.PunishAddDto;
 import com.pcs.daejeon.entity.Member;

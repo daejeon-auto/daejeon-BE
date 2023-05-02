@@ -6,7 +6,7 @@ import com.pcs.daejeon.dto.sanction.report.ReportListDto;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.service.PostService;
-import com.pcs.daejeon.service.ReportService;
+import com.pcs.daejeon.service.sanction.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;

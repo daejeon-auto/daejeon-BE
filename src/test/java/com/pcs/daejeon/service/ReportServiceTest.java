@@ -4,13 +4,15 @@ import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.entity.type.PostType;
+import com.pcs.daejeon.entity.type.ReportType;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.PostRepository;
-import com.pcs.daejeon.repository.sanction.ReportRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
+import com.pcs.daejeon.repository.sanction.ReportRepository;
+import com.pcs.daejeon.service.sanction.ReportService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +56,7 @@ class ReportServiceTest {
         School school = util.getLoginMember().getSchool();
         Post post = postRepository.save(new Post("hello world", school));
 
-        reportService.report("reason", post.getId());
+        reportService.report("reason", post.getId(), ReportType.SCHOOL);
         List<Report> byId = reportRepository.findAllByReportedPostId(post.getId());
         assertFalse(byId.isEmpty());
     }
@@ -65,14 +67,14 @@ class ReportServiceTest {
         School school = util.getLoginMember().getSchool();
         Post post = postRepository.save(new Post("hello world", school));
 
-        reportService.report("reason", post.getId());
+        reportService.report("reason", post.getId(), ReportType.SCHOOL);
     }
 
     @Test
     @DisplayName("신고 실패 - post 없음")
     void addReport404() {
         assertThrows(InvalidDataAccessApiUsageException.class,
-                () -> reportService.report("reason-----", 0L),
+                () -> reportService.report("reason-----", 0L, ReportType.SCHOOL),
                 "not found post");
     }
 
@@ -95,11 +97,12 @@ class ReportServiceTest {
             reportRepository.save(new Report(
                     "reason",
                     testMember,
-                    helloWorld
+                    helloWorld,
+                    ReportType.SCHOOL
             ));
         }
 
-        reportService.report("reason", helloWorld.getId());
+        reportService.report("reason", helloWorld.getId(), ReportType.SCHOOL);
 
         Assertions.assertThat(helloWorld.getPostType()).isEqualTo(PostType.BLIND);
     }

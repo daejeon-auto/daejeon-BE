@@ -7,7 +7,7 @@ import com.pcs.daejeon.dto.sanction.punish.PunishAddDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.service.MemberService;
-import com.pcs.daejeon.service.PunishService;
+import com.pcs.daejeon.service.sanction.PunishService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
