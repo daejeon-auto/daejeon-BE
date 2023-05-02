@@ -82,7 +82,7 @@ class ReportServiceTest {
     void rejectPost() {
         School school = util.getLoginMember().getSchool();
         Post helloWorld = postRepository.save(new Post("hello world", school));
-        Assertions.assertThat(helloWorld.getPostType()).isEqualTo(PostType.ACCEPTED);
+        Assertions.assertThat(helloWorld.getPostType()).isEqualTo(PostType.SHOW);
 
         for (int i = 0; i < 4; i++) {
             Member testMember = new Member(
@@ -101,7 +101,7 @@ class ReportServiceTest {
 
         reportService.report("reason", helloWorld.getId());
 
-        Assertions.assertThat(helloWorld.getPostType()).isEqualTo(PostType.REJECTED);
+        Assertions.assertThat(helloWorld.getPostType()).isEqualTo(PostType.BLIND);
     }
 
     @Test

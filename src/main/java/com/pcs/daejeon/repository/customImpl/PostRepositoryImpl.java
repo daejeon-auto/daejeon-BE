@@ -30,16 +30,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         Member loginMember = util.getLoginMember();
 
-        QPost likePost = new QPost("likePost");
-        QPost reportedPost = new QPost("reportedPost");
-        QMember likedBy = new QMember("likedBy");
-        QMember reportedBy = new QMember("reportedBy");
-
         JPAQuery<Tuple> tupleJPAQuery = query
                 .select(post, like, report)
                 .distinct() // 1:N 관계에서 첫 인덱스가 중복으로 불리는 것을 해결(쿼리에 따라 작동 안할수도)
                 .from(post)
-                .where(post.postType.eq(PostType.ACCEPTED),
+                .where(post.postType.eq(PostType.SHOW),
                         post.school.id.eq(schoolId))
                 .leftJoin(post.like, like) // 해당 포스트의 like를 like라는 이름으로 갖고옴
                     .on(like.likedBy.id.eq(loginMember == null ? 0L : loginMember.getId())) // 해당 유저가 한 좋아요 필터링
@@ -55,7 +50,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         JPAQuery<Long> total = query
                 .select(post.count())
                 .from(post)
-                .where(post.postType.eq(PostType.ACCEPTED),
+                .where(post.postType.eq(PostType.SHOW),
                         post.school.id.eq(schoolId));
 
         return PageableExecutionUtils.getPage(result, page, total::fetchOne);
@@ -85,7 +80,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         List<Post> result = query
                 .selectFrom(post)
                 .where(
-                        post.postType.eq(PostType.REJECTED),
+                        post.postType.eq(PostType.BLIND),
                         memberIdEq(memberId),
                         reportCountEq(reportCount)
                 )
@@ -97,7 +92,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         JPAQuery<Long> total = query
                 .select(post.count())
                 .from(post)
-                .where(post.postType.eq(PostType.REJECTED));
+                .where(post.postType.eq(PostType.BLIND));
 
         return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }
@@ -118,7 +113,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         JPAQuery<Long> total = query
                 .select(post.count())
                 .from(post)
-                .where(post.postType.eq(PostType.ACCEPTED), post.postType.eq(PostType.ACCEPTED));
+                .where(post.postType.eq(PostType.SHOW));
 
         return PageableExecutionUtils.getPage(result, page, total::fetchOne);
     }

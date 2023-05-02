@@ -32,31 +32,16 @@ public class ReportService {
         Member loginMember = util.getLoginMember();
         Optional<Post> post = postRepository.findById(postId);
 
+        if (post.isEmpty()) throw new IllegalStateException("post not found");
+
         Report report = new Report(reason, loginMember, post.get());
         reportRepository.save(report);
 
         Long reportCount = reportRepository.countByReportedPost(post.get());
         if (reportCount == 5) {
-            post.get().setPostType(PostType.REJECTED);
+            post.get().setPostType(PostType.BLIND);
         }
         log.info("[add-report] report post: id["+ post.get().getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"] reason: " + reason);
-    }
-
-    private void removeReport(Long postId) {
-        Member loginMember = util.getLoginMember();
-
-        Optional<Post> post = postRepository.findById(postId);
-        if (post.isEmpty()) {
-            throw new IllegalStateException("not found post");
-        }
-
-        Report report = reportRepository.findByReportedPostAndReportedBy(post.get(), loginMember);
-        if (report == null) {
-            throw new IllegalStateException("not found report");
-        }
-
-        reportRepository.delete(report);
-        log.info("[remove-report] remove report post: id["+ post.get().getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"]");
     }
 
     public List<Report> getReportList(Long postId) {

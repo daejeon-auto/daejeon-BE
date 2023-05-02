@@ -56,6 +56,6 @@ public class Post extends BasicEntity {
 
     @PrePersist
     public void prePersist() {
-        this.postType = PostType.ACCEPTED;
+        this.postType = PostType.SHOW;
     }
 }
