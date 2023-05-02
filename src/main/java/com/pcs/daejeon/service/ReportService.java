@@ -32,12 +32,14 @@ public class ReportService {
         Member loginMember = util.getLoginMember();
         Optional<Post> post = postRepository.findById(postId);
 
+        if (post.isEmpty()) throw new IllegalStateException("post not found");
+
         Report report = new Report(reason, loginMember, post.get());
         reportRepository.save(report);
 
         Long reportCount = reportRepository.countByReportedPost(post.get());
         if (reportCount == 5) {
-            post.get().setPostType(PostType.REJECTED);
+            post.get().setPostType(PostType.BLIND);
         }
         log.info("[add-report] report post: id["+ post.get().getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"] reason: " + reason);
     }

@@ -119,7 +119,7 @@ public class PostService {
             throw new IllegalStateException("school is different");
         }
 
-        post.setPostType(PostType.ACCEPTED);
+        post.setPostType(PostType.SHOW);
 
         Member loginMember = util.getLoginMember();
         log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"] --- ");

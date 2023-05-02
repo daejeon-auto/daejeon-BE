@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
@@ -160,32 +159,6 @@ public class PostController {
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PostMapping("/admin/posts/reject")
-    public ResponseEntity<Result<Stream<RejectedPostDto>>> rejectPostList(
-            @PageableDefault(size = 15) Pageable pageable,
-            @RequestParam(value = "memberId", required = false) Long memberId,
-            @RequestParam(value = "reportCount", required = false) Long reportCount) {
-
-        try {
-            Page<Post> pagedRejectedPost = postService.findPagedRejectedPost(pageable, memberId, reportCount);
-
-            Stream<RejectedPostDto> result = pagedRejectedPost.getContent()
-                    .stream()
-                    .map(o -> new RejectedPostDto(
-                            o.getId(),
-                            o.getDescription(),
-                            o.getCreatedDate(),
-                            o.getUpdatedDate(),
-                            o.getReports().size(),
-                            o.getCreatedBy()
-                    ));
-            return new ResponseEntity<>(new Result<>(result, false), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 

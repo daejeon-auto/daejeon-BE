@@ -117,7 +117,7 @@ class PostServiceTest {
         assertThat(postById.getPostType()).isEqualTo(PostType.DELETE);
 
         postService.acceptPost(postId);
-        assertThat(postById.getPostType()).isEqualTo(PostType.ACCEPTED);
+        assertThat(postById.getPostType()).isEqualTo(PostType.SHOW);
     }
 
     @Test
