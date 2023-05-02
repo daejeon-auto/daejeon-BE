@@ -42,23 +42,6 @@ public class ReportService {
         log.info("[add-report] report post: id["+ post.get().getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"] reason: " + reason);
     }
 
-    private void removeReport(Long postId) {
-        Member loginMember = util.getLoginMember();
-
-        Optional<Post> post = postRepository.findById(postId);
-        if (post.isEmpty()) {
-            throw new IllegalStateException("not found post");
-        }
-
-        Report report = reportRepository.findByReportedPostAndReportedBy(post.get(), loginMember);
-        if (report == null) {
-            throw new IllegalStateException("not found report");
-        }
-
-        reportRepository.delete(report);
-        log.info("[remove-report] remove report post: id["+ post.get().getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"]");
-    }
-
     public List<Report> getReportList(Long postId) {
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
