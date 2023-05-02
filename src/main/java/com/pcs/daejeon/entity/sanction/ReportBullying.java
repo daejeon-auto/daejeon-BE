@@ -1,4 +1,4 @@
-package com.pcs.daejeon.entity;
+package com.pcs.daejeon.entity.sanction;
 
 import com.pcs.daejeon.entity.basic.BasicEntity;
 import lombok.AccessLevel;

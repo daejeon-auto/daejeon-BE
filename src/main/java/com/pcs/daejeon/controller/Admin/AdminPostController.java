@@ -2,9 +2,9 @@ package com.pcs.daejeon.controller.Admin;
 
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.dto.post.RejectedPostDto;
-import com.pcs.daejeon.dto.report.ReportListDto;
+import com.pcs.daejeon.dto.sanction.report.ReportListDto;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.Report;
+import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.service.PostService;
 import com.pcs.daejeon.service.ReportService;
 import lombok.RequiredArgsConstructor;

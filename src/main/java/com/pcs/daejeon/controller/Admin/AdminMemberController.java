@@ -3,7 +3,7 @@ package com.pcs.daejeon.controller.Admin;
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.MemberListDto;
-import com.pcs.daejeon.dto.punish.PunishAddDto;
+import com.pcs.daejeon.dto.sanction.punish.PunishAddDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.service.MemberService;

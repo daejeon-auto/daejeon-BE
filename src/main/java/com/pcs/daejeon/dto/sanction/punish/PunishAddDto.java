@@ -1,4 +1,4 @@
-package com.pcs.daejeon.dto.punish;
+package com.pcs.daejeon.dto.sanction.punish;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pcs.daejeon.entity.type.PunishRating;

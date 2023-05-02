@@ -1,4 +1,4 @@
-package com.pcs.daejeon.dto.report;
+package com.pcs.daejeon.dto.sanction.report;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

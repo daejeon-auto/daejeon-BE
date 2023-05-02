@@ -2,6 +2,8 @@ package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pcs.daejeon.entity.basic.BasicTime;
+import com.pcs.daejeon.entity.sanction.Punish;
+import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import lombok.AccessLevel;

@@ -1,10 +1,10 @@
 package com.pcs.daejeon.service;
 
-import com.pcs.daejeon.dto.punish.PunishAddDto;
+import com.pcs.daejeon.dto.sanction.punish.PunishAddDto;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.Punish;
+import com.pcs.daejeon.entity.sanction.Punish;
 import com.pcs.daejeon.repository.MemberRepository;
-import com.pcs.daejeon.repository.PunishRepository;
+import com.pcs.daejeon.repository.sanction.PunishRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;

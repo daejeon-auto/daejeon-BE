@@ -2,7 +2,7 @@ package com.pcs.daejeon;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.Punish;
+import com.pcs.daejeon.entity.sanction.Punish;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;

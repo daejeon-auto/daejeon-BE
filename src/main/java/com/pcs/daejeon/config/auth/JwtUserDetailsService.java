@@ -1,7 +1,7 @@
 package com.pcs.daejeon.config.auth;
 
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.Punish;
+import com.pcs.daejeon.entity.sanction.Punish;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.PunishService;
 import lombok.RequiredArgsConstructor;

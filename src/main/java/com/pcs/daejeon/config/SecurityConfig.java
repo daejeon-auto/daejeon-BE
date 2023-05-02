@@ -9,7 +9,7 @@ import com.pcs.daejeon.config.oauth.JwtConfig;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.security.AccountResDto;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.Punish;
+import com.pcs.daejeon.entity.sanction.Punish;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.PunishService;

@@ -1,8 +1,8 @@
-package com.pcs.daejeon.repository;
+package com.pcs.daejeon.repository.sanction;
 
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.Report;
+import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.repository.custom.ReportRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

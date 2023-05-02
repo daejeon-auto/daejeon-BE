@@ -2,6 +2,7 @@ package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pcs.daejeon.entity.basic.BasicEntity;
+import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.entity.type.PostType;
 import lombok.Getter;
 
