@@ -7,6 +7,7 @@ import com.pcs.daejeon.dto.chkCode.PushCodeDto;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
+import com.pcs.daejeon.dto.report.AddReportBullyingDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Punish;
 import com.pcs.daejeon.service.MemberService;
@@ -190,6 +191,18 @@ public class MemberController {
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/report-bullying")
+    public ResponseEntity<Result> reportBullying(@RequestBody @Valid AddReportBullyingDto addReportBullyingDto) {
+
+        try {
+            memberService.reportBullying(addReportBullyingDto);
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 }
