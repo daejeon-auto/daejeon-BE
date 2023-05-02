@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.basic.BasicTime;
+import com.pcs.daejeon.entity.type.ReportType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,10 +42,14 @@ public class Report extends BasicTime {
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
     private LocalDateTime reportedAt;
 
-    public Report(String reason, Member reportedBy, Post reportedPost) {
+    @Enumerated(EnumType.STRING)
+    private ReportType reportType;
+
+    public Report(String reason, Member reportedBy, Post reportedPost, ReportType reportType) {
         this.reason = reason;
         this.reportedBy = reportedBy;
         this.reportedPost = reportedPost;
+        this.reportType = reportType;
         reportedAt = LocalDateTime.now();
     }
 }

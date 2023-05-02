@@ -4,7 +4,10 @@ import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.post.*;
 import com.pcs.daejeon.dto.sanction.report.ReportReasonDto;
-import com.pcs.daejeon.entity.*;
+import com.pcs.daejeon.entity.Post;
+import com.pcs.daejeon.entity.QLike;
+import com.pcs.daejeon.entity.QPost;
+import com.pcs.daejeon.entity.QReport;
 import com.pcs.daejeon.entity.sanction.Punish;
 import com.pcs.daejeon.entity.type.PunishRating;
 import com.pcs.daejeon.repository.PostRepository;
@@ -124,7 +127,7 @@ public class PostController {
                                                      @RequestBody @Valid ReportReasonDto reason) {
 
         try {
-            reportService.report(reason.getReason(), postId);
+            reportService.report(reason.getReason(), postId, reason.getReportType());
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (InvalidDataAccessApiUsageException e) {

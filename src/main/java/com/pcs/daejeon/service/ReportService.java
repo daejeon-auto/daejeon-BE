@@ -5,6 +5,7 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.Post;
 import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.entity.type.PostType;
+import com.pcs.daejeon.entity.type.ReportType;
 import com.pcs.daejeon.repository.PostRepository;
 import com.pcs.daejeon.repository.sanction.ReportRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class ReportService {
     private final PostRepository postRepository;
     private final Util util;
 
-    public void report(String reason, Long postId) {
+    public void report(String reason, Long postId, ReportType reportType) {
         if (reportRepository.validReport(postId)) {
             return;
         }
@@ -34,7 +35,7 @@ public class ReportService {
 
         if (post.isEmpty()) throw new IllegalStateException("post not found");
 
-        Report report = new Report(reason, loginMember, post.get());
+        Report report = new Report(reason, loginMember, post.get(), reportType);
         reportRepository.save(report);
 
         Long reportCount = reportRepository.countByReportedPost(post.get());
