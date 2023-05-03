@@ -1,6 +1,8 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.common.Util;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,9 @@ class SchoolServiceTest {
 
     @Autowired
     SchoolService schoolService;
+
+    @Autowired
+    Util util;
 
     @Test
     void getSchoolInfo() throws IOException {
@@ -50,6 +55,15 @@ class SchoolServiceTest {
 
     @Test
     void findSchool() {
+
+        // given
+        Long schoolId = util.getLoginMember().getSchool().getId();
+
+        // when
+        School school = schoolService.findSchool(schoolId);
+
+        // then
+        Assertions.assertThat(school.getId()).isEqualTo(schoolId);
     }
 
     @Test
