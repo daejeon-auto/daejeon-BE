@@ -113,6 +113,13 @@ public class SchoolService {
         return meals;
     }
 
+    /**
+     *
+     * @param schoolName
+     * @param location
+     * @return 0: school code / 1: locate code
+     * @throws IOException
+     */
     public String[] getSchoolCodes(String schoolName, String location) throws IOException {
         String url = "https://open.neis.go.kr/hub/schoolInfo?" +
                 "Type=json" +
