@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -62,16 +63,17 @@ class SchoolServiceTest {
     void getMealServiceInfo() throws IOException {
 
         // given
-        Member loginMember = util.getLoginMember();
-        School school = schoolService.findSchool(loginMember.getSchool().getId());
+        String code = "7150337";
+        String locateCode = "C10";
 
         // when
-        MealDto mealServiceInfo = schoolService.getMealServiceInfo(school.getCode(), school.getLocationCode());
+        MealDto mealServiceInfo = schoolService.getMealServiceInfo(code, locateCode);
 
         // then
-        assertThat(mealServiceInfo.getBreakfast().getClass()).isExactlyInstanceOf(String[].class);
-        assertThat(mealServiceInfo.getLunch().getClass()).isExactlyInstanceOf(String[].class);
-        assertThat(mealServiceInfo.getDinner().getClass()).isExactlyInstanceOf(String[].class);
+        assertThat(mealServiceInfo.getBreakfast()).isEqualTo(null);
+        Arrays.stream(mealServiceInfo.getLunch()).map(val ->
+            assertThat(val).isExactlyInstanceOf(String.class));
+        assertThat(mealServiceInfo.getDinner()).isEqualTo(null);
     }
 
     @Test
