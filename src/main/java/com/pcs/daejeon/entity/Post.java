@@ -42,7 +42,7 @@ public class Post extends BasicEntity {
     // 어느 학교의 게시글인지 확인
     @ManyToOne()
     @JoinColumn(name = "school_id")
-    private School school;
+    private School  school;
 
     public Post() {}
 

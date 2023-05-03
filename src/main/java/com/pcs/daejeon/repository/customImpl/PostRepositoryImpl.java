@@ -17,7 +17,7 @@ import java.util.List;
 
 import static com.pcs.daejeon.entity.QLike.like;
 import static com.pcs.daejeon.entity.QPost.post;
-import static com.pcs.daejeon.entity.QReport.report;
+import static com.pcs.daejeon.entity.sanction.QReport.report;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
