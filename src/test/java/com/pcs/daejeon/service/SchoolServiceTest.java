@@ -2,6 +2,8 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.common.Util;
+import com.pcs.daejeon.dto.school.MealDto;
+import com.pcs.daejeon.dto.school.SchoolRegistDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
 import org.assertj.core.api.Assertions;
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -29,18 +33,6 @@ class SchoolServiceTest {
     Util util;
 
     @Test
-    void getSchoolInfo() throws IOException {
-        String[] schoolCode = schoolService.getSchoolCodes("부산컴퓨터과학고등학교", "부산광역시");
-        Assertions.assertThat("7150337").isEqualTo(schoolCode[0]);
-        Assertions.assertThat("C10").isEqualTo(schoolCode[1]);
-    }
-
-    @Test
-    void getSchoolMeal() throws IOException {
-        schoolService.getMealServiceInfo("7150337", "C10");
-    }
-
-    @Test
     void findAllSchool() {
         // given
         List<School> allSchool = schoolService.findAllSchool();
@@ -48,7 +40,7 @@ class SchoolServiceTest {
         // when
         for (Object school : allSchool) {
             // then
-            Assertions.assertThat(school instanceof School).isTrue();
+            assertThat(school instanceof School).isTrue();
         }
 
     }
@@ -63,18 +55,40 @@ class SchoolServiceTest {
         School school = schoolService.findSchool(schoolId);
 
         // then
-        Assertions.assertThat(school.getId()).isEqualTo(schoolId);
+        assertThat(school.getId()).isEqualTo(schoolId);
     }
 
     @Test
-    void getMealServiceInfo() {
+    void getMealServiceInfo() throws IOException {
+
+        // given
+        Member loginMember = util.getLoginMember();
+        School school = schoolService.findSchool(loginMember.getSchool().getId());
+
+        // when
+        MealDto mealServiceInfo = schoolService.getMealServiceInfo(school.getCode(), school.getLocationCode());
+
+        // then
+        assertThat(mealServiceInfo.getBreakfast().getClass()).isExactlyInstanceOf(String[].class);
+        assertThat(mealServiceInfo.getLunch().getClass()).isExactlyInstanceOf(String[].class);
+        assertThat(mealServiceInfo.getDinner().getClass()).isExactlyInstanceOf(String[].class);
     }
 
     @Test
-    void getSchoolCodes() {
-    }
+    void getSchoolCodes() throws IOException {
 
-    @Test
-    void updateInstaInfo() {
+        // given
+        SchoolRegistDto schoolRegistDto = new SchoolRegistDto(
+                "부산컴퓨터과학고등학교",
+                "부산광역시");
+
+        //when
+        String[] schoolCodes = schoolService.getSchoolCodes(
+                schoolRegistDto.getName(),
+                schoolRegistDto.getLocate());
+
+        //then
+        assertThat(schoolCodes[0]).isEqualTo("7150337");
+        assertThat(schoolCodes[1]).isEqualTo("C10");
     }
 }
