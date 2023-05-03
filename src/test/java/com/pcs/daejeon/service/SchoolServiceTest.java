@@ -1,6 +1,7 @@
 package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.WithMockCustomUser;
+import com.pcs.daejeon.entity.School;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 
 @SpringBootTest
 @Transactional
@@ -31,5 +33,34 @@ class SchoolServiceTest {
     @Test
     void getSchoolMeal() throws IOException {
         schoolService.getMealServiceInfo("7150337", "C10");
+    }
+
+    @Test
+    void findAllSchool() {
+        // given
+        List<School> allSchool = schoolService.findAllSchool();
+
+        // when
+        for (Object school : allSchool) {
+            // then
+            Assertions.assertThat(school instanceof School).isTrue();
+        }
+
+    }
+
+    @Test
+    void findSchool() {
+    }
+
+    @Test
+    void getMealServiceInfo() {
+    }
+
+    @Test
+    void getSchoolCodes() {
+    }
+
+    @Test
+    void updateInstaInfo() {
     }
 }
