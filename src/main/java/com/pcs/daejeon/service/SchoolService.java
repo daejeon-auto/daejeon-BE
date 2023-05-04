@@ -2,6 +2,7 @@ package com.pcs.daejeon.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pcs.daejeon.common.InstagramUtil;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.school.MealApiDto;
 import com.pcs.daejeon.dto.school.MealDto;
@@ -9,6 +10,7 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -172,5 +175,35 @@ public class SchoolService {
         School school = schoolRepository.findById(loginMember.getSchool().getId()).get();
         school.setIsableInstagram(false);
         school.updateInstagram("", "");
+    }
+
+    @Scheduled(fixedDelay = 3600000) // 1시간 반복
+    public void uploadMeal() {
+        int now = LocalDateTime.now(ZoneId.of("Asia/Seoul")).getHour();
+        if (!(now == 19 || now == 8 || now == 13)) return;
+
+        schoolRepository.findAllByUploadMealIsTrue().forEach(school -> {
+            try {
+                MealDto mealServiceInfo = getMealServiceInfo(school.getCode(), school.getLocationCode());
+                InstagramUtil instagramUtil = new InstagramUtil();
+
+                if (now == 19 && mealServiceInfo.getBreakfast() != null) {
+                    instagramUtil.mealUploadCaption(mealServiceInfo.getBreakfast());
+                }
+                if (now == 8 && mealServiceInfo.getLunch() != null) {
+                    instagramUtil.mealUploadCaption(mealServiceInfo.getLunch());
+                }
+                if (now == 13 && mealServiceInfo.getDinner() != null) {
+                    instagramUtil.mealUploadCaption(mealServiceInfo.getDinner());
+                }
+
+                instagramUtil.uploadMeal(
+                        school.getInstaId(),
+                        school.getInstaPwd(),
+                        school.getSalt());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

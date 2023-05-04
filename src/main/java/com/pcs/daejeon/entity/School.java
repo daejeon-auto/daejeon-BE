@@ -37,6 +37,8 @@ public class School extends BasicTime {
     private String code;
     private String locationCode;
 
+    private boolean uploadMeal = false;
+
     private String instaId = null;
     private String instaPwd = null;
 
@@ -54,6 +56,14 @@ public class School extends BasicTime {
 
     public void setIsableInstagram(boolean isAbleInstagram) {
         this.isAbleInstagram = isAbleInstagram;
+    }
+
+    /**
+     * isAbleInstagram이 true일 때만 설정 가능
+     * @param uplodaMeal : 급식 업로드 할건지
+     */
+    public void setUploadMeal(boolean uplodaMeal) {
+        if (isAbleInstagram) this.uploadMeal = uplodaMeal;
     }
 
     public void updateInstagram(String instaId, String instaPwd) throws Exception {
