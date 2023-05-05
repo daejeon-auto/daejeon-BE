@@ -80,7 +80,12 @@ public class InstagramUtil {
         convertPngToJpg(true);
     }
 
-    public void imageCaption(String description, String[] meals) {
+    public void postImageCaption(String description) {
+        imageCaption(description, null);
+        convertPngToJpg(false);
+    }
+
+    private void imageCaption(String description, String[] meals) {
         try {
             String imagePath = meals != null ?
                     System.getProperty("user.dir") + "/src/mealTemplate.png" :
