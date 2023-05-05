@@ -123,7 +123,7 @@ public class InstagramUtil {
             g2d.setFont(font);
             g2d.setColor(color);
             for (int i = 0; i < (lines != null ? lines.length : meals.length); i++) {
-                g2d.drawString(lines[i], x, y + (i * captionHeight));
+                g2d.drawString(lines != null ? lines[i] : meals[i], x, y + (i * captionHeight));
             }
 
             // dispose of the graphics context
