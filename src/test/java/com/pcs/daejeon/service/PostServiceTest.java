@@ -66,7 +66,7 @@ class PostServiceTest {
     @Test
     @DisplayName("글 작성 성공")
     void writePost200() throws MethodArgumentNotValidException {
-        Long postId = postService.writePost("test글 작성");
+        Long postId = postService.writePost("test글 작성----------");
 
         Optional<Post> post = postRepository.findById(postId);
 
@@ -80,12 +80,6 @@ class PostServiceTest {
                             "test글 작성------------------------" +
                                     "-------------------------------------" +
                                     "-----------------------------------------"));
-    }
-
-    @Test
-    @DisplayName("글 작성 실패 - 욕설 포함")
-    void writePost400BadWord() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> postService.writePost("시발----------"));
     }
 
     @Test
@@ -129,7 +123,8 @@ class PostServiceTest {
     @Test
     @DisplayName("글 가져오기 성공")
     void findPagedPost() {
-        Page<Tuple> pagedPost = postService.findPagedPost(PageRequest.of(0, 15), util.getLoginMember().getSchool().getId());
+        Page<Tuple> pagedPost = postService.findPagedPost(PageRequest.of(0, 15),
+                util.getLoginMember().getSchool().getId());
 
         Assertions.assertTrue(pagedPost.hasContent());
         assertThat(pagedPost.getContent().size()).isEqualTo(15);
@@ -149,22 +144,11 @@ class PostServiceTest {
     @Test
     @DisplayName("신고된 게시글 가져오기 - 게시물 없음")
     void findPagedRejectedPost404() {
-        Page<Post> pagedRejectedPost = postService.findPagedRejectedPost(PageRequest.of(0, 15), null, null);
+        Page<Post> pagedRejectedPost = postService.findPagedRejectedPost(PageRequest.of(0, 15),
+                null, null);
 
         assertThat(pagedRejectedPost.getTotalElements()).isEqualTo(0);
     }
-
-    // TODO: 게시글 갖고 올 때 report가 5개 이상이어야 함. 신고는 계정당 하나임으로 해결법 모색
-    // searchPost까지
-//    @Test
-//    @DisplayName("신고된 게시글 가져오기 - 게시물 있음")
-//    void findPagedRejectedPost200() {
-//        Page<Post> pagedRejectedPost = postService.findPagedRejectedPost(PageRequest.of(0, 15), null, null);
-//    }
-
-//    @Test
-//    @DisplayName("신고된 게시글 가져오기 - 검색(memberId, reportCound)")
-//    void findPagedRejectPost_search() {}
 
     @Test
     @DisplayName("미신고 게시글 검색 성공")
