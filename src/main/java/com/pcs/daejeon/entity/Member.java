@@ -50,6 +50,11 @@ public class Member extends BasicTime {
     @NotEmpty(message = "비밀번호는 필수 입력 값입니다.")
     private String password;
 
+    /**
+     * 로그인 실패 횟수
+     */
+    private int failCnt = 0;
+
     @OneToMany(mappedBy = "likedBy")
     @JsonIgnore
     private final List<Like> like = new ArrayList<>();
@@ -74,6 +79,18 @@ public class Member extends BasicTime {
 
     public void setRole(RoleTier role) {
         this.role = role;
+    }
+
+    public void addFailCnt() {
+        this.failCnt++;
+
+        if (this.failCnt > 5) {
+            this.memberType = MemberType.DISABLED;
+        }
+    }
+
+    public void resetFailCnt() {
+        this.failCnt = 0;
     }
 
     public Member(String phoneNumber, String password, String loginId, School school) {

@@ -1,6 +1,8 @@
 package com.pcs.daejeon.config.handler;
 
 import com.pcs.daejeon.dto.security.AccountResDto;
+import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.repository.MemberRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
@@ -23,6 +25,11 @@ public class CustomUrlAuthenticationFailHandler extends SimpleUrlAuthenticationF
     protected final Log logger = LogFactory.getLog(this.getClass());
 
     private RequestCache requestCache = new HttpSessionRequestCache();
+    private final MemberRepository memberRepository;
+
+    public CustomUrlAuthenticationFailHandler(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
@@ -36,6 +43,10 @@ public class CustomUrlAuthenticationFailHandler extends SimpleUrlAuthenticationF
             errorMsg = "id or password not exist";
         } else if(exception instanceof DisabledException) {
             errorMsg = "account is disabled";
+            String loginId = request.getParameter("loginId");
+            Member byLoginId = memberRepository.findByLoginId(loginId);
+
+            if (byLoginId != null) byLoginId.addFailCnt();
         } else if(exception instanceof LockedException) {
             errorMsg = "account is pending";
         }
