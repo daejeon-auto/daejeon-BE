@@ -1,12 +1,6 @@
 package com.pcs.daejeon.service;
 
-import com.github.instagram4j.instagram4j.IGClient;
-import com.github.instagram4j.instagram4j.exceptions.IGLoginException;
-import com.github.instagram4j.instagram4j.requests.IGRequest;
-import com.github.instagram4j.instagram4j.requests.media.MediaConfigureTimelineRequest;
-import com.github.instagram4j.instagram4j.requests.upload.RuploadPhotoRequest;
-import com.github.instagram4j.instagram4j.responses.media.MediaResponse;
-import com.github.instagram4j.instagram4j.responses.media.RuploadPhotoResponse;
+import com.pcs.daejeon.common.InstagramUtil;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.Like;
 import com.pcs.daejeon.entity.Member;
@@ -31,12 +25,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -119,7 +107,7 @@ public class PostService {
             throw new IllegalStateException("school is different");
         }
 
-        post.setPostType(PostType.ACCEPTED);
+        post.setPostType(PostType.SHOW);
 
         Member loginMember = util.getLoginMember();
         log.info("[accept-post] accept post: id["+ post.getId() +"] by - "+ loginMember.getId()+"["+ loginMember.getId()+"] --- ");
@@ -183,119 +171,15 @@ public class PostService {
         Like like = new Like(util.getLoginMember(), post.get());
         likeRepository.save(like);
 
+        InstagramUtil instaramUtil = new InstagramUtil();
+
         Long likedCount = likeRepository.countByPost(post.get());
         if (likedCount == 15) {
-            imageCaption(post.get().getDescription());
+            instaramUtil.postImageCaption(post.get().getDescription());
             School school = loginMember.getSchool();
-            convertPngToJpg();
-            uploadToInstagram(school.getInstaId(),
+            instaramUtil.uploadToInstagram(school.getInstaId(),
                     school.getInstaPwd(),
                     school.getSalt());
         }
-    }
-
-    private IGClient igClient(String instaId, String instaPwd) throws IGLoginException {
-    IGClient client = IGClient.builder()
-                .username(instaId)
-                .password(instaPwd)
-                .login();
-
-        return client;
-    }
-
-    private void uploadToInstagram(String instaId, String instaPwd, String salt) throws Exception {
-        String decryptedInstaId = Util.decrypt(instaId, salt);
-        String decryptedInstaPwd = Util.decrypt(instaPwd, salt);
-
-        IGClient client = igClient(decryptedInstaId, decryptedInstaPwd);
-        File file = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
-        byte[] imgData = Files.readAllBytes(file.toPath());
-        IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
-        String id = client.sendRequest(uploadReq).join().getUpload_id();
-        IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
-                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption(""));
-        MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
-    }
-
-    private void convertPngToJpg() {
-        try {
-            File inputFile = new File(System.getProperty("user.dir")+"/src/textImage.png");
-            BufferedImage inputImage = ImageIO.read(inputFile);
-
-            BufferedImage result = new BufferedImage(
-                    inputImage.getWidth(),
-                    inputImage.getHeight(),
-                    BufferedImage.TYPE_INT_RGB);
-            result.createGraphics().drawImage(inputImage, 0, 0, Color.WHITE, null);
-            File outputFile = new File(System.getProperty("user.dir")+"/src/textImage.jpg");
-
-            ImageIO.write(result, "jpg", outputFile);
-        } catch (IOException ex) {
-            System.err.println("Error converting PNG to JPEG: " + ex.getMessage());
-        }
-    }
-
-    private void imageCaption(String description) {
-        try {
-            String imagePath = System.getProperty("user.dir") + "/src/template.png";
-
-            BufferedImage image = ImageIO.read(new File(imagePath));
-
-            // create a graphics context for the image
-            Graphics2D g2d = image.createGraphics();
-
-            // set the font and color for the caption
-            Font font = Font.createFont(Font.TRUETYPE_FONT, new File(System.getProperty("user.dir") + "/src/NotoSansKR-Bold.otf")).deriveFont(Font.BOLD, 50f);
-            Color color = Color.BLACK;
-
-            // get the dimensions of the image and caption text
-            int imageWidth = image.getWidth();
-            int imageHeight = image.getHeight();
-            int captionMaxWidth = imageWidth - 400;
-            int captionHeight = g2d.getFontMetrics(font).getHeight();
-
-            String[] lines = splitTextIntoLines(description, font, captionMaxWidth);
-
-            // calculate the position to draw the caption in the center of the image
-            int x = (imageWidth - captionMaxWidth) / 2;
-            int y = (imageHeight + captionHeight) / 2;
-
-            // draw the caption on the image
-            g2d.setFont(font);
-            g2d.setColor(color);
-
-            g2d.setFont(font);
-            g2d.setColor(color);
-            for (int i = 0; i < lines.length; i++) {
-                g2d.drawString(lines[i], x, y + (i * captionHeight));
-            }
-
-            // dispose of the graphics context
-            g2d.dispose();
-
-            // save the image with the caption
-            String newImagePath = System.getProperty("user.dir") + "/src/textImage.png";
-            ImageIO.write(image, "png", new File(newImagePath));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public static String[] splitTextIntoLines(String text, Font font, int maxWidth) {
-        String[] words = text.split("");
-        StringBuilder currentLine = new StringBuilder();
-        java.util.List<String> lines = new java.util.ArrayList<String>();
-
-        for (String word : words) {
-            if (font.getStringBounds(currentLine + word, new java.awt.font.FontRenderContext(null, true, true)).getWidth() <= maxWidth) {
-                currentLine.append(word);
-            } else {
-                lines.add(currentLine.toString().trim());
-                currentLine = new StringBuilder(word);
-            }
-        }
-        lines.add(currentLine.toString().trim());
-
-        return lines.toArray(new String[lines.size()]);
     }
 }

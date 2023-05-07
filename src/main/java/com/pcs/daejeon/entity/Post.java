@@ -2,6 +2,7 @@ package com.pcs.daejeon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pcs.daejeon.entity.basic.BasicEntity;
+import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.entity.type.PostType;
 import lombok.Getter;
 
@@ -41,7 +42,7 @@ public class Post extends BasicEntity {
     // 어느 학교의 게시글인지 확인
     @ManyToOne()
     @JoinColumn(name = "school_id")
-    private School school;
+    private School  school;
 
     public Post() {}
 
@@ -56,6 +57,6 @@ public class Post extends BasicEntity {
 
     @PrePersist
     public void prePersist() {
-        this.postType = PostType.ACCEPTED;
+        this.postType = PostType.SHOW;
     }
 }

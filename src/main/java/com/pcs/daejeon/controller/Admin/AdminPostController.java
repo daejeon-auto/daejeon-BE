@@ -1,13 +1,12 @@
 package com.pcs.daejeon.controller.Admin;
 
 import com.pcs.daejeon.common.Result;
-import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.post.RejectedPostDto;
-import com.pcs.daejeon.dto.report.ReportListDto;
+import com.pcs.daejeon.dto.sanction.report.ReportListDto;
 import com.pcs.daejeon.entity.Post;
-import com.pcs.daejeon.entity.Report;
+import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.service.PostService;
-import com.pcs.daejeon.service.ReportService;
+import com.pcs.daejeon.service.sanction.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -30,7 +29,6 @@ public class AdminPostController {
 
     private final ReportService reportService;
     private final PostService postService;
-    private final Util util;
 
     @PostMapping("/admin/reports/{id}")
     public ResponseEntity<Result<Stream<ReportListDto>>> getReportList(@PathVariable("id") Long postId) {
@@ -55,16 +53,16 @@ public class AdminPostController {
         }
     }
 
-    @PostMapping("/admin/posts")
+    @PostMapping("/admin/posts/reject")
     public ResponseEntity<Result<Stream<RejectedPostDto>>> rejectPostList(
             @PageableDefault(size = 15) Pageable pageable,
             @RequestParam(value = "memberId", required = false) Long memberId,
             @RequestParam(value = "reportCount", required = false) Long reportCount) {
 
         try {
-            Page<Post> searchPost = postService.searchPost(pageable, memberId, reportCount);
+            Page<Post> pagedRejectedPost = postService.findPagedRejectedPost(pageable, memberId, reportCount);
 
-            Stream<RejectedPostDto> result = searchPost.getContent()
+            Stream<RejectedPostDto> result = pagedRejectedPost.getContent()
                     .stream()
                     .map(o -> new RejectedPostDto(
                             o.getId(),

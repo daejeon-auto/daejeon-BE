@@ -2,14 +2,17 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.member.SignUpDto;
+import com.pcs.daejeon.dto.sanction.report.AddReportBullyingDto;
 import com.pcs.daejeon.dto.school.SchoolRegistDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.NumChkCode;
+import com.pcs.daejeon.entity.sanction.ReportBullying;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.NumChkCodeRepository;
+import com.pcs.daejeon.repository.sanction.ReportBullyingRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -39,6 +42,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final NumChkCodeRepository numChkCodeRepository;
     private final SchoolRepository schoolRepository;
+    private final ReportBullyingRepository reportBullyingRepository;
     private final Util util;
 
 
@@ -173,5 +177,14 @@ public class MemberService {
     private boolean isNotSameSchool(Member acceptMember) {
         Member admin = util.getLoginMember();
         return admin.getSchool() != acceptMember.getSchool();
+    }
+
+    public void reportBullying(AddReportBullyingDto addReportBullyingDto) {
+        Member loginMember = util.getLoginMember();
+
+        ReportBullying reportBullying = new ReportBullying(addReportBullyingDto.getReason(),
+                addReportBullyingDto.getPunishmentLevel());
+
+        reportBullyingRepository.save(reportBullying);
     }
 }

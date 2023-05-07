@@ -7,8 +7,9 @@ import com.pcs.daejeon.dto.chkCode.PushCodeDto;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
+import com.pcs.daejeon.dto.sanction.report.AddReportBullyingDto;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.Punish;
+import com.pcs.daejeon.entity.sanction.Punish;
 import com.pcs.daejeon.service.MemberService;
 import com.pcs.daejeon.service.RefreshTokenService;
 import com.pcs.daejeon.service.SchoolService;
@@ -17,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -132,37 +132,16 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/admin/member/accept/{id}")
-    public ResponseEntity<Result<String>> acceptMember(@PathVariable("id") Long id) {
-        try {
-            memberService.acceptMember(id);
-
-            return new ResponseEntity<>(new Result<>("success", false), HttpStatus.ACCEPTED);
-        } catch (IllegalStateException e ) {
-            HttpStatus status = HttpStatus.BAD_REQUEST;
-            if (Objects.equals(e.getMessage(), "member not found")) {
-                status = HttpStatus.NOT_FOUND;
-            }
-
-            if (Objects.equals(e.getMessage(), "school is different")) {
-                status = HttpStatus.FORBIDDEN;
-            }
-
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>( null, true), status);
-        } catch (Exception e) {
-            log.error("e = " + e);
-            return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @PostMapping("/member/info")
     public ResponseEntity<Result<MemberInfoDto>> memberInfo() {
 
         try {
             Member loginMember = memberService.findMember(util.getLoginMember().getId());
-            List<Punish> activePunish = loginMember.getPunish().stream()
-                    .map(val -> val.isValid() ? val : null).toList();
+            List<Punish> activePunish = null;
+            if (loginMember.getPunish() != null) {
+                 activePunish = loginMember.getPunish().stream()
+                        .map(val -> val.isValid() ? val : null).toList();
+            }
 
             MemberInfoDto memberInfoDto = new MemberInfoDto(
                     loginMember.getPhoneNumber(),
@@ -190,6 +169,18 @@ public class MemberController {
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>( null, true), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/report-bullying")
+    public ResponseEntity<Result> reportBullying(@RequestBody @Valid AddReportBullyingDto addReportBullyingDto) {
+
+        try {
+            memberService.reportBullying(addReportBullyingDto);
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("e = " + e);
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.BAD_REQUEST);
         }
     }
 }

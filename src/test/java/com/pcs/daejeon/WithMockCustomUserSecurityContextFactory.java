@@ -2,13 +2,13 @@ package com.pcs.daejeon;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Member;
-import com.pcs.daejeon.entity.Punish;
 import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.entity.sanction.Punish;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
-import com.pcs.daejeon.service.PunishService;
+import com.pcs.daejeon.service.sanction.PunishService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

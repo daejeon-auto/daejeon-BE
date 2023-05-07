@@ -1,6 +1,6 @@
 package com.pcs.daejeon.dto.member;
 
-import com.pcs.daejeon.entity.Punish;
+import com.pcs.daejeon.entity.sanction.Punish;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

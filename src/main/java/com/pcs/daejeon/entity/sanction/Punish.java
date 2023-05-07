@@ -1,7 +1,8 @@
-package com.pcs.daejeon.entity;
+package com.pcs.daejeon.entity.sanction;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.basic.BasicEntity;
 import com.pcs.daejeon.entity.type.PunishRating;
 import lombok.Getter;

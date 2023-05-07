@@ -2,6 +2,8 @@ package com.pcs.daejeon.repository.customImpl;
 
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.entity.*;
+import com.pcs.daejeon.entity.sanction.QReport;
+import com.pcs.daejeon.entity.sanction.Report;
 import com.pcs.daejeon.repository.custom.ReportRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
