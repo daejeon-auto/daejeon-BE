@@ -137,8 +137,11 @@ public class MemberController {
 
         try {
             Member loginMember = memberService.findMember(util.getLoginMember().getId());
-            List<Punish> activePunish = loginMember.getPunish().stream()
-                    .map(val -> val.isValid() ? val : null).toList();
+            List<Punish> activePunish = null;
+            if (loginMember.getPunish() != null) {
+                 activePunish = loginMember.getPunish().stream()
+                        .map(val -> val.isValid() ? val : null).toList();
+            }
 
             MemberInfoDto memberInfoDto = new MemberInfoDto(
                     loginMember.getPhoneNumber(),
