@@ -42,7 +42,7 @@ public class School extends BasicTime {
     private String instaId = null;
     private String instaPwd = null;
 
-    private final String salt = null;
+    private String salt = null;
 
     private boolean isAbleInstagram = false;
 
@@ -68,6 +68,8 @@ public class School extends BasicTime {
 
     public void updateInstagram(String instaId, String instaPwd) throws Exception {
         String salt = UUID.randomUUID().toString();
+
+        this.salt = salt;
 
         String encryptedInstaId = Util.encrypt(instaId, salt);
         String encryptedInstaPwd = Util.encrypt(instaPwd, salt);
