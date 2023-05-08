@@ -62,6 +62,7 @@ public class CustomUrlAuthenticationSuccessHandler extends SimpleUrlAuthenticati
             }
 
             Member member = securityUser.getMember();
+            member.resetFailCnt();
             School school = member.getSchool();
             // securityUser의 트랜젝션이 끝났기에 punish만 따로 불러옴
             List<Punish> punish = punishService.getPunish(member);
