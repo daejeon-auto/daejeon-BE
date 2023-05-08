@@ -1,10 +1,16 @@
 package com.pcs.daejeon.config;
 
 import com.pcs.daejeon.config.auth.JwtUserDetailsService;
+import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.config.handler.CustomUrlAuthenticationFailHandler;
 import com.pcs.daejeon.config.handler.CustomUrlAuthenticationSuccessHandler;
 import com.pcs.daejeon.config.oauth.JwtAuthenticationFilter;
 import com.pcs.daejeon.config.oauth.JwtConfig;
+import com.pcs.daejeon.dto.member.MemberInfoDto;
+import com.pcs.daejeon.dto.security.AccountResDto;
+import com.pcs.daejeon.entity.Member;
+import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.entity.sanction.Punish;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.RefreshTokenService;
 import com.pcs.daejeon.service.sanction.PunishService;
@@ -12,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -20,6 +29,8 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -28,6 +39,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
@@ -108,7 +121,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         return new CustomUrlAuthenticationSuccessHandler(
-                memberRepository, refreshTokenService,punishService, jwtConfig);
+                memberRepository, refreshTokenService, punishService, jwtConfig);
     }
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
