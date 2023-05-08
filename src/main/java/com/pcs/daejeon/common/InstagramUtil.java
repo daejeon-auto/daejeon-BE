@@ -54,7 +54,7 @@ public class InstagramUtil {
     public void convertPngToJpg(boolean isMealUpload) {
         try {
             File inputFile = new File(isMealUpload ?
-                    System.getProperty("user.dir") + "/src/mealTemplate.png" :
+                    System.getProperty("user.dir") + "/src/mealImage.png" :
                     System.getProperty("user.dir")+"/src/textImage.png");
             BufferedImage inputImage = ImageIO.read(inputFile);
 
@@ -76,7 +76,7 @@ public class InstagramUtil {
     public void mealUploadCaption(Object[] lines) {
         String[] meal = Arrays.stream(lines).map(Object::toString).toArray(String[]::new);
 
-        imageCaption("",  meal);
+        imageCaption(null,  meal);
         convertPngToJpg(true);
     }
 
@@ -87,9 +87,7 @@ public class InstagramUtil {
 
     private void imageCaption(String description, String[] meals) {
         try {
-            String imagePath = meals != null ?
-                    System.getProperty("user.dir") + "/src/mealTemplate.png" :
-                    System.getProperty("user.dir") + "/src/template.png";
+            String imagePath = System.getProperty("user.dir") + "/src/template.png";
 
             BufferedImage image = ImageIO.read(new File(imagePath));
 
@@ -103,18 +101,26 @@ public class InstagramUtil {
             // get the dimensions of the image and caption text
             int imageWidth = image.getWidth();
             int imageHeight = image.getHeight();
-            int captionMaxWidth = imageWidth - 400;
-            int captionHeight = g2d.getFontMetrics(font).getHeight();
+            FontMetrics fm = g2d.getFontMetrics(font);
 
-            String[] lines = null;
+            String[] lines;
 
-            if (meals != null) {
-                lines = splitTextIntoLines(description, font, captionMaxWidth);
+            if (meals == null) {
+                lines = splitTextIntoLines(description, font, imageWidth - 400);
+            } else {
+                lines = meals;
+            }
+
+            int maxWidth = 0;
+
+            for (String line : lines) {
+                if (maxWidth < fm.stringWidth(line)) maxWidth = fm.stringWidth(line);
             }
 
             // calculate the position to draw the caption in the center of the image
-            int x = (imageWidth - captionMaxWidth) / 2;
-            int y = (imageHeight + captionHeight) / 2;
+            int x = (imageWidth - maxWidth) / 2;
+            int captionHeight = g2d.getFontMetrics(font).getHeight();
+            int y = ((imageHeight - fm.getHeight()) / 3) + fm.getAscent();
 
             // draw the caption on the image
             g2d.setFont(font);
@@ -122,8 +128,9 @@ public class InstagramUtil {
 
             g2d.setFont(font);
             g2d.setColor(color);
-            for (int i = 0; i < (lines != null ? lines.length : meals.length); i++) {
-                g2d.drawString(lines != null ? lines[i] : meals[i], x, y + (i * captionHeight));
+
+            for (int i = 0; i < lines.length; i++) {
+                g2d.drawString(lines[i], x, y + (i * captionHeight));
             }
 
             // dispose of the graphics context
@@ -131,7 +138,7 @@ public class InstagramUtil {
 
             // save the image with the caption
             String newImagePath = meals != null ?
-                    System.getProperty("user.dir") + "/src/mealTemplate.png" :
+                    System.getProperty("user.dir") + "/src/mealImage.png" :
                     System.getProperty("user.dir") + "/src/textImage.png";
             ImageIO.write(image, "png", new File(newImagePath));
         } catch (Exception ex) {
