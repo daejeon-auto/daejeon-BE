@@ -124,4 +124,42 @@ public class SchoolController {
             return new ResponseEntity<>(new Result<>(null, true), status);
         }
     }
+
+    @PostMapping("/admin/school/active-meal")
+    public ResponseEntity<Result> activeMeal() {
+
+        try {
+            schoolService.activeMealUpload();
+
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (IllegalStateException e){
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found school")) status = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        } catch (Exception e) {
+            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+            log.info(e.getMessage());
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        }
+    }
+
+    @PostMapping("/admin/school/deactive-meal")
+    public ResponseEntity<Result> deactivateMeal() {
+
+        try {
+            schoolService.deactivateMealUpload();
+
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (IllegalStateException e){
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (e.getMessage().equals("not found school")) status = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        } catch (Exception e) {
+            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+            log.info(e.getMessage());
+            return new ResponseEntity<>(new Result<>(null, true), status);
+        }
+    }
 }
