@@ -2,12 +2,14 @@ package com.pcs.daejeon.controller;
 
 import com.github.instagram4j.instagram4j.IGClient;
 import com.github.instagram4j.instagram4j.exceptions.IGResponseException;
+import com.pcs.daejeon.common.InstagramUtil;
 import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.school.InstaInfoUpdateDto;
 import com.pcs.daejeon.dto.school.MealDto;
 import com.pcs.daejeon.dto.school.SchoolInfoDto;
 import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.repository.SchoolRepository;
 import com.pcs.daejeon.service.SchoolService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +31,7 @@ import java.util.List;
 public class SchoolController {
 
     private final SchoolService schoolService;
+    private final SchoolRepository schoolRepository;
     private final Util util;
 
     @PostMapping("/school/meal")
@@ -53,6 +61,7 @@ public class SchoolController {
             ).toList();
             return new ResponseEntity<>(new Result<>(allSchool, false), HttpStatus.OK);
         } catch (Exception e) {
+            log.error(e.getMessage());
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
