@@ -206,10 +206,10 @@ public class SchoolService {
                 if (now == 19 && mealServiceInfo.getBreakfast() != null) {
                     instagramUtil.mealUploadCaption(mealServiceInfo.getBreakfast());
                 }
-                if (now == 13 && mealServiceInfo.getLunch() != null) {
+                if (now == 8 && mealServiceInfo.getLunch() != null) {
                     instagramUtil.mealUploadCaption(mealServiceInfo.getLunch());
                 }
-                if (now == 113 && mealServiceInfo.getDinner() != null) {
+                if (now == 13 && mealServiceInfo.getDinner() != null) {
                     instagramUtil.mealUploadCaption(mealServiceInfo.getDinner());
                 }
 
