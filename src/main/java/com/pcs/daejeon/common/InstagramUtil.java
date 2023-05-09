@@ -148,7 +148,9 @@ public class InstagramUtil {
             }
 
             int captionHeight = g2d.getFontMetrics(font).getHeight();
-            int y = ((imageHeight - fm.getHeight()) / 3) + fm.getAscent() + 25;
+            int y = ((imageHeight - (captionHeight * lines.length)) / 2) + fm.getAscent();
+
+            if (meals != null) y += 75;
 
             // draw the caption on the image
             g2d.setFont(font);
