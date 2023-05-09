@@ -14,6 +14,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 public class InstagramUtil {
@@ -46,8 +51,29 @@ public class InstagramUtil {
         byte[] imgData = Files.readAllBytes(file.toPath());
         IGRequest<RuploadPhotoResponse> uploadReq = new RuploadPhotoRequest(imgData, "1");
         String id = client.sendRequest(uploadReq).join().getUpload_id();
+
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        System.out.println("now = " + now);
+
+        if (now.getHour() == 19) {
+            now = now.plusDays(1);
+        }
+
+        String today = now.format(DateTimeFormatter.ofPattern("MM월 dd일"));
+        String caption = "급식";
+
+        if (now.getHour() == 19 )
+            caption = "조식";
+        else if (now.getHour() == 8)
+            caption = "중식";
+        else if (now.getHour() == 13) {
+            caption = "석식";
+        }
+
         IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
-                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption(""));
+                // ex) 12월 23일 중식입니다.
+                new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption(isMeal ? today + " " + caption + "입니다." : ""));
         MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
     }
 
@@ -87,7 +113,9 @@ public class InstagramUtil {
 
     private void imageCaption(String description, String[] meals) {
         try {
-            String imagePath = System.getProperty("user.dir") + "/src/template.png";
+            String imagePath = meals != null ?
+                    System.getProperty("user.dir") + "/src/mealTemplate.png" :
+                    System.getProperty("user.dir") + "/src/template.png";
 
             BufferedImage image = ImageIO.read(new File(imagePath));
 
@@ -95,7 +123,9 @@ public class InstagramUtil {
             Graphics2D g2d = image.createGraphics();
 
             // set the font and color for the caption
-            Font font = Font.createFont(Font.TRUETYPE_FONT, new File(System.getProperty("user.dir") + "/src/NotoSansKR-Bold.otf")).deriveFont(Font.BOLD, 50f);
+            Font font = Font.createFont(Font.TRUETYPE_FONT,
+                    new File(System.getProperty("user.dir") + "/src/NotoSansKR-Bold.otf"))
+                    .deriveFont(Font.BOLD, meals != null ? 60f : 50f);
             Color color = Color.BLACK;
 
             // get the dimensions of the image and caption text
@@ -106,7 +136,7 @@ public class InstagramUtil {
             String[] lines;
 
             if (meals == null) {
-                lines = splitTextIntoLines(description, font, imageWidth - 400);
+                lines = splitTextIntoLines(description, font, imageWidth - 100);
             } else {
                 lines = meals;
             }
@@ -117,10 +147,8 @@ public class InstagramUtil {
                 if (maxWidth < fm.stringWidth(line)) maxWidth = fm.stringWidth(line);
             }
 
-            // calculate the position to draw the caption in the center of the image
-            int x = (imageWidth - maxWidth) / 2;
             int captionHeight = g2d.getFontMetrics(font).getHeight();
-            int y = ((imageHeight - fm.getHeight()) / 3) + fm.getAscent();
+            int y = ((imageHeight - fm.getHeight()) / 3) + fm.getAscent() + 25;
 
             // draw the caption on the image
             g2d.setFont(font);
@@ -130,6 +158,7 @@ public class InstagramUtil {
             g2d.setColor(color);
 
             for (int i = 0; i < lines.length; i++) {
+                int x = (imageWidth - fm.stringWidth(lines[i])) / 2;
                 g2d.drawString(lines[i], x, y + (i * captionHeight));
             }
 
