@@ -196,7 +196,7 @@ public class SchoolService {
     @Scheduled(fixedDelay = 3600000) // 1시간 반복
     public void uploadMeal() {
         int now = LocalDateTime.now(ZoneId.of("Asia/Seoul")).getHour();
-        if (!(now == 19 || now == 8 || now == 13)) return;
+        if (!(now == 19 || now == 6 || now == 13)) return;
 
         schoolRepository.findAllByUploadMealIsTrue().forEach(school -> {
             try {
@@ -206,7 +206,7 @@ public class SchoolService {
                 if (now == 19 && mealServiceInfo.getBreakfast() != null) {
                     instagramUtil.mealUploadCaption(mealServiceInfo.getBreakfast());
                 }
-                if (now == 8 && mealServiceInfo.getLunch() != null) {
+                if (now == 6 && mealServiceInfo.getLunch() != null) {
                     instagramUtil.mealUploadCaption(mealServiceInfo.getLunch());
                 }
                 if (now == 13 && mealServiceInfo.getDinner() != null) {
