@@ -126,8 +126,9 @@ public class InstagramUtil {
 
             // set the font and color for the caption
             Font font = Font.createFont(Font.TRUETYPE_FONT,
-                    new File(System.getProperty("user.dir") + "/src/NotoSansKR-Bold.otf"))
-                    .deriveFont(Font.BOLD, meals != null ? 60f : 50f);
+                    new File(System.getProperty("user.dir") +
+                            (meals != null ? "/src/GmarketSansBold.otf" : "/src/NotoSansKR-Bold.otf")))
+                    .deriveFont(Font.PLAIN, meals != null ? 70f : 50f);
             Color color = Color.BLACK;
 
             // get the dimensions of the image and caption text
@@ -150,6 +151,9 @@ public class InstagramUtil {
             }
 
             int captionHeight = g2d.getFontMetrics(font).getHeight();
+            if (meals != null) {
+                captionHeight += 15;
+            };
             int y = ((imageHeight - (captionHeight * lines.length)) / 2) + fm.getAscent();
 
             if (meals != null) y += 75;
@@ -162,7 +166,9 @@ public class InstagramUtil {
             g2d.setColor(color);
 
             for (int i = 0; i < lines.length; i++) {
-                int x = (imageWidth - fm.stringWidth(lines[i])) / 2;
+                int x = meals != null ?
+                        (imageWidth - fm.stringWidth(lines[i])) / 2 :
+                        (imageWidth - fm.stringWidth(lines[0])) / 2;
                 g2d.drawString(lines[i], x, y + (i * captionHeight));
             }
 
