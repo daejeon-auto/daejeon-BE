@@ -1,4 +1,9 @@
 spring:
+  redis:
+    host: localhost
+    port: 6379
+    password: koldin13579
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://db.inab.site:5432/dbmomin108902
