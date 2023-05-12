@@ -6,14 +6,14 @@ import com.pcs.daejeon.dto.sanction.report.AddReportBullyingDto;
 import com.pcs.daejeon.dto.school.SchoolRegistDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.NumChkCode;
-import com.pcs.daejeon.entity.sanction.ReportBullying;
 import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.entity.sanction.ReportBullying;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.NumChkCodeRepository;
-import com.pcs.daejeon.repository.sanction.ReportBullyingRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
+import com.pcs.daejeon.repository.sanction.ReportBullyingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.sdk.NurigoApp;
@@ -73,7 +73,24 @@ public class MemberService {
             byPhoneNumber.get().setCode(code);
         }
 
-        message.setText("[INAB] 대신전해드립니다 - 가입번호 ["+code+"]");
+        message.setText("[INAB] AnonPost - 가입번호 ["+code+"]");
+
+        SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+    }
+
+    public void pushAuthCode(String phoneNumber, String code) {
+        Optional<NumChkCode> byPhoneNumber = numChkCodeRepository.findByPhoneNumber(phoneNumber);
+
+        Message message = new Message();
+
+        message.setFrom("01027729778");
+        message.setTo(phoneNumber);
+
+        if (byPhoneNumber.isEmpty()) {
+            throw new IllegalStateException("phone number not found");
+        }
+
+        message.setText("[INAB] AnonPost - 인증 코드 ["+code+"]");
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }

@@ -1,11 +1,8 @@
-package com.pcs.daejeon.repository;
+package com.pcs.daejeon.repository.redis;
 
-import com.pcs.daejeon.entity.Session;
+import com.pcs.daejeon.entity.redis.Session;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.LinkedHashMap;
 
 @Component
 /**

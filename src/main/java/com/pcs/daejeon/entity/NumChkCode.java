@@ -1,6 +1,8 @@
 package com.pcs.daejeon.entity;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -9,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class NumChkCode {
 
-    @Id @Column(name = "num_chk_code_id")
+    @Id @Column(name = "chk_code_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

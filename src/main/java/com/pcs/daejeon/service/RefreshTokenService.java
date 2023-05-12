@@ -2,8 +2,8 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.config.oauth.JwtConfig;
-import com.pcs.daejeon.entity.Session;
-import com.pcs.daejeon.repository.RefreshSessionRepository;
+import com.pcs.daejeon.entity.redis.Session;
+import com.pcs.daejeon.repository.redis.RefreshSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UserDetails;
