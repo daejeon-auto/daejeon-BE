@@ -1,7 +1,8 @@
 spring:
   redis:
-    host: localhost
-    port: 6379
+    host: pcs.pah.kr
+    port: 1101
+    user: default
     password: koldin13579
 
   datasource:

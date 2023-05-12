@@ -46,7 +46,7 @@ dependencies {
 //	database
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.27'
 	runtimeOnly 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.4.10'
 	implementation("com.h2database:h2")
 
 	implementation ('org.springframework.boot:spring-boot-starter-web') {
