@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@RedisHash(value = "refresh-session", timeToLive = -1L)
+@RedisHash(value = "refresh_session", timeToLive = -1L)
 public class Session {
 
     @Id

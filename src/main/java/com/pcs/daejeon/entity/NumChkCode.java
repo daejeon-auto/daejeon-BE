@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class NumChkCode {
 
-    @Id @Column(name = "chk_code_id")
+    @Id @Column(name = "num_chk_code_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

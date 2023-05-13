@@ -5,8 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-/**
- * tomcat 내장 메모리 세션
- */
 public interface RefreshSessionRepository extends CrudRepository<Session, String> {
 }

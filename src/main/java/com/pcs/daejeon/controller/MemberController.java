@@ -4,6 +4,7 @@ import com.pcs.daejeon.common.Result;
 import com.pcs.daejeon.common.Util;
 import com.pcs.daejeon.dto.chkCode.ChkCodeDto;
 import com.pcs.daejeon.dto.chkCode.PushCodeDto;
+import com.pcs.daejeon.dto.member.ChangePwdDto;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.member.SignUpAdminDto;
 import com.pcs.daejeon.dto.member.SignUpDto;
@@ -37,6 +38,8 @@ public class MemberController {
     private final RefreshTokenService refreshTokenService;
     private final Util util;
 
+    // ======== 인증 관련 ========
+
     @PostMapping("/push-chk-code")
     public ResponseEntity<Result> pushChkCode(@RequestBody @Valid PushCodeDto pushCodeDto) {
 
@@ -62,6 +65,61 @@ public class MemberController {
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/push-auth-code")
+    public ResponseEntity<Result> pushAuthCode(@RequestBody @Valid PushCodeDto pushCodeDto) {
+
+        try {
+            memberService.pushAuthCode(pushCodeDto.getPhoneNumber());
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/chk-auth-code")
+    public ResponseEntity<Result> chkAuthCode(@RequestBody @Valid ChkCodeDto chkCodeDto) {
+
+        try {
+            boolean isCheck = memberService.checkAuthCode(
+                    String.valueOf(chkCodeDto.getCode()),
+                    chkCodeDto.getPhoneNumber());
+
+            return new ResponseEntity<>(new Result<>(null, !isCheck),
+                    isCheck ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/password/change")
+    public ResponseEntity<Result> changePassword(@RequestBody @Valid ChangePwdDto changePwdDto) {
+
+        try {
+            memberService.changePassword(
+                    changePwdDto.getNewPassword(),
+                    changePwdDto.getPhoneNumber());
+
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            if (Objects.equals(e.getMessage(), "can not change password")) {
+                status = HttpStatus.BAD_REQUEST;
+            }
+
+            if (Objects.equals(e.getMessage(), "member not found")) {
+                status = HttpStatus.NOT_FOUND;
+            }
+
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), status);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    // ======== 인증 관련 ========
 
     @PostMapping("/sign-up")
     public ResponseEntity<Result<String>> signUp(@RequestBody @Valid SignUpDto signUpDto) {
