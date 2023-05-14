@@ -8,6 +8,7 @@ import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.NumChkCode;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.redis.AuthCodeSession;
+import com.pcs.daejeon.entity.redis.ChangeablePwd;
 import com.pcs.daejeon.entity.sanction.ReportBullying;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
@@ -15,6 +16,7 @@ import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.NumChkCodeRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
 import com.pcs.daejeon.repository.redis.AuthCodeSessionRepository;
+import com.pcs.daejeon.repository.redis.ChangeablePwdRepository;
 import com.pcs.daejeon.repository.sanction.ReportBullyingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -45,6 +47,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final NumChkCodeRepository numChkCodeRepository;
     private final AuthCodeSessionRepository authCodeSessionRepository;
+    private final ChangeablePwdRepository changeablePwdRepository;
     private final SchoolRepository schoolRepository;
     private final ReportBullyingRepository reportBullyingRepository;
     private final PasswordEncoder pwdEncoder;
@@ -133,23 +136,23 @@ public class MemberService {
             return false;
         }
 
-        Member member = memberRepository.findByLoginId(byLoginId.get().getLoginId());
-        member.setCanPwdChange(true);
+        ChangeablePwd changeablePwd = new ChangeablePwd(phoneNumber, byLoginId.get().getLoginId());
+        changeablePwdRepository.save(changeablePwd);
 
         authCodeSessionRepository.delete(byLoginId.get());
         return true;
     }
 
     public void changePassword(String pwd, String phoneNumber) {
+        Optional<ChangeablePwd> byId = changeablePwdRepository.findById(phoneNumber);
+        if (byId.isEmpty()) {
+            throw new IllegalStateException("can not change password");
+        }
+
         Member member = memberRepository.findByPhoneNumber(phoneNumber);
 
         if (member == null) {
             throw new IllegalStateException("member not found");
-        }
-
-        // canPwdChange가 false일 때
-        if (!member.isCanPwdChange()) {
-            throw new IllegalStateException("can not change password");
         }
 
         member.setPassword(pwdEncoder.encode(pwd));

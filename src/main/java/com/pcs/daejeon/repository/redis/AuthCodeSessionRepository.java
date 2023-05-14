@@ -9,6 +9,5 @@ import java.util.Optional;
 @Component
 public interface AuthCodeSessionRepository extends CrudRepository<AuthCodeSession, String> {
     Optional<AuthCodeSession> findByLoginId(String loginId);
-    Optional<AuthCodeSession> findByPhoneNumberAndCode(String phoneNumber, String code);
 
 }

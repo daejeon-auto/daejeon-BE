@@ -51,11 +51,6 @@ public class Member extends BasicTime {
     private String password;
 
     /**
-     * 비밀번호 변경이 가능한지
-     */
-    private boolean canPwdChange = false;
-
-    /**
      * 로그인 실패 횟수
      */
     private int failCnt = 0;
@@ -96,10 +91,6 @@ public class Member extends BasicTime {
 
     public void resetFailCnt() {
         this.failCnt = 0;
-    }
-
-    public void setCanPwdChange(boolean canPwdChange) {
-        this.canPwdChange = canPwdChange;
     }
 
     public void setPassword(String password) {
