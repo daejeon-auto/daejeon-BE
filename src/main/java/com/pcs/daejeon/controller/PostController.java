@@ -106,16 +106,16 @@ public class PostController {
                     throw new IllegalArgumentException("limited account");
             });
 
-            postService.writePost(post.getDescription());
+            postService.writePost(post.getDescription(), post.getSchoolId());
 
             return new ResponseEntity<>(new Result<>("success"), HttpStatus.OK);
         } catch (IllegalArgumentException | MethodArgumentNotValidException e) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
 
             if (Objects.equals(e.getMessage(), "limited account")) status = HttpStatus.FORBIDDEN;
+            if (Objects.equals(e.getMessage(), "school is different")) status = HttpStatus.FORBIDDEN;
 
-            return new ResponseEntity<>(new Result<>(status == HttpStatus.FORBIDDEN ?
-                    "계정이 일부 기능 정지 상태입니다." : null, true), status);
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), status);
         } catch (Exception e) {
             log.error("e = " + e);
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);

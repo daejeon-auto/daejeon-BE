@@ -2,7 +2,8 @@ package com.pcs.daejeon.service;
 
 import com.pcs.daejeon.config.auth.PrincipalDetails;
 import com.pcs.daejeon.config.oauth.JwtConfig;
-import com.pcs.daejeon.repository.RefreshSessionRepository;
+import com.pcs.daejeon.entity.redis.Session;
+import com.pcs.daejeon.repository.redis.RefreshSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +28,9 @@ public class RefreshTokenService {
     public void setRefreshToken(String token) {
         long validityInMilliseconds = 1000L * 60 * 60 * 24 * 30;
         Date validity = new Date(new Date().getTime() + validityInMilliseconds);
-        
-        refreshSessionRepository.addData(token, validity);
+
+        Session session = new Session(token, validity);
+        refreshSessionRepository.save(session);
     }
 
     /**
@@ -39,12 +42,14 @@ public class RefreshTokenService {
         // 토큰 유효성 검사
         if (token == null || !jwtConfig.validateToken(token)) return null;
 
-        Date expiredDate = refreshSessionRepository.getData(token);
-        if (expiredDate == null) return null;
+        Optional<Session> session = refreshSessionRepository.findById(token);
+        if (session.isEmpty()) return null;
+
+        Date expiredDate = session.get().getExpiredDate();
 
         // expire 된 토큰이면 삭제후 null return
-        if (validRefreshToken(expiredDate)) {
-            refreshSessionRepository.removeData(token);
+        if (expiredDate == null || validRefreshToken(expiredDate)) {
+            refreshSessionRepository.deleteById(token);
             return null;
         }
 

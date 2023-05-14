@@ -1,4 +1,10 @@
 spring:
+  redis:
+    host: pcs.pah.kr
+    port: 1101
+    user: default
+    password: koldin13579
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://db.inab.site:5432/dbmomin108902

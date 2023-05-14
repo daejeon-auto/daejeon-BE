@@ -6,14 +6,18 @@ import com.pcs.daejeon.dto.sanction.report.AddReportBullyingDto;
 import com.pcs.daejeon.dto.school.SchoolRegistDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.NumChkCode;
-import com.pcs.daejeon.entity.sanction.ReportBullying;
 import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.entity.redis.AuthCodeSession;
+import com.pcs.daejeon.entity.redis.ChangeablePwd;
+import com.pcs.daejeon.entity.sanction.ReportBullying;
 import com.pcs.daejeon.entity.type.MemberType;
 import com.pcs.daejeon.entity.type.RoleTier;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.repository.NumChkCodeRepository;
-import com.pcs.daejeon.repository.sanction.ReportBullyingRepository;
 import com.pcs.daejeon.repository.SchoolRepository;
+import com.pcs.daejeon.repository.redis.AuthCodeSessionRepository;
+import com.pcs.daejeon.repository.redis.ChangeablePwdRepository;
+import com.pcs.daejeon.repository.sanction.ReportBullyingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.sdk.NurigoApp;
@@ -21,6 +25,7 @@ import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -41,8 +46,11 @@ public class MemberService {
     final DefaultMessageService messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
     private final MemberRepository memberRepository;
     private final NumChkCodeRepository numChkCodeRepository;
+    private final AuthCodeSessionRepository authCodeSessionRepository;
+    private final ChangeablePwdRepository changeablePwdRepository;
     private final SchoolRepository schoolRepository;
     private final ReportBullyingRepository reportBullyingRepository;
+    private final PasswordEncoder pwdEncoder;
     private final Util util;
 
 
@@ -65,7 +73,7 @@ public class MemberService {
         message.setFrom("01027729778");
         message.setTo(phoneNumber);
 
-        int code = generateUniqueCode();
+        int code = numChkCodeGenerator();
 
         if (byPhoneNumber.isEmpty()) {
             numChkCodeRepository.save(new NumChkCode(code, phoneNumber));
@@ -73,7 +81,36 @@ public class MemberService {
             byPhoneNumber.get().setCode(code);
         }
 
-        message.setText("[INAB] 대신전해드립니다 - 가입번호 ["+code+"]");
+        message.setText("[INAB] AnonPost - 가입번호 ["+code+"]");
+
+        SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+    }
+
+    public void pushAuthCode(String phoneNumber) {
+
+        Member byPhoneNumber = memberRepository.findByPhoneNumber(phoneNumber);
+        if (byPhoneNumber == null) {
+            throw new IllegalStateException("member not found");
+        }
+
+        String code = String.valueOf(generateUniqueCode());
+
+        Optional<AuthCodeSession> byLoginId = authCodeSessionRepository.findByLoginId(byPhoneNumber.getLoginId());
+
+        Message message = new Message();
+
+        message.setFrom("01027729778");
+        message.setTo(phoneNumber);
+
+        if (byLoginId.isEmpty()) {
+            AuthCodeSession session = new AuthCodeSession(
+                    phoneNumber, byPhoneNumber.getLoginId(), code);
+            authCodeSessionRepository.save(session);
+        } else {
+            byLoginId.get().setCode(code);
+        }
+
+        message.setText("[INAB] AnonPost - 인증 코드 ["+code+"]");
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
@@ -89,14 +126,63 @@ public class MemberService {
         return true;
     }
 
+    public boolean checkAuthCode(String code, String phoneNumber) {
+        Optional<AuthCodeSession> byLoginId = authCodeSessionRepository
+                .findById(phoneNumber);
+
+        Iterable<AuthCodeSession> all = authCodeSessionRepository.findAll();
+
+        if (byLoginId.isEmpty()) {
+            return false;
+        }
+
+        ChangeablePwd changeablePwd = new ChangeablePwd(phoneNumber, byLoginId.get().getLoginId());
+        changeablePwdRepository.save(changeablePwd);
+
+        authCodeSessionRepository.delete(byLoginId.get());
+        return true;
+    }
+
+    public void changePassword(String pwd, String phoneNumber) {
+        Optional<ChangeablePwd> byId = changeablePwdRepository.findById(phoneNumber);
+        if (byId.isEmpty()) {
+            throw new IllegalStateException("can not change password");
+        }
+
+        Member member = memberRepository.findByPhoneNumber(phoneNumber);
+
+        if (member == null) {
+            throw new IllegalStateException("member not found");
+        }
+
+        member.setPassword(pwdEncoder.encode(pwd));
+    }
+
     private int generateUniqueCode() {
         Random random = new Random();
         random.setSeed(System.currentTimeMillis());
         int code = random.nextInt(0, 100001);
+
+        return code;
+    }
+
+    private int numChkCodeGenerator() {
+        int code = generateUniqueCode();
         Optional<NumChkCode> byCode = numChkCodeRepository.findByCode(code);
 
         // 만약 코드가 있다면 새로운 코드 뽑기
         if (byCode.isPresent()) {
+            return generateUniqueCode();
+        }
+        return code;
+    }
+
+    private int authCodeGenerator() {
+        int code = generateUniqueCode();
+        Optional<AuthCodeSession> authCodeSession = authCodeSessionRepository.findById(String.valueOf(code));
+
+        // 만약 코드가 있다면 새로운 코드 뽑기
+        if (authCodeSession.isPresent()) {
             return generateUniqueCode();
         }
         return code;

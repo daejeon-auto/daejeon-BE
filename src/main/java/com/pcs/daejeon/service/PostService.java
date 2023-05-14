@@ -41,7 +41,7 @@ public class PostService {
     private final Util util;
     //    private final IGClient client;
 
-    public Long writePost(String description) throws MethodArgumentNotValidException {
+    public Long writePost(String description, Long schoolid) throws MethodArgumentNotValidException {
         description = description.replace("\n", " ");
 
 //        ------------- 욕설 필터링 임시 해지 --------------
@@ -51,6 +51,11 @@ public class PostService {
 //        }
 
         Member loginMember = util.getLoginMember();
+
+        if (!Objects.equals(loginMember.getSchool().getId(), schoolid)) {
+            throw new IllegalArgumentException("school is different");
+        }
+
         Post save = postRepository.save(new Post(description, loginMember.getSchool()));
         return save.getId();
     }

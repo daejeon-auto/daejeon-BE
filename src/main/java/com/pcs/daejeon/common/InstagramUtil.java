@@ -7,6 +7,7 @@ import com.github.instagram4j.instagram4j.requests.media.MediaConfigureTimelineR
 import com.github.instagram4j.instagram4j.requests.upload.RuploadPhotoRequest;
 import com.github.instagram4j.instagram4j.responses.media.MediaResponse;
 import com.github.instagram4j.instagram4j.responses.media.RuploadPhotoResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -14,13 +15,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
+@Slf4j
 public class InstagramUtil {
 
     private IGClient igClient(String instaId, String instaPwd) throws IGLoginException {
@@ -54,8 +54,6 @@ public class InstagramUtil {
 
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
-        System.out.println("now = " + now);
-
         if (now.getHour() == 19) {
             now = now.plusDays(1);
         }
@@ -65,7 +63,7 @@ public class InstagramUtil {
 
         if (now.getHour() == 19 )
             caption = "조식";
-        else if (now.getHour() == 8)
+        else if (now.getHour() == 6)
             caption = "중식";
         else if (now.getHour() == 13) {
             caption = "석식";
@@ -75,6 +73,10 @@ public class InstagramUtil {
                 // ex) 12월 23일 중식입니다.
                 new MediaConfigureTimelineRequest.MediaConfigurePayload().upload_id(id).caption(isMeal ? today + " " + caption + "입니다." : ""));
         MediaResponse.MediaConfigureTimelineResponse response = client.sendRequest(configReq).join();
+
+        if (response.getStatusCode() != 200) {
+            log.error("Error: " + response.getError_type());
+        }
     }
 
     public void convertPngToJpg(boolean isMealUpload) {
@@ -124,8 +126,9 @@ public class InstagramUtil {
 
             // set the font and color for the caption
             Font font = Font.createFont(Font.TRUETYPE_FONT,
-                    new File(System.getProperty("user.dir") + "/src/NotoSansKR-Bold.otf"))
-                    .deriveFont(Font.BOLD, meals != null ? 60f : 50f);
+                    new File(System.getProperty("user.dir") +
+                            (meals != null ? "/src/GmarketSansBold.otf" : "/src/NotoSansKR-Bold.otf")))
+                    .deriveFont(Font.PLAIN, meals != null ? 70f : 50f);
             Color color = Color.BLACK;
 
             // get the dimensions of the image and caption text
@@ -148,6 +151,9 @@ public class InstagramUtil {
             }
 
             int captionHeight = g2d.getFontMetrics(font).getHeight();
+            if (meals != null) {
+                captionHeight += 15;
+            };
             int y = ((imageHeight - (captionHeight * lines.length)) / 2) + fm.getAscent();
 
             if (meals != null) y += 75;
@@ -160,7 +166,9 @@ public class InstagramUtil {
             g2d.setColor(color);
 
             for (int i = 0; i < lines.length; i++) {
-                int x = (imageWidth - fm.stringWidth(lines[i])) / 2;
+                int x = meals != null ?
+                        (imageWidth - fm.stringWidth(lines[i])) / 2 :
+                        (imageWidth - fm.stringWidth(lines[0])) / 2;
                 g2d.drawString(lines[i], x, y + (i * captionHeight));
             }
 

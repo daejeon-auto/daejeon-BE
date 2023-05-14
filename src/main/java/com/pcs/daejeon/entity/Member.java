@@ -93,6 +93,10 @@ public class Member extends BasicTime {
         this.failCnt = 0;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Member(String phoneNumber, String password, String loginId, School school) {
         this.phoneNumber = phoneNumber;
         this.password = password;
