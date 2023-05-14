@@ -193,7 +193,7 @@ public class SchoolService {
         school.setUploadMeal(false);
     }
 
-    @Scheduled(fixedDelay = 3600000) // 1시간 반복
+    @Scheduled(cron="0 6,13,19 * * *") // 1시간 반복
     public void uploadMeal() {
         int now = LocalDateTime.now(ZoneId.of("Asia/Seoul")).getHour();
         if (!(now == 19 || now == 6 || now == 13)) return;
