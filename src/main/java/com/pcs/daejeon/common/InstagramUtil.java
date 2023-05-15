@@ -32,15 +32,15 @@ public class InstagramUtil {
         return client;
     }
 
-    public void uploadMeal(String instaId, String instaPwd, String salt) throws Exception {
-        uploadToInstagram(instaId, instaPwd, salt, true);
+    public void uploadMeal(String instaId, String instaPwd, String salt, String caption) throws Exception {
+        uploadToInstagram(instaId, instaPwd, salt, true, caption);
     }
 
     public void uploadToInstagram(String instaId, String instaPwd, String salt) throws Exception {
-        uploadToInstagram(instaId, instaPwd, salt, false);
+        uploadToInstagram(instaId, instaPwd, salt, false, null);
     }
 
-    private void uploadToInstagram(String instaId, String instaPwd, String salt, boolean isMeal) throws Exception {
+    private void uploadToInstagram(String instaId, String instaPwd, String salt, boolean isMeal, String caption) throws Exception {
         String decryptedInstaId = Util.decrypt(instaId, salt);
         String decryptedInstaPwd = Util.decrypt(instaPwd, salt);
 
@@ -59,15 +59,7 @@ public class InstagramUtil {
         }
 
         String today = now.format(DateTimeFormatter.ofPattern("MM월 dd일"));
-        String caption = "급식";
-
-        if (now.getHour() == 19 )
-            caption = "조식";
-        else if (now.getHour() == 6)
-            caption = "중식";
-        else if (now.getHour() == 13) {
-            caption = "석식";
-        }
+        if (caption == null) caption = "급식";
 
         IGRequest<MediaResponse.MediaConfigureTimelineResponse> configReq = new MediaConfigureTimelineRequest(
                 // ex) 12월 23일 중식입니다.
