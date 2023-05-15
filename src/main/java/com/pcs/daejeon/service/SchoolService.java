@@ -204,23 +204,25 @@ public class SchoolService {
                 String caption = null;
 
                 if (now == 19 && mealServiceInfo.getBreakfast() != null) {
-                    instagramUtil.mealUploadCaption(mealServiceInfo.getBreakfast());
                     caption = "조식";
+                    instagramUtil.mealUploadCaption(mealServiceInfo.getBreakfast());
                 }
                 if (now == 6 && mealServiceInfo.getLunch() != null) {
-                    instagramUtil.mealUploadCaption(mealServiceInfo.getLunch());
                     caption = "중식";
+                    instagramUtil.mealUploadCaption(mealServiceInfo.getLunch());
                 }
                 if (now == 13 && mealServiceInfo.getDinner() != null) {
-                    instagramUtil.mealUploadCaption(mealServiceInfo.getDinner());
                     caption = "석식";
+                    instagramUtil.mealUploadCaption(mealServiceInfo.getDinner());
                 }
 
-                instagramUtil.uploadMeal(
-                        school.getInstaId(),
-                        school.getInstaPwd(),
-                        school.getSalt(),
-                        caption);
+                if (caption != null) {
+                    instagramUtil.uploadMeal(
+                            school.getInstaId(),
+                            school.getInstaPwd(),
+                            school.getSalt(),
+                            caption);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
