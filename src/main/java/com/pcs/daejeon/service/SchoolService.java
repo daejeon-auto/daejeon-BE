@@ -202,21 +202,27 @@ public class SchoolService {
             try {
                 MealDto mealServiceInfo = getMealServiceInfo(school.getCode(), school.getLocationCode());
                 InstagramUtil instagramUtil = new InstagramUtil();
+                boolean work = false;
 
                 if (now == 19 && mealServiceInfo.getBreakfast() != null) {
                     instagramUtil.mealUploadCaption(mealServiceInfo.getBreakfast());
+                    work = true;
                 }
                 if (now == 6 && mealServiceInfo.getLunch() != null) {
                     instagramUtil.mealUploadCaption(mealServiceInfo.getLunch());
+                    work = true;
                 }
                 if (now == 13 && mealServiceInfo.getDinner() != null) {
                     instagramUtil.mealUploadCaption(mealServiceInfo.getDinner());
+                    work = true;
                 }
 
-                instagramUtil.uploadMeal(
-                        school.getInstaId(),
-                        school.getInstaPwd(),
-                        school.getSalt());
+                if (work) {
+                    instagramUtil.uploadMeal(
+                            school.getInstaId(),
+                            school.getInstaPwd(),
+                            school.getSalt());
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
