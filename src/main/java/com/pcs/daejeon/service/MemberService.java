@@ -155,6 +155,7 @@ public class MemberService {
         }
 
         member.setPassword(pwdEncoder.encode(pwd));
+        changeablePwdRepository.delete(byId.get());
     }
 
     private int generateUniqueCode() {
