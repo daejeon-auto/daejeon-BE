@@ -87,7 +87,7 @@ public class MemberController {
                     chkCodeDto.getPhoneNumber());
 
             return new ResponseEntity<>(new Result<>(null, !isCheck),
-                    isCheck ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+                    isCheck ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(new Result<>(null, true), HttpStatus.INTERNAL_SERVER_ERROR);

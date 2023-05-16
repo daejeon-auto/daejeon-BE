@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
@@ -130,9 +131,7 @@ public class MemberService {
         Optional<AuthCodeSession> byLoginId = authCodeSessionRepository
                 .findById(phoneNumber);
 
-        Iterable<AuthCodeSession> all = authCodeSessionRepository.findAll();
-
-        if (byLoginId.isEmpty()) {
+        if (byLoginId.isEmpty() || !Objects.equals(byLoginId.get().getCode(), code)) {
             return false;
         }
 
