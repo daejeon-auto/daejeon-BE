@@ -196,32 +196,32 @@ public class SchoolService {
     @Scheduled(cron="0 0 6,13,19 * * *") // 1시간 반복
     public void uploadMeal() {
         int now = LocalDateTime.now(ZoneId.of("Asia/Seoul")).getHour();
-        if (!(now == 19 || now == 6 || now == 13)) return;
 
         schoolRepository.findAllByUploadMealIsTrue().forEach(school -> {
             try {
                 MealDto mealServiceInfo = getMealServiceInfo(school.getCode(), school.getLocationCode());
                 InstagramUtil instagramUtil = new InstagramUtil();
-                boolean work = false;
+                String caption = null;
 
                 if (now == 19 && mealServiceInfo.getBreakfast() != null) {
+                    caption = "조식";
                     instagramUtil.mealUploadCaption(mealServiceInfo.getBreakfast());
-                    work = true;
                 }
                 if (now == 6 && mealServiceInfo.getLunch() != null) {
+                    caption = "중식";
                     instagramUtil.mealUploadCaption(mealServiceInfo.getLunch());
-                    work = true;
                 }
                 if (now == 13 && mealServiceInfo.getDinner() != null) {
+                    caption = "석식";
                     instagramUtil.mealUploadCaption(mealServiceInfo.getDinner());
-                    work = true;
                 }
 
-                if (work) {
+                if (caption != null) {
                     instagramUtil.uploadMeal(
                             school.getInstaId(),
                             school.getInstaPwd(),
-                            school.getSalt());
+                            school.getSalt(),
+                            caption);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
