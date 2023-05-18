@@ -11,6 +11,9 @@ import com.pcs.daejeon.dto.school.SchoolInfoDto;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.repository.SchoolRepository;
 import com.pcs.daejeon.service.SchoolService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -169,6 +173,23 @@ public class SchoolController {
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
             log.info(e.getMessage());
             return new ResponseEntity<>(new Result<>(null, true), status);
+        }
+    }
+
+    @PostMapping("/admin/school/remove")
+    public ResponseEntity<Result> schoolRemove() {
+
+        try {
+            schoolService.schoolRemove();
+            return new ResponseEntity<>(new Result<>(null, false), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+
+            if(Objects.equals(e.getMessage(), "school not found")) status = HttpStatus.BAD_REQUEST;
+
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), status);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

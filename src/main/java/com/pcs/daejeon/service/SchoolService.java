@@ -50,6 +50,15 @@ public class SchoolService {
         return school.get();
     }
 
+    public void schoolRemove() {
+        Member loginMember = util.getLoginMember();
+
+        Optional<School> school = schoolRepository.findById(loginMember.getSchool().getId());
+        if (school.isEmpty()) throw new IllegalStateException("school not found");
+
+        schoolRepository.deleteById(school.get().getId());
+    }
+
     public MealDto getMealServiceInfo(
             String schoolCode,        // 학교 코드
             String ATPT_OFCDC_SC_CODE // 교육청 코드
