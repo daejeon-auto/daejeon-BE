@@ -16,6 +16,7 @@ import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
+// post, like, report, punish에 영속.
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BasicTime {
@@ -55,7 +56,9 @@ public class Member extends BasicTime {
      */
     private int failCnt = 0;
 
-    @OneToMany(mappedBy = "likedBy")
+    @OneToMany(mappedBy = "likedBy",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     @JsonIgnore
     private final List<Like> like = new ArrayList<>();
 
@@ -69,7 +72,8 @@ public class Member extends BasicTime {
     private School school;
 
     @OneToMany(mappedBy = "member",
-            fetch = FetchType.LAZY)
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Punish> punish;
 

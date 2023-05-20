@@ -34,7 +34,6 @@ public class SchoolService {
 
     private final Util util;
     private final SchoolRepository schoolRepository;
-
     public List<School> findAllSchool() {
         return schoolRepository.findAll();
     }
@@ -56,7 +55,7 @@ public class SchoolService {
         Optional<School> school = schoolRepository.findById(loginMember.getSchool().getId());
         if (school.isEmpty()) throw new IllegalStateException("school not found");
 
-        schoolRepository.deleteById(school.get().getId());
+        schoolRepository.delete(school.get());
     }
 
     public MealDto getMealServiceInfo(
@@ -205,6 +204,9 @@ public class SchoolService {
     @Scheduled(cron="0 0 6,13,19 * * *") // 1시간 반복
     public void uploadMeal() {
         int now = LocalDateTime.now(ZoneId.of("Asia/Seoul")).getHour();
+
+        System.out.println("work");
+        System.out.println("now = " + now);
 
         schoolRepository.findAllByUploadMealIsTrue().forEach(school -> {
             try {

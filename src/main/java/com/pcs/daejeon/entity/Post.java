@@ -27,22 +27,27 @@ public class Post extends BasicEntity {
     @NotNull
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne @JsonIgnore
     @JoinColumn(name = "member_id")
-    @JsonIgnore
     private Member createByMember;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY,
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<Like> like;
 
-    @OneToMany(mappedBy = "reportedPost", cascade = CascadeType.ALL)
-    private List<Report> reports = new ArrayList<>();
+    @OneToMany(mappedBy = "reportedPost",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private final List<Report> reports = new ArrayList<>();
 
     // 어느 학교의 게시글인지 확인
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "school_id")
-    private School  school;
+    private School school;
 
     public Post() {}
 
