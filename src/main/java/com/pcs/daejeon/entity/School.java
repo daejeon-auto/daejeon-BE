@@ -22,13 +22,15 @@ public class School extends BasicTime {
 
     @OneToMany(
             fetch = FetchType.LAZY,
-            mappedBy = "school")
+            mappedBy = "school",
+            cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Member> student;
 
     @OneToMany(
             fetch = FetchType.LAZY,
-            mappedBy = "school")
+            mappedBy = "school",
+            cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Post> post;
 
