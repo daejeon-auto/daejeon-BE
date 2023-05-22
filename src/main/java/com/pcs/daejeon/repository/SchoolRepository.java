@@ -13,4 +13,5 @@ import java.util.List;
 public interface SchoolRepository extends JpaRepository<School, Long>, SchoolRepositoryCustom {
 
     List<School> findAllByUploadMealIsTrue();
+    School findByCode(String code);
 }
