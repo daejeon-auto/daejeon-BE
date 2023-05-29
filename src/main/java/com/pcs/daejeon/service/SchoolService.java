@@ -8,7 +8,9 @@ import com.pcs.daejeon.dto.school.MealApiDto;
 import com.pcs.daejeon.dto.school.MealDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
+import com.pcs.daejeon.entity.TodayMeal;
 import com.pcs.daejeon.repository.SchoolRepository;
+import com.pcs.daejeon.repository.TodayMealRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -34,6 +37,8 @@ public class SchoolService {
 
     private final Util util;
     private final SchoolRepository schoolRepository;
+    private final TodayMealRepository todayMealRepository;
+
     public List<School> findAllSchool() {
         return schoolRepository.findAll();
     }
@@ -55,13 +60,16 @@ public class SchoolService {
         Optional<School> school = schoolRepository.findById(loginMember.getSchool().getId());
         if (school.isEmpty()) throw new IllegalStateException("school not found");
 
-        schoolRepository.delete(school.get());
+        schoolRepository.deleteById(school.get().getId());
     }
 
     public MealDto getMealServiceInfo(
             String schoolCode,        // 학교 코드
             String ATPT_OFCDC_SC_CODE // 교육청 코드
     ) throws IOException {
+        MealDto dbMealInfo = getMealInfo(schoolCode);
+        if (dbMealInfo != null) return dbMealInfo;
+
         LocalDateTime now = LocalDateTime.now(java.time.ZoneId.of("Asia/Seoul"));
 
 
@@ -110,18 +118,65 @@ public class SchoolService {
         );
 
         MealDto meals = new MealDto();
+        School school = schoolRepository.findByCode(schoolCode);
 
-        rows.stream().forEach(val -> {
+        if (school.getTodayMeal() == null) {
+            TodayMeal toDayMealSave = todayMealRepository.save(new TodayMeal(school));
+            school.setTodayMeal(toDayMealSave);
+        }
+        TodayMeal todayMeal = school.getTodayMeal();
+
+        rows.forEach(val -> {
             Object[] dish = Arrays.stream(val.getDishName().split("<br/>")).map(br -> br.split(" ")[0]).toArray();
 
             String mealCode = val.getMealCode();
 
-            if (Objects.equals(mealCode, "1"))      meals.setBreakfast(dish);
-            else if (Objects.equals(mealCode, "2")) meals.setLunch(dish);
-            else if (Objects.equals(mealCode, "3")) meals.setDinner(dish);
+            // list to array
+            List<String> meal = new ArrayList<>();
+            for (Object object : dish) {
+                meal.add(object.toString());
+            }
+
+            if (Objects.equals(mealCode, "1")) {
+                meals.setBreakfast(dish);
+                todayMeal.setBreakfast(meal);
+            }
+            else if (Objects.equals(mealCode, "2")) {
+                meals.setLunch(dish);
+                todayMeal.setLunch(meal);
+            }
+            else if (Objects.equals(mealCode, "3")) {
+                meals.setDinner(dish);
+                todayMeal.setDinner(meal);
+            }
         });
 
         return meals;
+    }
+
+    private MealDto getMealInfo(String schoolCode) {
+        School school = schoolRepository.findByCode(schoolCode);
+
+        TodayMeal todayMeal = school.getTodayMeal();
+
+        if (todayMeal == null) return null;
+
+        LocalDateTime updatedDate = todayMeal.getUpdatedDate();
+        int month = updatedDate.getMonth().getValue();
+        int date = updatedDate.getDayOfMonth();
+
+        int nowMonth = LocalDateTime.now().getMonthValue();
+        int nowDate = LocalDateTime.now().getDayOfMonth();
+
+        if (month != nowMonth || date != nowDate) return null;
+
+        MealDto mealDto = new MealDto();
+
+        mealDto.setBreakfast(todayMeal.getBreakfast().toArray());
+        mealDto.setLunch(todayMeal.getLunch().toArray());
+        mealDto.setDinner(todayMeal.getDinner().toArray());
+
+        return mealDto;
     }
 
     /**
@@ -204,9 +259,6 @@ public class SchoolService {
     @Scheduled(cron="0 0 6,13,19 * * *") // 1시간 반복
     public void uploadMeal() {
         int now = LocalDateTime.now(ZoneId.of("Asia/Seoul")).getHour();
-
-        System.out.println("work");
-        System.out.println("now = " + now);
 
         schoolRepository.findAllByUploadMealIsTrue().forEach(school -> {
             try {
