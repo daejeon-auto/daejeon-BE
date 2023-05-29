@@ -47,8 +47,8 @@ public class SchoolController {
 
             return new ResponseEntity<>(new Result<>(mealServiceInfo, false), HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println("e = " + e);
-            return new ResponseEntity<>(new Result<>("", false), HttpStatus.INTERNAL_SERVER_ERROR);
+            e.printStackTrace();
+            return new ResponseEntity<>(new Result<>(e.getMessage(), true), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

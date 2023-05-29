@@ -23,14 +23,14 @@ public class School extends BasicTime {
     @OneToMany(
             fetch = FetchType.LAZY,
             mappedBy = "school",
-            cascade = CascadeType.REMOVE)
+            cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Member> student;
 
     @OneToMany(
             fetch = FetchType.LAZY,
             mappedBy = "school",
-            cascade = CascadeType.REMOVE)
+            cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Post> post;
 
@@ -38,6 +38,12 @@ public class School extends BasicTime {
     private String locate;
     private String code;
     private String locationCode;
+
+    @OneToOne(fetch = FetchType.LAZY,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL,
+            mappedBy = "school")
+    private TodayMeal todayMeal = new TodayMeal();
 
     private boolean uploadMeal = false;
 
@@ -53,7 +59,12 @@ public class School extends BasicTime {
         this.name = name;
         this.locate = locate;
         this.code = code;
+        this.todayMeal = new TodayMeal();
         this.locationCode = locationCode;
+    }
+
+    public void setTodayMeal(TodayMeal todayMeal) {
+        this.todayMeal = todayMeal;
     }
 
     public void setIsableInstagram(boolean isAbleInstagram) {
