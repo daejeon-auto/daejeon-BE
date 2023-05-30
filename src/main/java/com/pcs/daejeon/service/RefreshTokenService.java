@@ -1,7 +1,7 @@
 package com.pcs.daejeon.service;
 
-import com.pcs.daejeon.config.auth.PrincipalDetails;
-import com.pcs.daejeon.config.oauth.JwtConfig;
+import com.pcs.daejeon.config.security.auth.PrincipalDetails;
+import com.pcs.daejeon.config.security.oauth.JwtConfig;
 import com.pcs.daejeon.entity.redis.Session;
 import com.pcs.daejeon.repository.redis.RefreshSessionRepository;
 import lombok.RequiredArgsConstructor;

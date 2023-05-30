@@ -1,6 +1,6 @@
 package com.pcs.daejeon;
 
-import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.config.security.auth.PrincipalDetails;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
 import com.pcs.daejeon.entity.sanction.Punish;

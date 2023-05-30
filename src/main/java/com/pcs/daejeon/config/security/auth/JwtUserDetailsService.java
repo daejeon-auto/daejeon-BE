@@ -1,4 +1,4 @@
-package com.pcs.daejeon.config.auth;
+package com.pcs.daejeon.config.security.auth;
 
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.sanction.Punish;

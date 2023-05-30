@@ -1,4 +1,4 @@
-package com.pcs.daejeon.config.oauth;
+package com.pcs.daejeon.config.security.oauth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

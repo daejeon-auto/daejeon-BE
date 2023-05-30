@@ -1,6 +1,6 @@
-package com.pcs.daejeon.config.oauth;
+package com.pcs.daejeon.config.security.oauth;
 
-import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.config.security.auth.PrincipalDetails;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

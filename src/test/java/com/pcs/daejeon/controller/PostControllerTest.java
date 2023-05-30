@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pcs.daejeon.WithMockCustomUser;
 import com.pcs.daejeon.common.Result;
-import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.config.security.auth.PrincipalDetails;
 import com.pcs.daejeon.dto.post.PostDto;
 import com.pcs.daejeon.dto.post.PostListDto;
 import com.pcs.daejeon.entity.Member;

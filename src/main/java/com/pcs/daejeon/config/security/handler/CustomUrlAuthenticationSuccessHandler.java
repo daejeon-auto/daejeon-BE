@@ -1,7 +1,7 @@
-package com.pcs.daejeon.config.handler;
+package com.pcs.daejeon.config.security.handler;
 
-import com.pcs.daejeon.config.auth.PrincipalDetails;
-import com.pcs.daejeon.config.oauth.JwtConfig;
+import com.pcs.daejeon.config.security.auth.PrincipalDetails;
+import com.pcs.daejeon.config.security.oauth.JwtConfig;
 import com.pcs.daejeon.dto.member.MemberInfoDto;
 import com.pcs.daejeon.dto.security.AccountResDto;
 import com.pcs.daejeon.entity.Member;
@@ -11,20 +11,14 @@ import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.RefreshTokenService;
 import com.pcs.daejeon.service.sanction.PunishService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

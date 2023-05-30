@@ -2,7 +2,7 @@ package com.pcs.daejeon.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcs.daejeon.WithMockCustomUser;
-import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.config.security.auth.PrincipalDetails;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.repository.MemberRepository;

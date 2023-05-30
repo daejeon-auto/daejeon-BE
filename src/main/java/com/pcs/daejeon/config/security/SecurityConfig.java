@@ -1,10 +1,10 @@
-package com.pcs.daejeon.config;
+package com.pcs.daejeon.config.security;
 
-import com.pcs.daejeon.config.auth.JwtUserDetailsService;
-import com.pcs.daejeon.config.handler.CustomUrlAuthenticationFailHandler;
-import com.pcs.daejeon.config.handler.CustomUrlAuthenticationSuccessHandler;
-import com.pcs.daejeon.config.oauth.JwtAuthenticationFilter;
-import com.pcs.daejeon.config.oauth.JwtConfig;
+import com.pcs.daejeon.config.security.auth.JwtUserDetailsService;
+import com.pcs.daejeon.config.security.handler.CustomUrlAuthenticationFailHandler;
+import com.pcs.daejeon.config.security.handler.CustomUrlAuthenticationSuccessHandler;
+import com.pcs.daejeon.config.security.oauth.JwtAuthenticationFilter;
+import com.pcs.daejeon.config.security.oauth.JwtConfig;
 import com.pcs.daejeon.repository.MemberRepository;
 import com.pcs.daejeon.service.RefreshTokenService;
 import com.pcs.daejeon.service.sanction.PunishService;

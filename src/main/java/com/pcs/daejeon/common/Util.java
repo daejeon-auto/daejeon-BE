@@ -1,6 +1,6 @@
 package com.pcs.daejeon.common;
 
-import com.pcs.daejeon.config.auth.PrincipalDetails;
+import com.pcs.daejeon.config.security.auth.PrincipalDetails;
 import com.pcs.daejeon.dto.member.SignUpDto;
 import com.pcs.daejeon.entity.Member;
 import com.pcs.daejeon.entity.School;
